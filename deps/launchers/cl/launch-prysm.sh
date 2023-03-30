@@ -32,12 +32,6 @@ for var in "${env_vars[@]}" ; do
     fi
 done
 
-LOG_DIR="${LOG_DIR:-CONSENSUS_NODE_DIR}"
-if [[ ! -d "$LOG_DIR" ]]; then
-  mkdir -p "$LOG_DIR"
-fi
-echo "Logging to ${LOG_DIR}"
-
 # we can wait for the bootnode enr to drop before we get the signal to start up.
 while [ ! -f "$CONSENSUS_BOOTNODE_FILE" ]; do
   echo "consensus client waiting for bootnode enr file: $CONSENSUS_BOOTNODE_FILE"
@@ -50,7 +44,7 @@ while [ ! -f "$CONSENSUS_CHECKPOINT_FILE" ]; do
 done
 
 beacon-chain \
-  --log-file="$LOG_DIR/$HOSTNAME-$CONSENSUS_CLIENT-beacon.log" \
+  --log-file="$CONSENSUS_NODE_DIR/beacon.log" \
   --accept-terms-of-use=true \
   --datadir="$CONSENSUS_NODE_DIR" \
   --chain-config-file="$TESTNET_DIR/config.yaml" \
@@ -76,7 +70,7 @@ beacon-chain \
 sleep 10
 
 validator \
-  --log-file="$LOG_DIR/$HOSTNAME-$CONSENSUS_CLIENT-validator.log" \
+  --log-file="$CONSENSUS_NODE_DIR/validator.log" \
   --accept-terms-of-use=true \
   --datadir="$CONSENSUS_NODE_DIR" \
   --chain-config-file="$TESTNET_DIR/config.yaml" \
