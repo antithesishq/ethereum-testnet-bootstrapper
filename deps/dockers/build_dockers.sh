@@ -50,7 +50,7 @@ cd ../base-images/ || exit 1
 antithesis_log_step "Building etb-all-clients"
 build_image "etb-all-clients:minimal" "etb-all-clients_minimal.Dockerfile"
 build_image "etb-all-clients:minimal-fuzz" "etb-all-clients_minimal-fuzz.Dockerfile"
-podman build_image "etb-all-clients-inst:minimal" "etb-all-clients_minimal_inst.Dockerfile"
+build_image "etb-all-clients-inst:minimal" "etb-all-clients_minimal_inst.Dockerfile"
 
 # Check if failed images log contains entries
 if [ -s $FAILED_IMAGES_LOG ]; then
