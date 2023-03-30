@@ -3,10 +3,10 @@
 # $1: Image tag
 # $2: Dockerfile
 function build_image() {
-    if [ "${REBUILD_IMAGES}" == 1 ]; then
+    if [ "${NO_CACHE}" == 1 ]; then
         container_builder build --no-cache -t $1 -f $2 || record_image_failure $1
     else
-        container_builder build -t $1 -f $2 || record_image_failure $1 
+        container_builder build -t $1 -f $2 || record_image_failure $1
     fi
 }
 

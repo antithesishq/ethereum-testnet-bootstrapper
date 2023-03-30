@@ -13,7 +13,7 @@ rebuild-bootstrapper:
 build-etb-all-clients:
 	cd deps/dockers && ./build_dockers.sh
 rebuild-etb-all-clients:
-	cd deps/dockers && REBUILD_IMAGES=1 ./build_dockers.sh
+	cd deps/dockers && NO_CACHE=1 ./build_dockers.sh
 
 build-all-images: build-bootstrapper build-etb-all-clients
 rebuild-all-images: rebuild-bootstrapper rebuild-etb-all-clients

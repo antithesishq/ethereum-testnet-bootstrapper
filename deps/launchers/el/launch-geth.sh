@@ -30,6 +30,11 @@ for var in "${env_vars[@]}" ; do
     fi
 done
 
+LOG_DIR="${LOG_DIR:-EXECUTION_NODE_DIR}"
+if [[ ! -d "$LOG_DIR" ]]; then
+  mkdir -p "$LOG_DIR"
+fi
+echo "Logging to ${LOG_DIR}"
 
 while [ ! -f "$EXECUTION_CHECKPOINT_FILE" ]; do
   echo "Waiting for execution checkpoint file: $EXECUTION_CHECKPOINT_FILE"
@@ -87,4 +92,5 @@ geth \
   --syncmode=full \
   --vmodule=rpc=5 \
   --keystore '/source/apps/data/geth-keystores/' \
-  --discovery.dns=""
+  --discovery.dns="" \
+  --log.file="$LOG_DIR/$HOSTNAME-$EXECUTION_CLIENT.log"
