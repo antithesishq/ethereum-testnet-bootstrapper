@@ -12,7 +12,7 @@ on:
     branches: [ "master" ]
   schedule:
     # Runs daily at 00:00 (see https://crontab.guru/#0_0_*_*_*)
-    - cron: '0 0 * * *'
+    - cron: '0 3 * * *'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -21,7 +21,6 @@ concurrency:
 env:
     REGISTRY: us-central1-docker.pkg.dev/molten-verve-216720
     REPOSITORY: ethereum-repository
-    REBUILD_ALL: 1
 
 jobs:
   build:
@@ -37,12 +36,6 @@ jobs:
     - name: Build and push etb-all-clients images
       timeout-minutes: 500
       run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /opt/ghc
-          sudo rm -rf /usr/local/lib/android
-          sudo rm -rf "/usr/local/share/boost"
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-
           make rebuild-etb-all-clients
 
           docker tag etb-all-clients:minimal ${REGISTRY}/${REPOSITORY}/etb-all-clients:minimal
