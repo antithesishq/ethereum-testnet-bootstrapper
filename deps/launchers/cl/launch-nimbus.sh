@@ -45,7 +45,7 @@ while [ ! -f "$CONSENSUS_CHECKPOINT_FILE" ]; do
     sleep 1
 done
 
-echo "Launching nimbus."
+echo "Launching nimbus in ${CONTAINER_NAME}"
 
 nimbus_beacon_node \
     --non-interactive \
@@ -67,4 +67,6 @@ nimbus_beacon_node \
     --bootstrap-node="$bootnode_enr" \
     --jwt-secret="$JWT_SECRET_FILE" \
     --web3-url=http://"127.0.0.1:$EXECUTION_ENGINE_HTTP_PORT" \
-    --dump:on
+    --dump:on \
+    --doppelganger-detection=off \
+    > /logs/"service_$CONTAINER_NAME--nimbus" 2>&1

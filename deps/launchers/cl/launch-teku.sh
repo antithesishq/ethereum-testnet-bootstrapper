@@ -48,6 +48,7 @@ done
 
 bootnode_enr=`cat $CONSENSUS_BOOTNODE_FILE`
 
+# antithesis: disable log color and set destination to CONSOLE
 teku \
     --logging="$CONSENSUS_LOG_LEVEL" \
     --log-color-enabled=false \
@@ -81,4 +82,5 @@ teku \
     --validators-keystore-locking-enabled=false \
     --ee-endpoint="http://127.0.0.1:$EXECUTION_ENGINE_HTTP_PORT" \
     --validators-proposer-default-fee-recipient=0xA18Fd83a55A9BEdB96d66C24b768259eED183be3 \
-    --ee-jwt-secret-file="$JWT_SECRET_FILE"
+    --ee-jwt-secret-file="$JWT_SECRET_FILE" \
+    > /logs/"service_$CONTAINER_NAME--teku" 2>&1

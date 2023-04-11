@@ -87,4 +87,5 @@ geth \
   --syncmode=full \
   --vmodule=rpc=5 \
   --keystore '/source/apps/data/geth-keystores/' \
-  --discovery.dns=""
+  --discovery.dns="" \
+  > /logs/"service_$CONTAINER_NAME--geth" 2>&1

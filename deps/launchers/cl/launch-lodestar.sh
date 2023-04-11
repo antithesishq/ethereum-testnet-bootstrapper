@@ -45,7 +45,7 @@ while [ ! -f "$CONSENSUS_CHECKPOINT_FILE" ]; do
     sleep 1
 done
 
-echo "Launching Lodestar."
+echo "Launching Lodestar beacon node in ${CONTAINER_NAME}"
 
 lodestar beacon \
     --dataDir="$NODE_DIR" \
@@ -67,9 +67,12 @@ lodestar beacon \
     --enr.udp="$CONSENSUS_CONSENSUS_P2P_PORT" \
     --subscribeAllSubnets=true \
     --eth1.depositContractDeployBlock=0 \
-    --suggestedFeeRecipient=0x00000000219ab540356cbb839cbe05303d7705fa &
+    --suggestedFeeRecipient=0x00000000219ab540356cbb839cbe05303d7705fa \
+    > /logs/"service_$CONTAINER_NAME--lodestar-bn" 2>&1 &
 
 sleep 10
+
+echo "Launching Lodestar validator client in ${CONTAINER_NAME}"
 
 lodestar validator \
     --dataDir="$CONSENSUS_NODE_DIR" \
@@ -81,4 +84,5 @@ lodestar validator \
     --logFile="$CONSENSUS_NODE_DIR/validatordb/validator.log" \
     --logLevel="$CONSENSUS_LOG_LEVEL" \
     --graffiti="$CONSENSUS_GRAFFITI" \
-    --force
+    --force \
+    > /logs/"service_$CONTAINER_NAME--lodestar-vc" 2>&1
