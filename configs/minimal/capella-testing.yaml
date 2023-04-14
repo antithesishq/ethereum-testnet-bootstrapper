@@ -6,7 +6,7 @@
 docker:
     network-name: "ethereum-testnet"
     ip-subnet: "10.0.20.0/24"
-    volumes: ['./data:/data/', './:/source/']
+    volumes: ['./data:/data/', './:/source/', './capture_logs:/logs']
 
 # static files used by the bootstrapper, clients, and other modules
 files:
@@ -453,7 +453,7 @@ client-instances:
     execution-config: "nethermind-execution-config"
 
     validator-offset-start: 140
-    
+
   # clients to catch the extra deposits
   teku-whale:
     # docker-compose
