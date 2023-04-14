@@ -81,7 +81,8 @@ class TestnetMonitorAction(object):
         return f"{self.action.__name__} : {self.interval}"
 
     def perform_action(self):
-        with ThreadPoolExecutor(max_workers=len(self.targets)) as executor:
+        # antithesis: set max_workers to 2
+        with ThreadPoolExecutor(max_workers=2) as executor:
             results = executor.map(self.action, self.targets)
         return zip(self.targets, results)
 
@@ -164,6 +165,7 @@ class TestnetMonitor(object):
                 f"wait_for_slot: sleeping for {sleep_time} seconds. (curr_slot: {self.get_slot()} goal slot: {slot_num})"
             )
             time.sleep(sleep_time)
+        self.logger.debug(f"wait_for_slot: complete; curr_slot={self.get_slot()}; goal slot={slot_num})")
         return
 
     def wait_for_epoch(self, epoch_num):
@@ -215,7 +217,8 @@ class TestnetMonitor(object):
             for action in self.one_time_actions[observed_slot]:
                 actions_to_do.append(action)
 
-        with ThreadPoolExecutor(max_workers=len(actions_to_do)) as executor:
+        # antithesis: set max_workers to 2
+        with ThreadPoolExecutor(max_workers=2) as executor:
             results = executor.map(_action_proxy, actions_to_do)
 
         return zip(actions_to_do, results)

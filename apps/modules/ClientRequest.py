@@ -37,7 +37,7 @@ class ClientRequest(object):
         req_type: RequestType,
         logger: logging.Logger = None,
         protocol: RequestProtocol = RequestProtocol.HTTP,
-        timeout=5,
+        timeout=15,
     ):
 
         self.payload: dict = payload
@@ -76,6 +76,8 @@ class ClientRequest(object):
             base_url = client.get_full_execution_http_jsonrpc_path()
             path = self.payload["method"]
 
+        interval = 0.5
+        backoff = 1.5
         while int(time.time()) <= end:
             try:
                 if self.req_type == RequestType.ExecutionRPCRequest:
@@ -103,20 +105,21 @@ class ClientRequest(object):
             except requests.ConnectionError as e:
                 last_known_err = e
                 self.logger.error(
-                    f"{self.req_type}::{base_url}{path} ConnectionError Exception, retrying."
+                    f"{self.req_type}::{base_url}/{path} ConnectionError Exception, retrying."
                 )
             except requests.Timeout as e:
                 last_known_err = e
                 self.logger.error(
-                    f"{self.req_type}::{base_url}{path} Timeout Exception"
+                    f"{self.req_type}::{base_url}/{path} Timeout Exception"
                 )
             except Exception as e:
                 last_known_err = e
                 self.logger.error(
-                    f"{self.req_type}::{base_url}{path} Unexpected Exception {e}. Retrying.."
+                    f"{self.req_type}::{base_url}/{path} Unexpected Exception {e}. Retrying.."
                 )
 
-            time.sleep(0.5)  # dont spam
+            time.sleep(interval)
+            interval *= backoff  # dont spam
 
         if self.response.status_code == 200:
             # unlikely racy condition
@@ -138,19 +141,19 @@ class ClientRequest(object):
 
 
 def perform_batched_request(req: ClientRequest, clients: list[ClientInstance]):
-    with ThreadPoolExecutor(max_workers=len(clients)) as executor:
+    with ThreadPoolExecutor(max_workers=2) as executor:
         results = executor.map(req.perform_request, clients)
     return zip(clients, results)
 
 
-"""
-    Some predefined useful JSON-RPC requests for EL
-"""
+##
+## Some predefined useful JSON-RPC requests for EL
+##
 
 
 class eth_getBlockByNumber(ClientRequest):
     def __init__(
-        self, block="latest", logger: logging.Logger = None, _id: int = 1, timeout=5
+        self, block="latest", logger: logging.Logger = None, _id: int = 1, timeout=15
     ):
         payload = {
             "method": "eth_getBlockByNumber",
@@ -168,7 +171,7 @@ class eth_getBlockByNumber(ClientRequest):
 
 
 class admin_nodeInfo(ClientRequest):
-    def __init__(self, logger: logging.Logger = None, _id: int = 1, timeout=5):
+    def __init__(self, logger: logging.Logger = None, _id: int = 1, timeout=15):
         payload = {
             "method": "admin_nodeInfo",
             "params": [],
@@ -190,7 +193,7 @@ class admin_nodeInfo(ClientRequest):
 
 class admin_addPeer(ClientRequest):
     def __init__(
-        self, enode: str, logger: logging.Logger = None, _id: int = 1, timeout=5
+        self, enode: str, logger: logging.Logger = None, _id: int = 1, timeout=15
     ):
         payload = {
             "method": "admin_addPeer",
@@ -210,10 +213,19 @@ class admin_addPeer(ClientRequest):
         return resp.json()["result"]
 
 
-"""
-    Some useful predefined BeaconAPI requests for CL
-"""
+##
+## Some useful predefined BeaconAPI requests for CL
+##
 
+class beacon_getBlockHeader(ClientRequest):
+    def __init__(self, block="head", logger: logging.Logger = None, timeout: int = 5):
+        payload = f"/eth/v1/beacon/headers/{block}"
+        super().__init__(
+            payload, RequestType.BeaconAPIRequest, logger, RequestProtocol.HTTP, timeout
+        )
+
+    def retrieve_response(self, resp: requests.Response):
+        return resp.json()["data"]["header"]["message"]
 
 class beacon_getBlockV2(ClientRequest):
     # https://ethereum.github.io/beacon-APIs/#/Beacon/getBlockV2
