@@ -103,7 +103,7 @@ class EthereumTestnetBootstrapper(object):
         for attempt in range(pair_el_clients_attempts):
             try:
                 print(f"Attempt {attempt + 1}/{pair_el_clients_attempts}", flush=True)
-        self.pair_el_clients()
+                self.pair_el_clients()
                 print("Successfully paired EL clients", flush=True)
                 break
             except Exception as e:
