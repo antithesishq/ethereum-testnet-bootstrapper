@@ -10,7 +10,7 @@ Client | Current Release | Branch/tag used for Antithesis testing
 --- | --- | ---
 Nimbus | 23.3.2 | [unstable](https://github.com/status-im/nimbus-eth2/tree/unstable)
 Lodestar | 1.7.2 | [unstable](https://github.com/ChainSafe/lodestar/tree/unstable)
-Lighthouse | 4.0.1 | [capella](https://github.com/sigp/lighthouse/tree/capella)
+Lighthouse | 4.0.1 | [unstable](https://github.com/sigp/lighthouse/tree/unstable)
 Prysm | 4.0.1 | [4.0.0-rc.2](https://github.com/prysmaticlabs/prysm/tree/v4.0.0-rc.2)
 Teku | 23.3.1 | [23.3.1](https://github.com/ConsenSys/teku/releases/tag/23.3.1)
 
