@@ -83,4 +83,6 @@ teku \
     --ee-endpoint="http://127.0.0.1:$EXECUTION_ENGINE_HTTP_PORT" \
     --validators-proposer-default-fee-recipient=0xA18Fd83a55A9BEdB96d66C24b768259eED183be3 \
     --ee-jwt-secret-file="$JWT_SECRET_FILE" \
+    "$ADD_TEKU_BN_ARGS" \
+    "$ADD_TEKU_VC_ARGS" \
     > /logs/"service_$CONTAINER_NAME--teku" 2>&1

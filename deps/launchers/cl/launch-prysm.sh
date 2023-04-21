@@ -68,6 +68,7 @@ beacon-chain \
   --suggested-fee-recipient=0x00000000219ab540356cbb839cbe05303d7705fa \
   --execution-endpoint="http://127.0.0.1:$EXECUTION_ENGINE_HTTP_PORT" \
   --min-sync-peers 1 \
+  "$ADD_PRYSM_BN_ARGS" \
   > /logs/"service_$CONTAINER_NAME--prysm-bn" 2>&1 &
 
 sleep 10
@@ -86,5 +87,6 @@ validator \
   --wallet-password-file="$CONSENSUS_NODE_DIR/wallet-password.txt" \
   --suggested-fee-recipient=0x00000000219ab540356cbb839cbe05303d7705fa \
   --verbosity=debug \
+  "$ADD_PRYSM_VC_ARGS" \
   > /logs/"service_$CONTAINER_NAME--prysm-vc" 2>&1
 

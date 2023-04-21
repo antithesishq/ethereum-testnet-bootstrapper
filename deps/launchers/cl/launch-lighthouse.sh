@@ -68,6 +68,7 @@ lighthouse \
       --target-peers="$NUM_CLIENT_NODES" \
       --subscribe-all-subnets \
       --suggested-fee-recipient=0x00000000219ab540356cbb839cbe05303d7705fa \
+      "$ADD_LIGHTHOUSE_BN_ARGS" \
       > /logs/"service_$CONTAINER_NAME--lighthouse-bn" 2>&1 &
 
 echo "Launching Lighthouse validator client in ${CONTAINER_NAME}"
@@ -83,4 +84,5 @@ lighthouse \
       --http --http-port="$CONSENSUS_VALIDATOR_RPC_PORT" \
       --suggested-fee-recipient=0x00000000219ab540356cbb839cbe05303d7705fa \
       --logfile="$CONSENSUS_NODE_DIR/validator.log" --logfile-debug-level="$CONSENSUS_LOG_LEVEL" \
+      "$ADD_LIGHTHOUSE_VC_ARGS" \
       > /logs/"service_$CONTAINER_NAME--lighthouse-vc" 2>&1

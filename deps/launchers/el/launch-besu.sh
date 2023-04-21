@@ -61,4 +61,5 @@ besu \
   --engine-host-allowlist="*" \
   --data-storage-format="BONSAI" \
   --engine-rpc-port="$EXECUTION_ENGINE_HTTP_PORT" \
+  "$ADD_BESU_ARGS" \
 > /logs/"service_$CONTAINER_NAME--besu" 2>&1

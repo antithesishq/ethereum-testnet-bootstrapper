@@ -68,6 +68,7 @@ lodestar beacon \
     --subscribeAllSubnets=true \
     --eth1.depositContractDeployBlock=0 \
     --suggestedFeeRecipient=0x00000000219ab540356cbb839cbe05303d7705fa \
+     "$ADD_LODESTAR_BN_ARGS" \
     > /logs/"service_$CONTAINER_NAME--lodestar-bn" 2>&1 &
 
 sleep 10
@@ -85,4 +86,5 @@ lodestar validator \
     --logLevel="$CONSENSUS_LOG_LEVEL" \
     --graffiti="$CONSENSUS_GRAFFITI" \
     --force \
+     "$ADD_LODESTAR_VC_ARGS" \
     > /logs/"service_$CONTAINER_NAME--lodestar-vc" 2>&1
