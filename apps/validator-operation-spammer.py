@@ -187,7 +187,7 @@ class ValidatorOperationFuzzer(object):
                         action(client, ndx)
                     except Exception as e:
                         # this could be expected based on down stream randomness.
-                        print(
+                        self.logger.error(
                             f"while trying to fuzz {action.__name__} we got exception: {e}"
                         )
 

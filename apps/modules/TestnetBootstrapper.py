@@ -337,13 +337,12 @@ class ConsensusDirectoryGeneratorV2(object):
         for client in self.etb_config.get_client_instances():
             consensus_client_name = client.consensus_config.get("client")
             keystore_dir = client.get_consensus_node_dir() + "/generated_keystores/"
+            num_validators = client.consensus_config.get("num-validators")
             min_ndx = client.get("validator-offset-start")
-            max_ndx = client.get(
-                "validator-offset-start"
-            ) + client.consensus_config.get("num-validators")
+            max_ndx = min_ndx + num_validators
             src_mnemonic = self.etb_config.accounts.get("validator-mnemonic")
             print(
-                f"generating validator stores for client: {consensus_client_name}",
+                f"generating {num_validators} validator stores for client: {consensus_client_name}",
                 flush=True,
             )
 
