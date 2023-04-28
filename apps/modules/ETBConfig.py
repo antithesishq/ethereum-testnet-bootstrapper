@@ -203,6 +203,9 @@ class Instance(ConfigEntry):
             for k, v in self.get("additional-env").items():
                 env_vars[k.replace("-", "_").upper()] = v
 
+        # add container-name if not already defined
+        if not env_vars.get("CONTAINER_NAME"):
+            env_vars["CONTAINER_NAME"] = self.name
         return env_vars
 
     def get_docker_repr(self, docker_config: ConfigEntry) -> dict:
