@@ -1,6 +1,6 @@
 FROM etb-client-builder:latest as builder
 
-ARG BRANCH="capella"
+ARG BRANCH="unstable"
 
 RUN apt-get install -y unzip && \
     PB_REL="https://github.com/protocolbuffers/protobuf/releases" && \

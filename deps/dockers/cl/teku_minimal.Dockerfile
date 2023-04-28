@@ -1,4 +1,4 @@
-FROM consensys/teku:23.3.1 as builder
+FROM consensys/teku:develop as builder
 
 RUN /opt/teku/bin/teku --version | awk -F/ '{ print $2 }' > /tmp/teku.version
 
