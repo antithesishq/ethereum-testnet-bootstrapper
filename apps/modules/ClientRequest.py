@@ -242,7 +242,18 @@ class beacon_getBlockV2(ClientRequest):
 class beacon_getGenesis(ClientRequest):
     # https://ethereum.github.io/beacon-APIs/#/Beacon/getGenesis
     def __init__(self, logger: logging.Logger = None, timeout: int = 5):
-        payload = f"/eth/v1/beacon/genesis"
+        payload = "/eth/v1/beacon/genesis"
+        super().__init__(
+            payload, RequestType.BeaconAPIRequest, logger, RequestProtocol.HTTP, timeout
+        )
+
+    def retrieve_response(self, resp: requests.Response):
+        return resp.json()["data"]
+
+class beacon_getValidators(ClientRequest):
+    # https://ethereum.github.io/beacon-APIs/#/Beacon/getStateValidators
+    def __init__(self, logger: logging.Logger = None, timeout: int = 5):
+        payload = "/eth/v1/beacon/states/head/validators"
         super().__init__(
             payload, RequestType.BeaconAPIRequest, logger, RequestProtocol.HTTP, timeout
         )
