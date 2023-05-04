@@ -35,7 +35,7 @@ class PremineKeyPair(object):
             self.mnemonic, account_path=self.premine_path, passphrase=self.password
         )
         self.public_key = acct.address
-        self.private_key = acct.privateKey.hex()
+        self.private_key = acct.key.hex()
 
 
 """
@@ -847,12 +847,10 @@ class ETBConfig(object):
         :return: {premine : (public, private)}
         """
         pkps = []
+        passphrase = self.accounts.get("eth1-passphrase")
+        mnemonic = self.accounts.get("eth1-account-mnemonic")
         for acc in self.accounts.get("eth1-premine"):
-            pkp = PremineKeyPair(
-                acc,
-                self.accounts.get("eth1-passphrase"),
-                self.accounts.get("eth1-account-mnemonic"),
-            )
+            pkp = PremineKeyPair(acc, passphrase, mnemonic)
             pkps.append(pkp)
 
         return pkps
