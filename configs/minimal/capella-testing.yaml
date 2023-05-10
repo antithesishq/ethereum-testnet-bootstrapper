@@ -59,7 +59,13 @@ config-params:
     config-name: "local-minimal-testnet"
 
     #config param overrides
-    min-genesis-active-validator-count: 100 # custom pre-seeded into genesis state.
+    # custom pre-seeded into genesis state
+    # NOTE: if the config specified more validators than this, any validators
+    #       over this number will require deposit transactions during the
+    #       experiment in order to become active.
+    #       Cf. concensus-configs/<config>/num-validators
+    #       Cf. clients-instances/<node>/validator-offset-start
+    min-genesis-active-validator-count: 90
     min-validator-withdrawability-delay: 2 # increase the withdrawal speed
     shard-committee-period: 2 # increase the withdrawal speed
 
@@ -149,7 +155,7 @@ consensus-configs:
   prysm-consensus-client:
     client: "prysm"
     launcher: "/source/deps/launchers/cl/launch-prysm.sh"
-    num-validators: 10       # number of validators for every client node
+    num-validators: 5       # number of validators for every client node
 
     log-level: "debug"
 
@@ -163,7 +169,7 @@ consensus-configs:
   nimbus-consensus-client:
     client: "nimbus"
     launcher: "/source/deps/launchers/cl/launch-nimbus.sh"
-    num-validators: 10       # number of validators for every client node
+    num-validators: 5       # number of validators for every client node
     # start ports increment each time we have a node.
     log-level: "debug"
 
@@ -179,7 +185,7 @@ consensus-configs:
     launcher: "/source/deps/launchers/cl/launch-teku.sh"
     log-level: "DEBUG"
 
-    num-validators: 10       # number of validators for every client node
+    num-validators: 5       # number of validators for every client node
 
     p2p-port: 4000    # start port used for discovery
     beacon-api-port: 5000   # start port used for the beacon rest API
@@ -191,7 +197,7 @@ consensus-configs:
   lighthouse-consensus-client:
     client: "lighthouse"
     launcher: "/source/deps/launchers/cl/launch-lighthouse.sh"
-    num-validators: 10       # number of validators for every client node
+    num-validators: 5       # number of validators for every client node
     # start ports increment each time we have a node.
     log-level: "debug"
     p2p-port: 4000    # start port used for discovery
@@ -204,7 +210,7 @@ consensus-configs:
   lodestar-consensus-client:
     client: "lodestar"
     launcher: "/source/deps/launchers/cl/launch-lodestar.sh"
-    num-validators: 10       # number of validators for every client node
+    num-validators: 5       # number of validators for every client node
     # start ports increment each time we have a node.
     log-level: "debug"
     p2p-port: 4000    # start port used for discovery
@@ -219,7 +225,7 @@ consensus-configs:
     launcher: "/source/deps/launchers/cl/launch-teku.sh"
     log-level: "DEBUG"
 
-    num-validators: 50       # number of validators for every client node
+    num-validators: 25       # number of validators for every client node
 
     p2p-port: 4000    # start port used for discovery
     beacon-api-port: 5000   # start port used for the beacon rest API
@@ -264,7 +270,7 @@ client-instances:
     consensus-config: "teku-consensus-client"
     execution-config: "geth-execution-config"
 
-    validator-offset-start: 10
+    validator-offset-start: 5
 
   lighthouse-geth:
     # docker-compose
@@ -277,7 +283,7 @@ client-instances:
     consensus-config: "lighthouse-consensus-client"
     execution-config: "geth-execution-config"
 
-    validator-offset-start: 20
+    validator-offset-start: 10
 
   lodestar-geth:
     # docker-compose
@@ -290,7 +296,7 @@ client-instances:
     consensus-config: "lodestar-consensus-client"
     execution-config: "geth-execution-config"
 
-    validator-offset-start: 30
+    validator-offset-start: 15
 
     additional-env:
       lodestar-preset: "minimal"
@@ -306,7 +312,7 @@ client-instances:
     consensus-config: "nimbus-consensus-client"
     execution-config: "geth-execution-config"
 
-    validator-offset-start: 40
+    validator-offset-start: 20
 
   # Besu clients
 
@@ -321,7 +327,7 @@ client-instances:
     consensus-config: "prysm-consensus-client"
     execution-config: "besu-execution-config"
 
-    validator-offset-start: 50
+    validator-offset-start: 25
 
     additional-env:
       validator-password: "testnet-password"
@@ -337,7 +343,7 @@ client-instances:
     consensus-config: "teku-consensus-client"
     execution-config: "besu-execution-config"
 
-    validator-offset-start: 60
+    validator-offset-start: 30
 
   lighthouse-besu:
     # docker-compose
@@ -350,7 +356,7 @@ client-instances:
     consensus-config: "lighthouse-consensus-client"
     execution-config: "besu-execution-config"
 
-    validator-offset-start: 70
+    validator-offset-start: 35
 
   lodestar-besu:
     # docker-compose
@@ -363,7 +369,7 @@ client-instances:
     consensus-config: "lodestar-consensus-client"
     execution-config: "besu-execution-config"
 
-    validator-offset-start: 80
+    validator-offset-start: 40
 
     additional-env:
       lodestar-preset: "minimal"
@@ -379,7 +385,7 @@ client-instances:
     consensus-config: "nimbus-consensus-client"
     execution-config: "besu-execution-config"
 
-    validator-offset-start: 90
+    validator-offset-start: 45
 
 # Nethermind clients
 
@@ -394,7 +400,7 @@ client-instances:
     consensus-config: "prysm-consensus-client"
     execution-config: "nethermind-execution-config"
 
-    validator-offset-start: 100
+    validator-offset-start: 50
 
     additional-env:
       validator-password: "testnet-password"
@@ -410,7 +416,7 @@ client-instances:
     consensus-config: "teku-consensus-client"
     execution-config: "nethermind-execution-config"
 
-    validator-offset-start: 110
+    validator-offset-start: 55
 
   lighthouse-nethermind:
     # docker-compose
@@ -423,7 +429,7 @@ client-instances:
     consensus-config: "lighthouse-consensus-client"
     execution-config: "nethermind-execution-config"
 
-    validator-offset-start: 120
+    validator-offset-start: 60
 
   lodestar-nethermind:
     # docker-compose
@@ -436,7 +442,7 @@ client-instances:
     consensus-config: "lodestar-consensus-client"
     execution-config: "nethermind-execution-config"
 
-    validator-offset-start: 130
+    validator-offset-start: 65
 
     additional-env:
       lodestar-preset: "minimal"
@@ -452,7 +458,7 @@ client-instances:
     consensus-config: "nimbus-consensus-client"
     execution-config: "nethermind-execution-config"
 
-    validator-offset-start: 140
+    validator-offset-start: 70
 
   # clients to catch the extra deposits
   teku-whale:
@@ -466,7 +472,7 @@ client-instances:
     consensus-config: "teku-consensus-client-whale"
     execution-config: "geth-execution-config"
 
-    validator-offset-start: 150
+    validator-offset-start: 75
 
 # generic instances that run fuzzers/health checks/etc.
 generic-instances:
@@ -494,6 +500,15 @@ generic-instances:
     start-ip-address: "10.0.20.208"
     num-nodes: 1
     entrypoint: "python3 /source/apps/validator-operation-spammer.py --config /data/etb-config.yaml --only-valid-deposits"
+
+  # spam transactions at a randomly chosen node
+  # slot-delay should be shortly before the end of status-check phase0 slot
+  tx-spammer:
+    image: "etb-all-clients"
+    tag: "minimal-fuzz"
+    start-ip-address: "10.0.20.209"
+    num-nodes: 1
+    entrypoint: "python3 /source/apps/tx-fuzz.py --fuzz-mode spam --config /data/etb-config.yaml --slot-delay 80 --target-ip 10.0.20.30 --target-port 8645"
 
 
   eth2-bootnode:
