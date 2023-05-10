@@ -69,6 +69,8 @@ class ExecutionGenesisWriter(object):
             "grayGlacierBlock": self.etb_config.get_execution_merge_fork_block(),
             "shanghaiTime": self.etb_config.get_shanghai_time(),
             "terminalTotalDifficulty": self.etb_config.get_terminal_total_difficulty(),
+            # required to fix the error "Fatal: Failed to register the Ethereum service: ethash is only supported as a historical component of already merged networks"
+            "terminalTotalDifficultyPassed": True,
         }
         self.genesis["config"] = config
 
