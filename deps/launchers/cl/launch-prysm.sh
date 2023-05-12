@@ -46,6 +46,7 @@ done
 echo "Launching Prysm beacon node in ${CONTAINER_NAME}"
 
 beacon-chain \
+  --dev \
   --log-file="$CONSENSUS_NODE_DIR/beacon.log" \
   --accept-terms-of-use=true \
   --datadir="$CONSENSUS_NODE_DIR" \
