@@ -79,6 +79,9 @@ class ClientRequest(object):
         interval = 0.5
         backoff = 1.5
         while int(time.time()) <= end:
+            if self.response: # we already have a response so not the first time of making this request
+                time.sleep(interval)
+                interval *= backoff  # dont spam
             try:
                 if self.req_type == RequestType.ExecutionRPCRequest:
                     self.response = requests.post(
@@ -97,10 +100,10 @@ class ClientRequest(object):
                     ):
                         if "error" in self.response.json():
                             self.logger.error(
-                                f"{self.req_type}::{base_url}{path} returned error: {self.response.json()['error']}"
+                                f"{self.req_type}::{base_url}/{path} returned error: {self.response.json()['error']}"
                             )
-                            continue
-                    return None, self.response
+                    else:
+                        break
 
             except requests.ConnectionError as e:
                 last_known_err = e
@@ -117,9 +120,6 @@ class ClientRequest(object):
                 self.logger.error(
                     f"{self.req_type}::{base_url}/{path} Unexpected Exception {e}. Retrying.."
                 )
-
-            time.sleep(interval)
-            interval *= backoff  # dont spam
 
         if self.response.status_code == 200:
             # unlikely racy condition
