@@ -43,7 +43,10 @@ while [ ! -f "$CONSENSUS_CHECKPOINT_FILE" ]; do
     sleep 1
 done
 
+echo "Launching Prysm beacon node in ${CONTAINER_NAME}"
+
 beacon-chain \
+  --dev \
   --log-file="$CONSENSUS_NODE_DIR/beacon.log" \
   --accept-terms-of-use=true \
   --datadir="$CONSENSUS_NODE_DIR" \
@@ -65,9 +68,12 @@ beacon-chain \
   --jwt-secret="$JWT_SECRET_FILE" \
   --suggested-fee-recipient=0x00000000219ab540356cbb839cbe05303d7705fa \
   --execution-endpoint="http://127.0.0.1:$EXECUTION_ENGINE_HTTP_PORT" \
-  --min-sync-peers 1 &
+  --min-sync-peers 1 \
+  > /logs/"service_$CONTAINER_NAME--prysm-bn" 2>&1 &
 
 sleep 10
+
+echo "Launching Prysm validator client in ${CONTAINER_NAME}"
 
 validator \
   --log-file="$CONSENSUS_NODE_DIR/validator.log" \
@@ -80,4 +86,6 @@ validator \
   --wallet-dir="$CONSENSUS_NODE_DIR" \
   --wallet-password-file="$CONSENSUS_NODE_DIR/wallet-password.txt" \
   --suggested-fee-recipient=0x00000000219ab540356cbb839cbe05303d7705fa \
-  --verbosity=debug
+  --verbosity=debug \
+  > /logs/"service_$CONTAINER_NAME--prysm-vc" 2>&1
+

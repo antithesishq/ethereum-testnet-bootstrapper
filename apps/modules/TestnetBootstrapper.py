@@ -98,7 +98,23 @@ class EthereumTestnetBootstrapper(object):
         write_checkpoint_file(self.etb_config.get("execution-checkpoint-file"))
 
         # pair all the EL clients together.
-        self.pair_el_clients()
+        # antithesis: add retry logic and terminate message on failure
+        pair_el_clients_attempts = 10
+        for attempt in range(pair_el_clients_attempts):
+            try:
+                print(f"Attempt {attempt + 1}/{pair_el_clients_attempts}", flush=True)
+                self.pair_el_clients()
+                print("Successfully paired EL clients", flush=True)
+                break
+            except Exception as e:
+                if attempt == (pair_el_clients_attempts - 1):
+                    print("Failed to pair EL clients so terminating experiment", flush=True)
+                    print("terminate", flush=True)
+                    raise e
+                else:
+                    sleep_s = 2 ** (attempt + 1)
+                    print(f"Failed to pair EL clients. Sleeping {sleep_s} seconds", flush=True)
+                    time.sleep(sleep_s)
 
         # if needed we start the clique miners
         if self.etb_config.get_genesis_fork_upgrade() < ForkVersion.Bellatrix:
