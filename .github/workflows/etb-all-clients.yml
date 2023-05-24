@@ -33,11 +33,13 @@ jobs:
         registry: us-central1-docker.pkg.dev
         username: _json_key
         password: ${{ secrets.ANTITHESIS_LOGIN_FILE }}
-    - name: Build and push etb-all-clients images
+    - name: Build etb-all-clients images
       timeout-minutes: 500
       run: |
           make rebuild-etb-all-clients
-
+    - name: Push etb-all-clients images
+      timeout-minutes: 500
+      run: |
           docker tag etb-all-clients:minimal ${REGISTRY}/${REPOSITORY}/etb-all-clients:minimal
           docker push ${REGISTRY}/${REPOSITORY}/etb-all-clients:minimal
 
