@@ -1,6 +1,7 @@
 FROM etb-client-builder:latest as builder
 
 ARG BRANCH="master"
+ARG CACHE_DATE=2023-05-23
 
 WORKDIR /git
 
