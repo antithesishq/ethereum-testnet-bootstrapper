@@ -33,6 +33,11 @@ jobs:
         registry: us-central1-docker.pkg.dev
         username: _json_key
         password: ${{ secrets.ANTITHESIS_LOGIN_FILE }}
+    - name: Docker clean
+      run: |
+          docker image rm ${REGISTRY}/${REPOSITORY}/etb-all-clients:minimal
+          docker image rm ${REGISTRY}/${REPOSITORY}/etb-all-clients:minimal-fuzz
+          docker image rm ${REGISTRY}/${REPOSITORY}/etb-all-clients-inst:minimal
     - name: Build etb-all-clients images
       timeout-minutes: 500
       run: |
