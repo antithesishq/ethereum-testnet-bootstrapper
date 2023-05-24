@@ -41,10 +41,10 @@ jobs:
       timeout-minutes: 500
       run: |
           docker tag etb-all-clients:latest-minimal ${REGISTRY}/${REPOSITORY}/etb-all-clients:latest-minimal
-          docker push ${REGISTRY}/${REPOSITORY}/etb-all-clients:minimal
+          docker push ${REGISTRY}/${REPOSITORY}/etb-all-clients:latest-minimal
 
           docker tag etb-all-clients:latest-minimal-fuzz ${REGISTRY}/${REPOSITORY}/etb-all-clients:latest-minimal-fuzz
-          docker push ${REGISTRY}/${REPOSITORY}/etb-all-clients:minimal-fuzz
+          docker push ${REGISTRY}/${REPOSITORY}/etb-all-clients:latest-minimal-fuzz
 
           docker tag etb-all-clients-inst:latest-minimal ${REGISTRY}/${REPOSITORY}/etb-all-clients-inst:latest-minimal
-          docker push ${REGISTRY}/${REPOSITORY}/etb-all-clients-inst:minimal
+          docker push ${REGISTRY}/${REPOSITORY}/etb-all-clients-inst:latest-minimal
