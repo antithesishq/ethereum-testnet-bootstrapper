@@ -45,11 +45,11 @@ jobs:
     - name: Push etb-all-clients images
       timeout-minutes: 500
       run: |
-          docker tag etb-all-clients:minimal ${REGISTRY}/${REPOSITORY}/etb-all-clients:minimal
+          docker tag etb-all-clients:minimal ${REGISTRY}/${REPOSITORY}/etb-all-clients:latest-minimal
           docker push ${REGISTRY}/${REPOSITORY}/etb-all-clients:minimal
 
-          docker tag etb-all-clients:minimal-fuzz ${REGISTRY}/${REPOSITORY}/etb-all-clients:minimal-fuzz
+          docker tag etb-all-clients:minimal-fuzz ${REGISTRY}/${REPOSITORY}/etb-all-clients:latest-minimal-fuzz
           docker push ${REGISTRY}/${REPOSITORY}/etb-all-clients:minimal-fuzz
 
-          docker tag etb-all-clients-inst:minimal ${REGISTRY}/${REPOSITORY}/etb-all-clients-inst:minimal
+          docker tag etb-all-clients-inst:minimal ${REGISTRY}/${REPOSITORY}/etb-all-clients-inst:latest-minimal
           docker push ${REGISTRY}/${REPOSITORY}/etb-all-clients-inst:minimal
