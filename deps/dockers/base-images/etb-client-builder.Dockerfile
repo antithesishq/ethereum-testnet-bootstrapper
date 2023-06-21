@@ -8,7 +8,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     lsb-release \
     software-properties-common \
     apt-transport-https \
-    openjdk-17-jdk \
     ca-certificates \
     wget \
     tzdata \
@@ -20,6 +19,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libc6-dev \
     libsnappy-dev \
     git
+
+RUN apt-get install -y --no-install-recommends \
+    openjdk-17-jdk
 
 # set up dotnet
 RUN wget https://packages.microsoft.com/config/debian/11/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && dpkg -i packages-microsoft-prod.deb && rm packages-microsoft-prod.deb
