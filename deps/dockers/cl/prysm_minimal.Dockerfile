@@ -1,6 +1,6 @@
 FROM gcr.io/prysmaticlabs/build-agent as builder
 
-ARG BRANCH="v4.0.0-rc.2"
+ARG BRANCH="v4.0.6"
 
 WORKDIR /git
 
