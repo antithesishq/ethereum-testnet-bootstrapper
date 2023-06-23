@@ -24,6 +24,17 @@ RUN . /envfile; ./hack/update-go-ssz.sh --config=minimal || true
 
 FROM etb-client-builder:latest as instrumentor
 
+RUN rm -rf /usr/local/go
+ENV GOLANG_VERSION 1.20.5
+ENV ARCH amd64
+ENV GOLANG_DOWNLOAD_URL https://go.dev/dl/go$GOLANG_VERSION.linux-$ARCH.tar.gz
+ENV GOPATH /go
+ENV GOROOT /usr/local/go
+ENV PATH $GOPATH/bin:$GOROOT/bin:$PATH
+RUN curl -fsSL "$GOLANG_DOWNLOAD_URL" -o golang.tar.gz \
+    && tar -C /usr/local -xzf golang.tar.gz \
+    && rm golang.tar.gz
+
 COPY --from=builder /git/prysm /git/prysm
 WORKDIR /git
 
