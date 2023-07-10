@@ -217,16 +217,6 @@ class admin_addPeer(ClientRequest):
 ## Some useful predefined BeaconAPI requests for CL
 ##
 
-class beacon_getBlockHeader(ClientRequest):
-    def __init__(self, block="head", logger: logging.Logger = None, timeout: int = 5):
-        payload = f"/eth/v1/beacon/headers/{block}"
-        super().__init__(
-            payload, RequestType.BeaconAPIRequest, logger, RequestProtocol.HTTP, timeout
-        )
-
-    def retrieve_response(self, resp: requests.Response):
-        return resp.json()["data"]["header"]["message"]
-
 class beacon_getBlockV2(ClientRequest):
     # https://ethereum.github.io/beacon-APIs/#/Beacon/getBlockV2
     def __init__(self, block="head", logger: logging.Logger = None, timeout: int = 5):
@@ -260,3 +250,13 @@ class beacon_getValidators(ClientRequest):
 
     def retrieve_response(self, resp: requests.Response):
         return resp.json()["data"]
+
+class beacon_getBlockV1(ClientRequest):
+    def __init__(self, block="head", logger: logging.Logger = None, timeout: int = 5):
+        payload = f"/eth/v1/beacon/headers/{block}"
+        super().__init__(
+            payload, RequestType.BeaconAPIRequest, logger, RequestProtocol.HTTP, timeout
+        )
+    
+    def retrieve_response(self, resp: requests.Response):
+        return resp.json()

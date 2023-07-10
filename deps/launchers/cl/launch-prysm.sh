@@ -86,6 +86,6 @@ validator \
   --wallet-dir="$CONSENSUS_NODE_DIR" \
   --wallet-password-file="$CONSENSUS_NODE_DIR/wallet-password.txt" \
   --suggested-fee-recipient=0x00000000219ab540356cbb839cbe05303d7705fa \
-  --verbosity=debug \
+  --verbosity="$CONSENSUS_LOG_LEVEL" \
   > /logs/"service_$CONTAINER_NAME--prysm-vc" 2>&1
 

@@ -68,6 +68,8 @@ lighthouse \
       --target-peers="$NUM_CLIENT_NODES" \
       --subscribe-all-subnets \
       --suggested-fee-recipient=0x00000000219ab540356cbb839cbe05303d7705fa \
+      --port="$CONSENSUS_P2P_PORT" \
+      --logfile="$CONSENSUS_NODE_DIR/beacon_node.log" --logfile-debug-level="$CONSENSUS_LOG_LEVEL" \
       > /logs/"service_$CONTAINER_NAME--lighthouse-bn" 2>&1 &
 
 echo "Launching Lighthouse validator client in ${CONTAINER_NAME}"

@@ -329,6 +329,11 @@ class EthereumTestnetBootstrapper(object):
 
         cdg = ConsensusDirectoryGeneratorV2(self.etb_config, self.logger)
         cdg.generate_validator_stores()
+        with open("/data/validators-to-client-mapping", "w") as f:
+            f.write(cdg.stringify_validators_to_client_mapping())
+        self.logger.debug("ConsensusBootstrapper wrote validators-to-client-mapping")
+
+
 
 
 class ConsensusDirectoryGeneratorV2(object):
@@ -347,6 +352,10 @@ class ConsensusDirectoryGeneratorV2(object):
         self.consensus_config = self.etb_config.get("consensus-config-file")
 
         self.eth2valtools = Eth2ValTools(self.logger)
+        self.validators_to_client_mapping = []
+
+    def stringify_validators_to_client_mapping(self) -> str:
+        return '\n'.join(self.validators_to_client_mapping)
 
     def generate_validator_stores(self):
         # create the validator keystores.
@@ -370,6 +379,11 @@ class ConsensusDirectoryGeneratorV2(object):
                 prysm=consensus_client_name == "prysm",
                 prysm_password=client.get("validator-password"),
             )
+
+            if client.root_name == "teku-whale":
+                self.validators_to_client_mapping.append(f"{min_ndx}-{max_ndx-10} {client.root_name}")
+            else:
+                self.validators_to_client_mapping.append(f"{min_ndx}-{max_ndx} {client.root_name}")
 
             # get the correct key representation
             if consensus_client_name == "teku":
