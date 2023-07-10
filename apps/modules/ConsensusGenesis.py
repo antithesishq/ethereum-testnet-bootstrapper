@@ -31,7 +31,7 @@ class ConsensusGenesisWriter(object):
             preset_name = "mainnet"
 
         self.logger.info(f"writing {preset_name} config.yaml")
-        return self._get_deneb_devnet_7()
+        # return self._get_deneb_devnet_7()
         return f"""
 # Extends the {preset_name} preset
 PRESET_BASE: '{preset_name}'
