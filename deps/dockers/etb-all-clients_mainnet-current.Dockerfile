@@ -91,7 +91,7 @@ RUN npm install -g npm@latest
 RUN npm install -g @bazel/bazelisk # prysm build system
 
 # setup cargo/rustc (lighthouse)
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain nightly -y
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable -y
 ENV PATH="$PATH:/root/.cargo/bin"
 # Build rocksdb
 RUN git clone --depth=1 https://github.com/facebook/rocksdb.git
