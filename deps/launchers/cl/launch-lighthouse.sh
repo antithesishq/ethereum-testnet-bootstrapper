@@ -18,7 +18,7 @@ env_vars=(
   "IP_ADDRESS"
   "IP_SUBNET"
   "JWT_SECRET_FILE"
-  "TESTNET_DIR"
+  "COLLECTION_DIR"
   "NUM_CLIENT_NODES"
   "EXECUTION_ENGINE_HTTP_PORT"
   "EXECUTION_ENGINE_WS_PORT"
@@ -38,17 +38,18 @@ while [ ! -f "$CONSENSUS_BOOTNODE_FILE" ]; do
   sleep 1
 done
 
-bootnode_enr=`cat $CONSENSUS_BOOTNODE_FILE`
-
 while [ ! -f "$CONSENSUS_CHECKPOINT_FILE" ]; do
   echo "Waiting for consensus checkpoint file: $CONSENSUS_CHECKPOINT_FILE"
     sleep 1
 done
 
-echo "Launching Lighthouse beacon node in ${CONTAINER_NAME}"
+bootnode_enr=`cat $CONSENSUS_BOOTNODE_FILE`
+
+echo "Launching lighthouse."
 
 lighthouse \
-      --testnet-dir="$TESTNET_DIR" \
+      --testnet-dir="$COLLECTION_DIR" \
+      -l \
       bn \
       --datadir="$CONSENSUS_NODE_DIR" \
       --staking \
@@ -57,6 +58,7 @@ lighthouse \
       --http-allow-origin="*" \
       --http-allow-sync-stalled \
       --listen-address=0.0.0.0 \
+      --port="$CONSENSUS_P2P_PORT" \
       --execution-endpoints="http://127.0.0.1:$EXECUTION_ENGINE_HTTP_PORT" \
       --enable-private-discovery \
       --enr-address "$IP_ADDRESS" \
@@ -67,15 +69,14 @@ lighthouse \
       --boot-nodes="$bootnode_enr" \
       --target-peers="$NUM_CLIENT_NODES" \
       --subscribe-all-subnets \
-      --suggested-fee-recipient=0x00000000219ab540356cbb839cbe05303d7705fa \
-      --port="$CONSENSUS_P2P_PORT" \
-      --logfile="$CONSENSUS_NODE_DIR/beacon_node.log" --logfile-debug-level="$CONSENSUS_LOG_LEVEL" \
-      > /logs/"service_$CONTAINER_NAME--lighthouse-bn" 2>&1 &
+      --debug-level="$CONSENSUS_LOG_LEVEL" \
+      --suggested-fee-recipient=0x00000000219ab540356cbb839cbe05303d7705fa &
 
 echo "Launching Lighthouse validator client in ${CONTAINER_NAME}"
 sleep 10
 lighthouse \
-      --testnet-dir="$TESTNET_DIR" \
+      -l \
+      --testnet-dir="$COLLECTION_DIR" \
       vc \
       --validators-dir "$CONSENSUS_NODE_DIR/keys" \
       --secrets-dir "$CONSENSUS_NODE_DIR/secrets" \
@@ -84,5 +85,5 @@ lighthouse \
       --graffiti="$CONSENSUS_GRAFFITI" \
       --http --http-port="$CONSENSUS_VALIDATOR_RPC_PORT" \
       --suggested-fee-recipient=0x00000000219ab540356cbb839cbe05303d7705fa \
-      --logfile="$CONSENSUS_NODE_DIR/validator.log" --logfile-debug-level="$CONSENSUS_LOG_LEVEL" \
-      > /logs/"service_$CONTAINER_NAME--lighthouse-vc" 2>&1
+      --debug-level="$CONSENSUS_LOG_LEVEL" \
+      --logfile="$CONSENSUS_NODE_DIR/validator.log" --logfile-debug-level="$CONSENSUS_LOG_LEVEL"
