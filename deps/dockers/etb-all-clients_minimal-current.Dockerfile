@@ -203,7 +203,7 @@ RUN git clone "${NETHERMIND_REPO}" && \
     git log -n 1 --format=format:"%H" > /nethermind.version
 
 RUN cd nethermind && \
-    dotnet publish src/Nethermind/Nethermind.Runner -c release -o out
+    dotnet publish -p:PublishReadyToRun=false src/Nethermind/Nethermind.Runner -c release -o out
 
 ############################### Misc.  Modules  ###############################
 FROM etb-client-builder AS misc-builder
