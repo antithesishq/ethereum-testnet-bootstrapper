@@ -26,7 +26,6 @@ from pathlib import Path
 
 import requests
 
-
 from etb.monitoring.testnet_monitor import (
     TestnetMonitor,
     TestnetMonitorAction,
@@ -544,7 +543,7 @@ if __name__ == "__main__":
             logger.debug("Waiting for %s -- check %d", args.config, wait_count)
         wait_count += 1
 
-    status_checker = TestnetStatusCheckerV2(ETBConfig(args.config, logger), logger)
+    status_checker = TestnetStatusCheckerV2(ETBConfig(args.config), logger)
 
     if args.no_terminate:
         # antithesis
