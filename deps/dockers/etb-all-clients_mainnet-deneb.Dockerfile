@@ -122,11 +122,12 @@ RUN git clone "${LIGHTHOUSE_REPO}" && \
 
 RUN cd lighthouse && \
     cargo update -p proc-macro2 && \
-    cargo build --release --manifest-path lighthouse/Cargo.toml --bin lighthouse
+    cargo build --release --manifest-path lighthouse/Cargo.toml --bin lighthouse && \
+    mv target/release/lighthouse target/release/lighthouse_uinstrumented
 
 # Antithesis instrumented lighthouse binary
 RUN cd lighthouse && \ 
-LD_LIBRARY_PATH=/usr/lib/ RUSTFLAGS="-Cpasses=sancov-module -Cllvm-args=-sanitizer-coverage-level=3 -Cllvm-args=-sanitizer-coverage-trace-pc-guard -Ccodegen-units=1 -Cdebuginfo=2 -L/usr/lib/ -lvoidstar" cargo build --release --manifest-path lighthouse/Cargo.toml --target x86_64-unknown-linux-gnu --features spec-minimal --bin lighthouse_instrumented
+LD_LIBRARY_PATH=/usr/lib/ RUSTFLAGS="-Cpasses=sancov-module -Cllvm-args=-sanitizer-coverage-level=3 -Cllvm-args=-sanitizer-coverage-trace-pc-guard -Ccodegen-units=1 -Cdebuginfo=2 -L/usr/lib/ -lvoidstar" cargo build --release --manifest-path lighthouse/Cargo.toml --features spec-minimal --bin lighthouse
 
 # LODESTAR
 #FROM etb-client-builder AS lodestar-builder
@@ -325,8 +326,8 @@ COPY --from=misc-builder /git/beacon-metrics-gazer/target/release/beacon-metrics
 
 COPY --from=lighthouse-builder /lighthouse.version /lighthouse.version
 # Antithesis copy instrumented and uninstrumented versions of lighthouse
-COPY --from=lighthouse-builder /git/lighthouse/target/release/lighthouse_instrumented /usr/local/bin/lighthouse
-COPY --from=lighthouse-builder /git/lighthouse/target/release/lighthouse /usr/local/bin/lighthouse_uninstrumented
+COPY --from=lighthouse-builder /git/lighthouse/target/release/lighthouse_uninstrumented /usr/local/bin/lighthouse_uninstrumented
+COPY --from=lighthouse-builder /git/lighthouse/target/release/lighthouse /usr/local/bin/lighthouse
 
 COPY --from=teku-builder  /git/teku/build/install/teku/. /opt/teku
 COPY --from=teku-builder /teku.version /teku.version
@@ -342,7 +343,15 @@ RUN ln -s /opt/teku/bin/teku /usr/local/bin/teku
 
 # execution clients
 COPY --from=geth-builder /geth.version /geth.version
+
+# Antithesis geth instrumentation
 COPY --from=geth-builder /root/go/bin/geth /usr/local/bin/geth
+COPY --from=builder /root/go/bin/bootnode /usr/local/bin/bootnode
+COPY --from=builder /tmp/geth_race /usr/local/bin/geth_race
+COPY --from=builder /tmp/geth_uninstrumented /usr/local/bin/geth_uninstrumented
+COPY --from=builder /tmp/bootnode_uninstrumented /usr/local/bin/bootnode_uninstrumented
+COPY --from=builder /git/geth_instrumented/symbols/* /opt/antithesis/symbols/
+COPY --from=builder /git/geth_instrumented/customer /geth_instrumented_code
 
 #COPY --from=besu-builder /besu.version /besu.version
 #COPY --from=besu-builder /git/besu/build/install/besu/. /opt/besu
