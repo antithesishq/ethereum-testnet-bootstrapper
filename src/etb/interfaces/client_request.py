@@ -297,6 +297,42 @@ class BeaconAPIgetBlockV2(BeaconAPIRequest):
 
         return response  # the exception
 
+class BeaconAPIgetBlockV1(BeaconAPIRequest):
+    """
+    /eth/v1/beacon/blocks/{block} beaconAPI request.
+    https://ethereum.github.io/beacon-APIs/#/Beacon/getBlockV1
+    """
+
+    def __init__(self, block="head", max_retries: int = 3, timeout: int = 5):
+        payload = f"/eth/v1/beacon/blocks/{block}"
+        super().__init__(payload=payload, max_retries=max_retries, timeout=timeout)
+
+    def get_block(
+        self, response: Union[Exception, requests.Response]
+    ) -> Union[Exception, dict]:
+        if self.is_valid(response):
+            return response.json()["data"]["message"]
+
+        return response  # the exception
+
+class BeaconAPIgetValidators(BeaconAPIRequest):
+    """
+    /eth/v1/beacon/states/{state_id}/validators beaconAPI request.
+    https://ethereum.github.io/beacon-APIs/#/Beacon/getBlockV1
+    """
+
+    def __init__(self, state="head", max_retries: int = 3, timeout: int = 5):
+        payload = f"/eth/v1/beacon/states/{state}/validators"
+        super().__init__(payload=payload, max_retries=max_retries, timeout=timeout)
+
+    def get_validators(
+        self, response: Union[Exception, requests.Response]
+    ) -> Union[Exception, dict]:
+        if self.is_valid(response):
+            return response.json()["data"]["message"]
+
+        return response  # the exception
+
 
 class BeaconAPIgetGenesis(BeaconAPIRequest):
     """

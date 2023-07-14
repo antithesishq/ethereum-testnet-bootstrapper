@@ -24,16 +24,29 @@ from json import JSONEncoder
 from json.decoder import JSONDecodeError
 from pathlib import Path
 
-from modules.TestnetMonitor import (
+import requests
+
+
+from etb.monitoring.testnet_monitor import (
     TestnetMonitor,
     TestnetMonitorAction,
     ActionInterval,
-    ActionIntervalType,
+    TestnetMonitorActionInterval,
 )
-from modules.ClientRequest import perform_batched_request, beacon_getBlockV2, beacon_getValidators, beacon_getBlockV1
+
+from etb.interfaces.client_request import (
+    perform_batched_request,
+    BeaconAPIgetBlockV2,
+    BeaconAPIgetBlockV1,
+    BeaconAPIgetValidators,
+)
+
+from typing import Union, Any
+
+# from modules.ClientRequest import perform_batched_request, beacon_getBlockV2, beacon_getValidators, beacon_getBlockV1
 
 # from modules.BeaconAPI import BeaconAPI, ETBConsensusBeaconAPI
-from modules.ETBConfig import ETBConfig, ClientInstance
+from etb.config.etb_config import ETBConfig, ClientInstance
 
 # from modules.TestnetHealthMetrics import UniqueConsensusHeads
 from multiprocessing import Pool
@@ -95,28 +108,28 @@ def get_heads_status_check_slot(clients_to_monitor: list[ClientInstance]) -> Hea
     unreachable_clients = []
     heads: dict[str, Head] = {}
 
-    rpc_request = beacon_getBlockV2()
-    for client, result in perform_batched_request(rpc_request, clients_to_monitor):
-        error, response = result
-        if error is None:
-            try:
-                block = rpc_request.retrieve_response(response)
-                state_root = str(block["state_root"])
-                if state_root not in heads:
-                    head = Head(
-                        block["slot"],
-                        state_root,
-                        bytes.fromhex(block["body"]["graffiti"][2:])
-                        .decode("utf-8")
-                        .replace("\x00", ""))
-                    heads[state_root] = head
-                heads[state_root].add_node(client.name)
+    # rpc_request = beacon_getBlockV2()
+    rpc_request = BeaconAPIgetBlockV2(max_retries=5, timeout=3)
+    for cl_client, rpc_future in perform_batched_request(rpc_request, clients_to_monitor).items():
+        result: Union[requests.Response, Exception] = rpc_future.result()
+        if rpc_request.is_valid(result):
+            block = rpc_request.get_block(result)
+            state_root = str(block["state_root"])
+            if state_root not in heads:
+                head = Head(
+                    block["slot"],
+                    state_root,
+                    bytes.fromhex(block["body"]["graffiti"][2:])
+                    .decode("utf-8")
+                    .replace("\x00", ""))
+                heads[state_root] = head
+            heads[state_root].add_node(cl_client.name)
             # antithesis: have seen instances of invalid json
-            except JSONDecodeError as e:
-                print(f"Invalid JSON received from client {client.name}'s getBlockV2 beacon API: {response.content}", flush=True)
-                unreachable_clients.append(client.name)
+            # except JSONDecodeError as e:
+            #     print(f"Invalid JSON received from client {cl_client.name}'s getBlockV2 beacon API: {response.content}", flush=True)
+            #     unreachable_clients.append(cl_client.name)
         else:
-            unreachable_clients.append(client.name)
+            unreachable_clients.append(cl_client.name)
     return HeadStatusCheck(unreachable_clients, [h for h in heads.values()])
 
 def check_for_consensus(
@@ -181,12 +194,12 @@ def get_all_slots_per_client(client):
         return []
     try:
         while (True):
-            b = beacon_getBlockV1(p, timeout=15)
+            b = BeaconAPIgetBlockV1(max_retries= 2, timeout=15)
             _e, response = b.perform_request(client)
-            data = b.retrieve_response(response)
+            data = b.get_block(response)
             # print(data)
-            p = data['data']['header']['message']['parent_root']
-            s = data['data']['header']['message']['slot']
+            p = data['parent_root']
+            s = data['slot']
             print(f"{client.root_name}: {[p, s]}")
             parents_and_slots.append([p, s])
             if (p == '0x0000000000000000000000000000000000000000000000000000000000000000'):
@@ -351,13 +364,13 @@ class ValidatorStatus:
 
 def get_validators_from_client(clients_to_monitor: list[ClientInstance]):
     validators:list[ValidatorStatus] = []
-    rpc_request = beacon_getValidators()
+    rpc_request = BeaconAPIgetValidators(max_retries=5, timeout=3)
     client_validators = {"client": "None", "validators": validators}
     # for client, result in perform_batched_request(rpc_request, clients_to_monitor):
     for client in clients_to_monitor:
         error, response = rpc_request.perform_request(client)
         if error is None:
-            data = rpc_request.retrieve_response(response)
+            data = rpc_request.get_validators(response)
             for v in data:
                 if v:
                     client_validators["validators"].append(ValidatorStatus(v["validator"]["pubkey"], v["status"]))
@@ -370,7 +383,7 @@ def get_validators_from_client(clients_to_monitor: list[ClientInstance]):
 class StatusCheckPerSlotHeadMonitor(TestnetMonitorAction):
     def __init__(self, clients_to_check: list[ClientInstance]):
         super().__init__(
-            ActionInterval(1, ActionIntervalType.ON_SLOT),
+            TestnetMonitorAction("AntithesisStatusCheck", TestnetMonitorActionInterval.EVERY_SLOT),
             get_heads_status_check_slot,
             [clients_to_check],
         )

@@ -430,3 +430,11 @@ generic-instances:
     num-nodes: 1
     # runs on the first prysm geth node.
     entrypoint: "python3 /source/src/tx_spammer.py --target-ip 10.0.20.10 --target-port 8645 --epoch-delay 1 --fuzz-mode spam --tx-fuzz-path /usr/local/bin/livefuzzer"
+
+  antithesis-checker:
+    image: "ethereum-testnet-bootstrapper"
+    tag: "latest"
+    start-ip-address: "10.0.20.205"
+    num-nodes: 1
+    entrypoint: "python3 /source/apps/antithesis_checker.py --config /data/etb-config.yaml
+      --phase0-slot '96' --phase1-slot '104' --phase2-slot '120' --phase3-slot '128']"
