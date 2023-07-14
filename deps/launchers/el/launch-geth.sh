@@ -46,6 +46,15 @@ geth init \
 # Now start geth.
 echo "Starting geth"
 
+log_file="/logs/service_$CONTAINER_NAME--geth"
+
+if [ -f "$log_file" ]; then
+  echo "Log file $log_file exists"
+else
+  mkdir /logs
+  touch $log_file
+fi
+
 geth \
   --datadir="$EXECUTION_NODE_DIR" \
   --networkid="$CHAIN_ID" \
@@ -70,4 +79,4 @@ geth \
   --syncmode=full \
   --vmodule=rpc=5 \
   --discovery.dns="" \
-  > /logs/"service_$CONTAINER_NAME--geth" 2>&1
+  > $log_file 2>&1
