@@ -31,3 +31,6 @@ function container_builder() {
 
 log_step "building mainnet-deneb"
 build_image "etb-all-clients:mainnet-deneb" "etb-all-clients_mainnet-deneb.Dockerfile"
+
+# log_step "building mainnet-deneb instrumentation"
+# build_image "etb-all-clients:mainnet-deneb-inst" "etb-all-clients_mainnet-deneb-inst.Dockerfile"
