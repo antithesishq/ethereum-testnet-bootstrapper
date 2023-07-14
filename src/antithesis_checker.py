@@ -543,7 +543,7 @@ if __name__ == "__main__":
             logger.debug("Waiting for %s -- check %d", args.config, wait_count)
         wait_count += 1
 
-    status_checker = TestnetStatusCheckerV2(ETBConfig(args.config), logger)
+    status_checker = TestnetStatusCheckerV2(ETBConfig(Path(args.config)), logger)
 
     if args.no_terminate:
         # antithesis
