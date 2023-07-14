@@ -346,12 +346,12 @@ COPY --from=geth-builder /geth.version /geth.version
 
 # Antithesis geth instrumentation
 COPY --from=geth-builder /root/go/bin/geth /usr/local/bin/geth
-COPY --from=builder /root/go/bin/bootnode /usr/local/bin/bootnode
-COPY --from=builder /tmp/geth_race /usr/local/bin/geth_race
-COPY --from=builder /tmp/geth_uninstrumented /usr/local/bin/geth_uninstrumented
-COPY --from=builder /tmp/bootnode_uninstrumented /usr/local/bin/bootnode_uninstrumented
-COPY --from=builder /git/geth_instrumented/symbols/* /opt/antithesis/symbols/
-COPY --from=builder /git/geth_instrumented/customer /geth_instrumented_code
+COPY --from=geth-builder /root/go/bin/bootnode /usr/local/bin/bootnode
+COPY --from=geth-builder /tmp/geth_race /usr/local/bin/geth_race
+COPY --from=geth-builder /tmp/geth_uninstrumented /usr/local/bin/geth_uninstrumented
+COPY --from=geth-builder /tmp/bootnode_uninstrumented /usr/local/bin/bootnode_uninstrumented
+COPY --from=geth-builder /git/geth_instrumented/symbols/* /opt/antithesis/symbols/
+COPY --from=geth-builder /git/geth_instrumented/customer /geth_instrumented_code
 
 #COPY --from=besu-builder /besu.version /besu.version
 #COPY --from=besu-builder /git/besu/build/install/besu/. /opt/besu
