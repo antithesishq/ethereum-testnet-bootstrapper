@@ -123,7 +123,7 @@ RUN git clone "${LIGHTHOUSE_REPO}" && \
 RUN cd lighthouse && \
     cargo update -p proc-macro2 && \
     cargo build --release --manifest-path lighthouse/Cargo.toml --bin lighthouse && \
-    mv target/release/lighthouse target/release/lighthouse_uinstrumented
+    mv target/release/lighthouse target/release/lighthouse_uninstrumented
 
 # Antithesis instrumented lighthouse binary
 RUN cd lighthouse && \ 
