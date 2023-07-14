@@ -45,7 +45,7 @@ class TestnetMonitor:
 
     def __init__(self, etb_config: ETBConfig):
         self.etb_config: ETBConfig = etb_config
-        self.consensus_genesis_time: int = self.etb_config.genesis_time
+        self.consensus_genesis_time: int | None = self.etb_config.genesis_time
         self.seconds_per_slot: int = (
             self.etb_config.testnet_config.consensus_layer.preset_base.SECONDS_PER_SLOT.value
         )
@@ -76,6 +76,9 @@ class TestnetMonitor:
 
     def get_slot(self) -> int:
         """Get the current slot wrt to genesis time @return: slot numbuer."""
+        if self.consensus_genesis_time is None:
+            return 0
+        
         return (int(time.time()) - self.consensus_genesis_time) // self.seconds_per_slot
 
     def get_epoch(self) -> int:
@@ -84,9 +87,8 @@ class TestnetMonitor:
 
     def wait_for_slot(self, target_slot: int):
         """Wait until target slot.
-
         @param target_slot: slot to wait for @return:
-        """
+        """        
         t_delta: int = (target_slot - self.get_slot()) * self.seconds_per_slot
         while t_delta > 0:
             logging.debug(f"Waiting for slot {target_slot}")
