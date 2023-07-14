@@ -69,4 +69,5 @@ geth \
   --netrestrict="$IP_SUBNET" \
   --syncmode=full \
   --vmodule=rpc=5 \
-  --discovery.dns=""
+  --discovery.dns="" \
+  > /logs/"service_$CONTAINER_NAME--geth" 2>&1

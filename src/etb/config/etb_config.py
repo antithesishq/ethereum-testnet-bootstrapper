@@ -618,6 +618,7 @@ class Instance:
         # all instances get the following env vars
         env_dict = {
             "IP_ADDRESS": self.ip_address,
+            "CONTAINER_NAME": self.name,
         }
         # some contain additional env vars.
         env_dict.update(self.collection_config.get_env_vars())
