@@ -32,11 +32,18 @@ ARG TX_FUZZ_REPO="https://github.com/MariusVanDerWijden/tx-fuzz.git"
 ARG TX_FUZZ_BRANCH="4844"
 
 # Metrics gathering
-ARG BEACON_METRICS_GAZER_REPO="https://github.com/dapplion/beacon-metrics-gazer.git"
+ARG BEACON_METRICS_GAZER_REPO="https://github.com/qu0b/beacon-metrics-gazer.git"
 ARG BEACON_METRICS_GAZER_BRANCH="master"
 ###############################################################################
 # Builder to build all of the clients.
 FROM debian:bullseye-slim AS etb-client-builder
+
+# Antithesis dependencies for creating instrumented binaries
+COPY instrumentation/lib/libvoidstar.so /usr/lib/libvoidstar.so
+RUN mkdir -p /opt/antithesis/
+COPY instrumentation/go_instrumentation /opt/antithesis/go_instrumentation
+RUN /opt/antithesis/go_instrumentation/bin/goinstrumentor -version
+
 
 # build deps
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -117,6 +124,10 @@ RUN cd lighthouse && \
     cargo update -p proc-macro2 && \
     cargo build --release --manifest-path lighthouse/Cargo.toml --bin lighthouse
 
+# Antithesis instrumented lighthouse binary
+RUN cd lighthouse && \ 
+LD_LIBRARY_PATH=/usr/lib/ RUSTFLAGS="-Cpasses=sancov-module -Cllvm-args=-sanitizer-coverage-level=3 -Cllvm-args=-sanitizer-coverage-trace-pc-guard -Ccodegen-units=1 -Cdebuginfo=2 -L/usr/lib/ -lvoidstar" cargo build --release --manifest-path lighthouse/Cargo.toml --target x86_64-unknown-linux-gnu --features spec-minimal --bin lighthouse_instrumented
+
 # LODESTAR
 #FROM etb-client-builder AS lodestar-builder
 #ARG LODESTAR_BRANCH
@@ -140,9 +151,15 @@ RUN cd lighthouse && \
 #    git checkout "${NIMBUS_ETH2_BRANCH}" && \
 #    git log -n 1 --format=format:"%H" > /nimbus.version && \
 #    make -j16 update
-#
+
+# Antithensis instrumented nimbus binary
+# RUN make -j16 USE_LIBBACKTRACE=0 nimbus_beacon_node NIMFLAGS="-d:const_preset=minimal -d:web3_consensus_const_preset=minimal -d:disableMarchNative -d:FIELD_ELEMENTS_PER_BLOB=4 --cc:clang --clang.exe:clang-15 --clang.linkerexe:clang-15 --passC:'-fno-lto -fsanitize-coverage=trace-pc-guard' --passL:'-fno-lto -L/usr/lib/ -lvoidstar'"
+# RUN mv /nimbus-eth2/build/nimbus_beacon_node /nimbus-eth2/build/nimbus_beacon_node_instrumented
+
 #RUN cd nimbus-eth2 && \
 #    make -j16 nimbus_beacon_node NIMFLAGS="-d:disableMarchNative --cc:clang --clang.exe:clang-15 --clang.linkerexe:clang-15"
+
+
 
 # TEKU
 FROM etb-client-builder AS teku-builder
@@ -168,6 +185,16 @@ RUN cd teku && \
 #
 #RUN cd prysm && bazel build //cmd/beacon-chain:beacon-chain //cmd/validator:validator
 
+# Antithesis instrumented prysm binary
+# RUN /opt/antithesis/go_instrumentation/bin/goinstrumentor \
+#     -logtostderr -stderrthreshold=INFO \
+#     -antithesis /opt/antithesis/go_instrumentation/instrumentation/go/wrappers \
+#     prysm prysm_instrumented
+
+# RUN go build -tags minimal -o /validator ./cmd/validator
+# RUN go build -tags minimal -o /beacon-chain ./cmd/beacon-chain
+# RUN go build -race -tags minimal -o /validator_race ./cmd/validator
+# RUN go build -race -tags minimal -o /beacon-chain_race ./cmd/beacon-chain
 
 ############################# Execution  Clients  #############################
 # Geth
@@ -179,7 +206,21 @@ RUN git clone "${GETH_REPO}" && \
     git checkout "${GETH_BRANCH}" && \
     git log -n 1 --format=format:"%H" > /geth.version
 
-RUN cd go-ethereum && \
+# Antithesis add instrumentation
+RUN mkdir geth_instrumented
+RUN /opt/antithesis/go_instrumentation/bin/goinstrumentor \
+    -logtostderr -stderrthreshold=INFO \
+    -antithesis /opt/antithesis/go_instrumentation/instrumentation/go/wrappers \
+    go-ethereum geth_instrumented
+
+RUN cd go-ethereum && go install ./... && \
+    mv /root/go/bin/geth /tmp/geth_uninstrumented && \
+    mv /root/go/bin/bootnode /tmp/bootnode_uninstrumented
+
+RUN cd geth_instrumented/customer && \
+    go install -race ./... && mv /root/go/bin/geth /tmp/geth_race
+
+RUN cd geth_instrumented/customer && \
     go install ./...
 
 # Besu
@@ -283,7 +324,9 @@ COPY --from=misc-builder /git/beacon-metrics-gazer/target/release/beacon-metrics
 #COPY --from=nimbus-eth2-builder /nimbus.version /nimbus.version
 
 COPY --from=lighthouse-builder /lighthouse.version /lighthouse.version
-COPY --from=lighthouse-builder /git/lighthouse/target/release/lighthouse /usr/local/bin/lighthouse
+# Antithesis copy instrumented and uninstrumented versions of lighthouse
+COPY --from=lighthouse-builder /git/lighthouse/target/release/lighthouse_instrumented /usr/local/bin/lighthouse
+COPY --from=lighthouse-builder /git/lighthouse/target/release/lighthouse /usr/local/bin/lighthouse_uninstrumented
 
 COPY --from=teku-builder  /git/teku/build/install/teku/. /opt/teku
 COPY --from=teku-builder /teku.version /teku.version
