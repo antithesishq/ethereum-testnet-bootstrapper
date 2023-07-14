@@ -538,10 +538,10 @@ if __name__ == "__main__":
 #    logger.debug("status-check: args=%s", args)
 
     wait_count = 0
-    while not Path("/data/etb-config-file-ready").exists():
+    while not Path(args.config).exists():
         time.sleep(1)
         if wait_count % 10 == 0:
-            logger.debug("Waiting for /data/etb-config-file-ready -- check %d", wait_count)
+            logger.debug("Waiting for %s -- check %d", args.config, wait_count)
         wait_count += 1
 
     status_checker = TestnetStatusCheckerV2(ETBConfig(args.config, logger), logger)
