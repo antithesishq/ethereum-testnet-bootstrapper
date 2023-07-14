@@ -30,7 +30,6 @@ import requests
 from etb.monitoring.testnet_monitor import (
     TestnetMonitor,
     TestnetMonitorAction,
-    ActionInterval,
     TestnetMonitorActionInterval,
 )
 
