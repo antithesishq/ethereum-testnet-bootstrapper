@@ -193,7 +193,7 @@ def get_all_slots_per_client(client):
     try:
         while (True):
             b = BeaconAPIgetBlockV1(max_retries= 2, timeout=15)
-            _e, response = b.perform_request(client)
+            response = b.perform_request(client)
             data = b.get_block(response)
             # print(data)
             p = data['parent_root']
@@ -362,12 +362,12 @@ class ValidatorStatus:
 
 def get_validators_from_client(clients_to_monitor: list[ClientInstance]):
     validators:list[ValidatorStatus] = []
-    rpc_request = BeaconAPIgetValidators(max_retries=5, timeout=3)
     client_validators = {"client": "None", "validators": validators}
     # for client, result in perform_batched_request(rpc_request, clients_to_monitor):
+    rpc_request = BeaconAPIgetValidators(max_retries=5, timeout=3)
     for client in clients_to_monitor:
-        error, response = rpc_request.perform_request(client)
-        if error is None:
+        response = rpc_request.perform_request(client)
+        if rpc_request.is_valid(response):
             data = rpc_request.get_validators(response)
             for v in data:
                 if v:
