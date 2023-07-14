@@ -403,7 +403,7 @@ class TestnetStatusCheckerV2(object):
     def perform_finite_status_check(self, args):
 
         # go ahead and get the defaults.
-        slots_per_epoch = self.etb_config.preset_base.SLOTS_PER_EPOCH.value
+        slots_per_epoch = self.etb_config.testnet_config.consensus_layer.preset_base.SLOTS_PER_EPOCH.value
         if args.phase0_slot == -1:
             phase0_slot = slots_per_epoch
         else:
