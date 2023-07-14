@@ -245,6 +245,7 @@ RUN git clone "${NETHERMIND_REPO}" && \
     git checkout "${NETHERMIND_BRANCH}" && \
     git log -n 1 --format=format:"%H" > /nethermind.version
 
+# Antithesis disable PublishReadyToRun to avoid mixed DLLs
 RUN cd nethermind && \
     dotnet publish -p:PublishReadyToRun=false src/Nethermind/Nethermind.Runner -c release -o out
 
@@ -277,6 +278,12 @@ RUN cd beacon-metrics-gazer && \
 FROM debian:bullseye-slim
 
 WORKDIR /git
+
+# Antithesis add instrumentation
+ENV LD_LIBRARY_PATH=/usr/lib/
+COPY instrumentation/lib/libvoidstar.so /usr/lib/libvoidstar.so
+RUN mkdir -p /opt/antithesis/
+COPY instrumentation/go_instrumentation /opt/antithesis/go_instrumentation
 
 RUN apt update && apt install curl ca-certificates -y --no-install-recommends \
     wget \
