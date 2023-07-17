@@ -36,9 +36,11 @@ jobs:
     - name: Build etb-all-clients images
       timeout-minutes: 500
       run: |
-          make build-client-images
+          make build-all-images
     - name: Push etb-all-clients images
       timeout-minutes: 500
       run: |
           docker tag etb-all-clients:mainnet-deneb ${REGISTRY}/${REPOSITORY}/etb-all-clients:latest-deneb
           docker push ${REGISTRY}/${REPOSITORY}/etb-all-clients:latest-deneb
+          docker tag ethereum-testnet-bootstrapper ${REGISTRY}/${REPOSITORY}/ethereum-testnet-bootstrapper:latest-deneb
+          docker push ${REGISTRY}/${REPOSITORY}/ethereum-testnet-bootstrapper:latest-deneb
