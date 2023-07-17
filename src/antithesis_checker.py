@@ -188,7 +188,7 @@ def get_all_slots_per_client(client):
     parents_and_slots = []
     # We are not checking for forks in teku
     # This is a temporary if statement to avoid querying for teku, their api is super slow and will extend the rollout unnecessarily
-    if "teku" in client.root_name :
+    if "teku" in client.collection_name :
         return []
     try:
         while (True):
@@ -198,7 +198,7 @@ def get_all_slots_per_client(client):
             # print(data)
             p = data['parent_root']
             s = data['slot']
-            print(f"{client.root_name}: {[p, s]}")
+            print(f"{client.collection_name}: {[p, s]}")
             parents_and_slots.append([p, s])
             if (p == '0x0000000000000000000000000000000000000000000000000000000000000000'):
                 # print("End of block has been reached")
@@ -207,7 +207,7 @@ def get_all_slots_per_client(client):
         print(e)
         # It could be possible that we retrieve a response for one slot but not the next slot because of connection issues, this might produce an incomplete chain, therefore we just return the empty chain. No point requering after 15 seconds
         return []
-    return [client.root_name, parents_and_slots]
+    return [client.collection_name, parents_and_slots]
 
 def calculate_slots_skipped_by_all_clients(clients_and_data, highest_slot):
     clients_to_skipped_slots = {}
@@ -374,7 +374,7 @@ def get_validators_from_client(clients_to_monitor: list[ClientInstance]):
                     client_validators["validators"].append(ValidatorStatus(v["validator"]["pubkey"], v["status"]))
                 else:
                     client_validators["validators"].append(ValidatorStatus("Unknown", "Unknown"))
-            client_validators["client"] = client.root_name
+            client_validators["client"] = client.collection_name
             break
     return client_validators
 
@@ -398,6 +398,7 @@ class TestnetStatusCheckerV2(object):
             self.logger = logger
 
         self.clients_to_monitor = self.etb_config.get_client_instances()
+        
         self.testnet_monitor = TestnetMonitor(self.etb_config)
 
     def perform_finite_status_check(self, args):
@@ -537,10 +538,10 @@ if __name__ == "__main__":
 #    logger.debug("status-check: args=%s", args)
 
     wait_count = 0
-    while not Path(args.config).exists():
+    while not Path("/data/etb-config-checkpoint.txt").exists():
         time.sleep(1)
         if wait_count % 10 == 0:
-            logger.debug("Waiting for %s -- check %d", args.config, wait_count)
+            logger.debug("Waiting for %s -- check %d", "/data/etb-config-checkpoint.txt", wait_count)
         wait_count += 1
 
     status_checker = TestnetStatusCheckerV2(ETBConfig(Path(args.config)), logger)

@@ -329,7 +329,7 @@ class BeaconAPIgetValidators(BeaconAPIRequest):
         self, response: Union[Exception, requests.Response]
     ) -> Union[Exception, dict]:
         if self.is_valid(response):
-            return response.json()["data"]["message"]
+            return response.json()["data"]
 
         return response  # the exception
 
