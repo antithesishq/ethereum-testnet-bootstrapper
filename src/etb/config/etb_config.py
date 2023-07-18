@@ -60,7 +60,7 @@ class DockerConfig(Config):
 
         self.network_name: str = config["network-name"]
         self.ip_subnet: str = config["ip-subnet"]
-        self.volumes: List[str] = ["./data:/data", "./:/source/"]
+        self.volumes: List[str] = ["./data:/data", "./:/source/", "./capture_logs:/logs"]
 
 
 class FilesConfig(Config):
