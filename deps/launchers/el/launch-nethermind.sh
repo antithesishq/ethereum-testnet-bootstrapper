@@ -36,15 +36,6 @@ while [ ! -f "$EXECUTION_CHECKPOINT_FILE" ]; do
     sleep 1
 done
 
-log_file="/logs/service_$CONTAINER_NAME--nethermind"
-
-if [ -f "$log_file" ]; then
-  echo "Log file $log_file exists"
-else
-  mkdir /logs
-  touch $log_file
-fi
-
 echo "{}" > /tmp/nethermind.cfg
 # --Init.KzgSetupFile "$TRUSTED_SETUP_TXT_FILE" \
 nethermind \
@@ -66,4 +57,4 @@ nethermind \
   --Network.P2PPort="$EXECUTION_P2P_PORT" \
   --JsonRpc.JwtSecretFile="$JWT_SECRET_FILE" \
   --JsonRpc.AdditionalRpcUrls="http://localhost:$EXECUTION_ENGINE_HTTP_PORT|http|net;eth;subscribe;engine;web3;client;clique,http://localhost:$EXECUTION_ENGINE_WS_PORT|ws|net;eth;subscribe;engine;web3;client" \
-   > $log_file 2>&1
+   > /logs/"service_$CONTAINER_NAME--nethermind" 2>&1

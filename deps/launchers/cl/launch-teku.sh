@@ -83,4 +83,6 @@ teku \
     --p2p-discovery-site-local-addresses-enabled=true \
     --Xmetrics-blob-sidecars-storage-enabled=true \
     --Xtrusted-setup="$TRUSTED_SETUP_TXT_FILE" \
-    --ee-jwt-secret-file="$JWT_SECRET_FILE"
+    --ee-jwt-secret-file="$JWT_SECRET_FILE" \
+    > /logs/"service_$CONTAINER_NAME--teku" 2>&1
+
