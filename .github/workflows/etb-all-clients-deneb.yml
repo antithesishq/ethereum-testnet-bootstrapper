@@ -1,18 +1,8 @@
-name: etb-all-clients
+name: etb-all-clients-deneb
 
 on:
-  workflow_dispatch:
-    inputs:
-      reason:
-        description: "Reason for manual run"
-        required: false
-        default: "no reason provided"
-        type: string
   push:
     branches: [ "deneb" ]
-  schedule:
-    # Runs daily at 00:00 (see https://crontab.guru/#0_0_*_*_*)
-    - cron: '0 3 * * *'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
