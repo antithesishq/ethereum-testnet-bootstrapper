@@ -1,0 +1,36 @@
+name: etb-all-clients-deneb
+
+on:
+  push:
+    branches: [ "deneb" ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+    REGISTRY: us-central1-docker.pkg.dev/molten-verve-216720
+    REPOSITORY: ethereum-repository
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+    - uses: actions/checkout@v3
+    - name: Registry login
+      uses: docker/login-action@v2
+      with:
+        registry: us-central1-docker.pkg.dev
+        username: _json_key
+        password: ${{ secrets.ANTITHESIS_LOGIN_FILE }}
+    - name: Build etb-all-clients images
+      timeout-minutes: 500
+      run: |
+          make build-all-images
+    - name: Push etb-all-clients images
+      timeout-minutes: 500
+      run: |
+          docker tag etb-all-clients:mainnet-deneb ${REGISTRY}/${REPOSITORY}/etb-all-clients:latest-deneb
+          docker push ${REGISTRY}/${REPOSITORY}/etb-all-clients:latest-deneb
+          docker tag ethereum-testnet-bootstrapper ${REGISTRY}/${REPOSITORY}/ethereum-testnet-bootstrapper:latest-deneb
+          docker push ${REGISTRY}/${REPOSITORY}/ethereum-testnet-bootstrapper:latest-deneb
