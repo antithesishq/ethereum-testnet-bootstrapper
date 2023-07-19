@@ -1,4 +1,3 @@
-# quick test
 .PHONY: clean
 log_level ?= "info"
 # Build ethereum-testnet-bootstrapper image
