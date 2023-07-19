@@ -13,14 +13,10 @@ build-config:
 	make clean
 	make init-testnet config=/configs/mainnet-deneb-testnet.yaml log_level=debug
 	docker build -t etb-mainnet-config -f config.Dockerfile .
-	sudo rm -r $(shell pwd)/data/
-	sudo rm -r $(shell pwd)/src/
 rebuild-config:
 	make clean
 	make init-testnet config=/configs/mainnet-deneb-testnet.yaml log_level=debug
 	docker build --no-cache -t etb-mainnet-config -f config.Dockerfile .
-	sudo rm -r $(shell pwd)/data/
-	sudo rm -r $(shell pwd)/src/
 
 # Build the etb-all-clients images:
 build-client-images:
