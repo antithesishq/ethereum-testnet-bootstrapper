@@ -10,12 +10,14 @@ rebuild-bootstrapper:
 # (You can change the config= param to any of the yaml files in configs folder, you should also change the tag in the docker build of this step to respect this change)
 build-config:
 	make clean
-	make init-testnet config=configs/mainnet-deneb-testnet.yaml log_level=debug
+	make init-testnet config=/configs/mainnet-deneb-testnet.yaml log_level=debug
 	docker build -t etb-mainnet-config -f config.Dockerfile .
+	make clean
 rebuild-config:
 	make clean
-	make init-testnet config=configs/mainnet-deneb-testnet.yaml log_level=debug
+	make init-testnet config=/configs/mainnet-deneb-testnet.yaml log_level=debug
 	docker build --no-cache -t etb-mainnet-config -f config.Dockerfile .
+	make clean
 
 # Build the etb-all-clients images:
 build-client-images:
@@ -38,4 +40,4 @@ run-bootstrapper:
 
 # remove last run.
 clean:
-	docker run -t -v $(shell pwd)/:/source/ -v $(shell pwd)/data/:/data ethereum-testnet-bootstrapper --clean --log-level $(log_level)
+	docker run -v $(shell pwd)/:/source/ -v $(shell pwd)/data/:/data ethereum-testnet-bootstrapper --clean --log-level $(log_level)
