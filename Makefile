@@ -9,7 +9,6 @@ rebuild-bootstrapper:
 # Build etb-mainnet-config or etb-minimal-config
 # (You can change the config= param to any of the yaml files in configs folder, you should also change the tag in the docker build of this step to respect this change)
 build-config:
-	ls $(shell pwd)
 	make clean
 	make init-testnet config=/configs/mainnet-deneb-testnet.yaml log_level=debug
 	docker build -t etb-mainnet-config -f config.Dockerfile .
