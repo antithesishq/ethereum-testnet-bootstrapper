@@ -34,6 +34,4 @@ jobs:
           docker push ${REGISTRY}/${REPOSITORY}/etb-all-clients:latest-deneb
           docker tag ethereum-testnet-bootstrapper ${REGISTRY}/${REPOSITORY}/ethereum-testnet-bootstrapper:latest-deneb
           docker push ${REGISTRY}/${REPOSITORY}/ethereum-testnet-bootstrapper:latest-deneb
-          docker tag etb-mainnet-config ${REGISTRY}/${REPOSITORY}/etb-mainnet-config:latest-deneb
-          docker push ${REGISTRY}/${REPOSITORY}/etb-mainnet-config:latest-deneb
           
