@@ -1,4 +1,4 @@
-name: etb-all-clients-deneb
+name: etb-all-clients-denebV2
 
 on:
   push:
