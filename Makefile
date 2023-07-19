@@ -14,7 +14,7 @@ build-config:
 	make init-testnet config=/configs/mainnet-deneb-testnet.yaml log_level=debug
 	docker build -t etb-mainnet-config -f config.Dockerfile .
 	sudo rm -r $(shell pwd)/data/
-	sudo rm -r $(shell pwd)/src/
+	sudo rm -r $(shell pwd)/src/etb/
 rebuild-config:
 	make clean
 	make init-testnet config=/configs/mainnet-deneb-testnet.yaml log_level=debug
