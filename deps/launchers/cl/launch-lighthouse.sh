@@ -32,6 +32,9 @@ for var in "${env_vars[@]}" ; do
     fi
 done
 
+# antithesis overwrite lighthouse log level
+CONSENSUS_LOG_LEVEL = "info"
+
 # we can wait for the bootnode enr to drop before we get the signal to start up.
 while [ ! -f "$CONSENSUS_BOOTNODE_FILE" ]; do
   echo "consensus client waiting for bootnode enr file: $CONSENSUS_BOOTNODE_FILE"
