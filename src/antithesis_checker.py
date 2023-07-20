@@ -192,15 +192,15 @@ def get_all_slots_per_client(client):
         return []
     try:
         while (True):
-            b = BeaconAPIgetBlockV1(max_retries= 2, timeout=15)
+            b = BeaconAPIgetBlockV2(max_retries= 2, timeout=15)
             response = b.perform_request(client)
             data = b.get_block(response)
-            # print(data)
+            print(data)
             p = data['parent_root']
             s = data['slot']
             print(f"{client.collection_name}: {[p, s]}")
             parents_and_slots.append([p, s])
-            if (p == '0x0000000000000000000000000000000000000000000000000000000000000000'):
+            if (p == '0x0000000000000000000000000000000000000000000000000000000000000000' or s == 0):
                 # print("End of block has been reached")
                 break
     except Exception as e:
@@ -425,8 +425,7 @@ class TestnetStatusCheckerV2(object):
         else:
             phase3_slot = args.phase3_slot
 
-        print(f"phase0_slot: {phase0_slot}\nphase1_slot: {phase1_slot}\n", flush=True)
-        print(f"phase2_slot: {phase2_slot}\nphase3_slot: {phase3_slot}\n", flush=True)
+        print(f"phase0_slot: {phase0_slot}\nphase1_slot: {phase1_slot}\nphase2_slot: {phase2_slot}\nphase3_slot: {phase3_slot}", flush=True)
 
         self.testnet_monitor.wait_for_slot(phase0_slot)
         # antithesis
@@ -435,8 +434,8 @@ class TestnetStatusCheckerV2(object):
         print("checking validator status...", flush=True)
         client_validators = get_validators_from_client(self.clients_to_monitor)
         print(f"validators_count: {len(client_validators['validators'])}", flush=True)
-        print(encoder.encode(client_validators), flush=True)
-        # print(f"validators: {encoder.encode(validators)}", flush=True)
+        # print(encoder.encode(client_validators), flush=True)
+        print(f"validators: {encoder.encode(client_validators)}", flush=True)
 
         # if check_for_consensus(self.clients_to_monitor):
         #     print(f"Phase0 passed.", flush=True)
