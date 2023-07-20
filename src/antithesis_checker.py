@@ -465,8 +465,8 @@ class TestnetStatusCheckerV2(object):
             print("Phase3 passed.", flush=True)
         else:
             print("Phase3 failed.", flush=True)
-
-        print_all_data_for_every_client(self.clients_to_monitor)
+        # This currently causes an endless loop   
+        # print_all_data_for_every_client(self.clients_to_monitor)
         print("workload_complete", flush=True)
 
     def perform_indefinite_status_check(self):
