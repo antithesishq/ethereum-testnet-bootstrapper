@@ -36,8 +36,3 @@ jobs:
           docker push ${REGISTRY}/${REPOSITORY}/ethereum-testnet-bootstrapper:latest-deneb
           docker tag etb-mainnet-config ${REGISTRY}/${REPOSITORY}/etb-mainnet-config:latest-deneb
           docker push ${REGISTRY}/${REPOSITORY}/etb-mainnet-config:latest-deneb
-    - name: Clean python resources  
-      timeout-minutes: 500
-      run: |
-        sudo rm -r /home/devops/antithesis-ethereum-testnet-bootstrapper/antithesis-ethereum-testnet-bootstrapper/ethereum-testnet-bootstrapper/ethereum-testnet-bootstrapper/src/etb
-        sudo rm -r /home/devops/antithesis-ethereum-testnet-bootstrapper/antithesis-ethereum-testnet-bootstrapper/ethereum-testnet-bootstrapper/ethereum-testnet-bootstrapper/data/
