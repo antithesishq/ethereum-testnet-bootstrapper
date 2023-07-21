@@ -23,6 +23,7 @@ from ...interfaces.client_request import (
     BeaconAPIgetFinalityCheckpoints,
     BeaconAPIgetPeers,
     BeaconAPIgetIdentity,
+    BeaconAPIgetBlob,
 )
 
 """
@@ -468,4 +469,43 @@ class ConsensusLayerPeeringSummary:
             out += f"\tinbound: {inbound_peer_map[client]}\n"
             out += f"\toutbound: {outbound_peer_map[client]}\n"
 
+        return out
+
+
+BlobSideCar = tuple[int, str, int]
+
+class BlobMonitor(ConsensusMetricMonitor):
+    """
+    A monitor that reports the blob sidecar of the clients.
+    It will retry the query up to max_retries_for_consensus times.
+    """
+
+    def __init__(
+        self, max_retries: int = 3, timeout: int = 5, max_retries_for_consensus: int = 3
+    ):
+        self.query = BeaconAPIgetBlob(max_retries=max_retries, timeout=timeout)
+        self.max_retry_for_consensus = max_retries_for_consensus
+
+        super().__init__(
+            client_query=self.query.perform_request,
+            response_parser=self._get_blob_metadata,
+        )
+
+    def _get_blob_metadata(
+        self, response: requests.Response
+    ) -> Optional[BlobSideCar]:
+        try:
+            blob = self.query.get_blob(response)
+            slot = blob["slot"]
+            proposer = blob["proposer_index"]
+            block_root = f'0x{blob["block_root"][-8:]}'
+            return slot, block_root, proposer
+        except Exception as e:
+            logging.debug(f"Exception parsing response: {e}")
+            return None
+
+    def report_metric(self) -> str:
+        """Report the results obtained from the measurements."""
+        out = f"num_blob_forks: {len(self.consensus_results) - 1}\n"
+        out += super().report_metric()
         return out

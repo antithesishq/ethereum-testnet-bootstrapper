@@ -95,6 +95,28 @@ class PeersMonitorAction(TestnetMonitorAction):
             f"{self.get_peering_summary_monitor.run(self.instances_to_monitor)}\n"
         )
 
+class BlobMonitorAction(TestnetMonitorAction):
+    def __init__(
+        self,
+        client_instances: list[ClientInstance],
+        max_retries: int,
+        timeout: int,
+        max_retries_for_consensus: int,  # not used.
+        interval: TestnetMonitorActionInterval,
+    ):
+        super().__init__(name="blob-monitor", interval=interval)
+        self.get_blob_monitor = ExecutionLayerBlobSummary(
+            max_retries=max_retries,
+            timeout=timeout,
+        )
+        self.instances_to_monitor = client_instances
+
+    def perform_action(self):
+        logging.info("blob-info:")
+        logging.info(
+            f"{self.get_blob_monitor.run(self.instances_to_monitor)}\n"
+        )
+
 
 class NodeWatch:
     """
@@ -128,11 +150,12 @@ class NodeWatch:
         @return: a TestnetMonitor.
         """
         metrics: dict[
-            str, Type[Union[HeadsMonitorAction, CheckpointsMonitorAction]]
+            str, Type[Union[HeadsMonitorAction, CheckpointsMonitorAction, PeersMonitorAction]]
         ] = {
             "heads": HeadsMonitorAction,
             "checkpoints": CheckpointsMonitorAction,
             "peers": PeersMonitorAction,
+            "blob": BlobMonitorAction,
         }
 
         intervals = {

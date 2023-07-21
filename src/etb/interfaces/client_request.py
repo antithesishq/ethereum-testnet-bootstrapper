@@ -520,3 +520,22 @@ class BeaconAPIgetPeers(BeaconAPIRequest):
             return response.json()["data"]
 
         return response  # the exception
+
+
+class BeaconAPIgetBlob(BeaconAPIRequest):
+    """
+    /eth/v2/beacon/blocks/{block} beaconAPI request.
+    https://ethereum.github.io/beacon-APIs/#/Beacon/getBlobSidecars
+    """
+
+    def __init__(self, block="head", max_retries: int = 3, timeout: int = 5):
+        payload = f"/eth/v1/beacon/blob_sidecars/{block}"
+        super().__init__(payload=payload, max_retries=max_retries, timeout=timeout)
+
+    def get_blob(
+        self, response: Union[Exception, requests.Response]
+    ) -> Union[Exception, dict]:
+        if self.is_valid(response):
+            return response.json()["data"]
+
+        return response  # the exception
