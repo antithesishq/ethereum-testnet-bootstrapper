@@ -35,7 +35,6 @@ from etb.monitoring.testnet_monitor import (
 from etb.interfaces.client_request import (
     perform_batched_request,
     BeaconAPIgetBlockV2,
-    BeaconAPIgetBlockV1,
     BeaconAPIgetValidators,
 )
 
