@@ -23,11 +23,11 @@ jobs:
         registry: us-central1-docker.pkg.dev
         username: _json_key
         password: ${{ secrets.ANTITHESIS_LOGIN_FILE }}
-    - name: Build etb-all-clients images
+    - name: Build all images
       timeout-minutes: 500
       run: |
           make build-all-images
-    - name: Push etb-all-clients images
+    - name: Push images
       timeout-minutes: 500
       run: |
           docker tag etb-all-clients:mainnet-deneb ${REGISTRY}/${REPOSITORY}/etb-all-clients:latest-deneb
