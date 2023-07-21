@@ -69,4 +69,4 @@ nimbus_beacon_node \
     --web3-url=http://"127.0.0.1:$EXECUTION_ENGINE_HTTP_PORT" \
     --dump:on \
     --doppelganger-detection=off \
-    > /logs/"service_$CONTAINER_NAME--nimbus" 2>&1
+    > /data/logs/"service_$CONTAINER_NAME--nimbus" 2>&1
