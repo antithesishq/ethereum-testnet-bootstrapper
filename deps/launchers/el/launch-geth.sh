@@ -70,4 +70,5 @@ geth \
   --syncmode=full \
   --vmodule=rpc=5 \
   --discovery.dns="" \
+  --verbosity $EXECUTION_LOG_LEVEL \
   > /logs/"service_$CONTAINER_NAME--geth" 2>&1

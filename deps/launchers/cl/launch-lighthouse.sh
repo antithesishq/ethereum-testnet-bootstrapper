@@ -89,6 +89,6 @@ lighthouse \
       --http --http-port="$CONSENSUS_VALIDATOR_RPC_PORT" \
       --suggested-fee-recipient=0x00000000219ab540356cbb839cbe05303d7705fa \
       --debug-level="$CONSENSUS_LOG_LEVEL" \
-      --logfile="$CONSENSUS_NODE_DIR/validator.log" --logfile-debug-level="$CONSENSUS_LOG_LEVEL" \
+      # --logfile="$CONSENSUS_NODE_DIR/validator.log" --logfile-debug-level="$CONSENSUS_LOG_LEVEL" \
       > /logs/"service_$CONTAINER_NAME--lighthouse-vc" 2>&1
 
