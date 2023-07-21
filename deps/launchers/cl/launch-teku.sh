@@ -84,5 +84,5 @@ teku \
     --Xmetrics-blob-sidecars-storage-enabled=true \
     --Xtrusted-setup="$TRUSTED_SETUP_TXT_FILE" \
     --ee-jwt-secret-file="$JWT_SECRET_FILE" \
-    > /logs/"service_$CONTAINER_NAME--teku" 2>&1
+    > /data/logs/"service_$CONTAINER_NAME--teku" 2>&1
 
