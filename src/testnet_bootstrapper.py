@@ -117,6 +117,14 @@ class EthereumTestnetBootstrapper:
             )
         local_testnet_dir.mkdir(parents=True)  # /data/local_testnet
 
+        # Antithesis capture logs via a mounted directory.
+        local_logs_dir: pathlib.Path = etb_config.files.local_logs_dir
+
+        if local_logs_dir.exists():
+            raise Exception(
+                f"non-empty local-logs-dir:{local_logs_dir}, please run `make clean` first."
+            )
+        local_logs_dir.mkdir(parents=True)  # /data/local_testnet
         # create the client directories
         # directory structure:
         # /testnet_root/local_testnet/collection_name/node_<node_num>/{cl

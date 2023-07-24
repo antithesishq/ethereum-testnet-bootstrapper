@@ -21,6 +21,7 @@ from etb.monitoring.monitors.consensus_monitors import (
     HeadsMonitor,
     CheckpointsMonitor,
     ConsensusLayerPeeringSummary,
+    BlobMonitor,
 )
 from etb.monitoring.testnet_monitor import (
     TestnetMonitor,
@@ -105,7 +106,7 @@ class BlobMonitorAction(TestnetMonitorAction):
         interval: TestnetMonitorActionInterval,
     ):
         super().__init__(name="blob-monitor", interval=interval)
-        self.get_blob_monitor = ExecutionLayerBlobSummary(
+        self.get_blob_monitor = BlobMonitor(
             max_retries=max_retries,
             timeout=timeout,
         )

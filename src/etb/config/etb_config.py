@@ -86,6 +86,8 @@ class FilesConfig(Config):
             "consensus-bootnode-file": "/data/consensus-bootnodes.txt",
             "etb-config-file": "/data/etb-config.yaml",
             "local-testnet-dir": "/data/local-testnet/",
+            # antithesis capture log directory
+            "local-log-dir": "/data/logs/",
             "docker-compose-file": "/source/docker-compose.yaml",  # used by host so use /source/
             "etb-config-checkpoint-file": "/data/etb-config-checkpoint.txt",
             "consensus-checkpoint-file": "/data/consensus-checkpoint.txt",
@@ -121,6 +123,7 @@ class FilesConfig(Config):
         self.etb_config_file: pathlib.Path = pathlib.Path(fields["etb-config-file"])
         self.testnet_root: pathlib.Path = pathlib.Path(fields["testnet-root"])
         self.local_testnet_dir: pathlib.Path = pathlib.Path(fields["local-testnet-dir"])
+        self.local_logs_dir: pathlib.Path = pathlib.Path(fields["local-log-dir"])
         self.docker_compose_file: pathlib.Path = pathlib.Path(
             fields["docker-compose-file"]
         )
