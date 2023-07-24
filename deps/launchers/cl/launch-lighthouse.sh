@@ -76,7 +76,7 @@ lighthouse \
       --trusted-setup-file-override="$TRUSTED_SETUP_JSON_FILE" \
       --self-limiter="blob_sidecars_by_range:512/10" \
       --suggested-fee-recipient=0x00000000219ab540356cbb839cbe05303d7705fa \
-        > /logs/"service_$CONTAINER_NAME--lighthouse-bn" 2>&1 &
+        > /data/logs/"service_$CONTAINER_NAME--lighthouse-bn" 2>&1 &
 
 echo "Launching Lighthouse validator client in ${CONTAINER_NAME}"
 sleep 10
@@ -92,6 +92,6 @@ lighthouse \
       --http --http-port="$CONSENSUS_VALIDATOR_RPC_PORT" \
       --suggested-fee-recipient=0x00000000219ab540356cbb839cbe05303d7705fa \
       --debug-level="$CONSENSUS_LOG_LEVEL" \
+      > /data/logs/"service_$CONTAINER_NAME--lighthouse-vc" 2>&1
       # --logfile="$CONSENSUS_NODE_DIR/validator.log" --logfile-debug-level="$CONSENSUS_LOG_LEVEL" \
-      > /logs/"service_$CONTAINER_NAME--lighthouse-vc" 2>&1
 

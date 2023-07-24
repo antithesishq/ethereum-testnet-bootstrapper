@@ -3,7 +3,7 @@
 docker:
     network-name: "ethereum-testnet"
     ip-subnet: "10.0.20.0/24"
-    volumes: ['./data:/data/', './:/source/', './data/capture_logs:/logs']
+    volumes: ['./data:/data/', './:/source/']
 
 # add optional custom files here. They are propagated to all container env.
 # NOTE: default values are not overwritten!
