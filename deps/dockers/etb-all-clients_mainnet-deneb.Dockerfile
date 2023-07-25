@@ -166,9 +166,19 @@ RUN cd teku && \
 #    git checkout "${PRYSM_BRANCH}" && \
 #    git log -n 1 --format=format:"%H" > /prysm.version
 #
-#RUN cd prysm && bazel build //cmd/beacon-chain:beacon-chain //cmd/validator:validator
-
-
+#RUN cd prysm && \
+#    go build -race -tags minimal -o /validator_race ./cmd/validator && \
+#    go build -race -tags minimal -o /beacon-chain_race ./cmd/beacon-chain
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
 ############################# Execution  Clients  #############################
 # Geth
 FROM etb-client-builder AS geth-builder
@@ -180,7 +190,7 @@ RUN git clone "${GETH_REPO}" && \
     git log -n 1 --format=format:"%H" > /geth.version
 
 RUN cd go-ethereum && \
-    go install ./...
+    go install -race ./...
 
 # Besu
 #FROM etb-client-builder AS besu-builder
