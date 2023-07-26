@@ -142,7 +142,7 @@ RUN cd lighthouse && \
 #    make -j16 update
 #
 #RUN cd nimbus-eth2 && \
-#    make -j16 nimbus_beacon_node NIMFLAGS="-d:disableMarchNative --cc:clang --clang.exe:clang-15 --clang.linkerexe:clang-15"
+#    make -j16 nimbus_beacon_node NIMFLAGS="-d:disableMarchNative --cc:clang --clang.exe:clang-15 --clang.linkerexe:clang-15 --passC:'-fsanitize=thread' --passL:'-fsanitize=thread'"
 
 # TEKU
 FROM etb-client-builder AS teku-builder
