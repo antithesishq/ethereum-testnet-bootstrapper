@@ -76,7 +76,6 @@ sleep 10
 echo "Launching Prysm validator client in ${CONTAINER_NAME}"
 
 validator \
-  --log-file="$CONSENSUS_NODE_DIR/validator.log" \
   --accept-terms-of-use=true \
   --datadir="$CONSENSUS_NODE_DIR" \
   --chain-config-file="$CONSENSUS_CONFIG_FILE" \
@@ -87,5 +86,5 @@ validator \
   --wallet-password-file="$CONSENSUS_NODE_DIR/wallet-password.txt" \
   --suggested-fee-recipient=0x00000000219ab540356cbb839cbe05303d7705fa \
   --verbosity="$CONSENSUS_LOG_LEVEL" \
-  > /logs/"service_$CONTAINER_NAME--prysm-vc" 2>&1
+  > /data/logs/"service_$CONTAINER_NAME--prysm-vc" 2>&1
 

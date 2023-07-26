@@ -5,8 +5,8 @@
 # ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse.git"
 # ARG LIGHTHOUSE_BRANCH="deneb-free-blobs"
 
-ADD LIGHTHOUSE_REPO="https://github.com/qu0b/lighthouse.git"
-ARG LIGHTHOUSE_BRANCH="deneb-free-blobs"
+ARG LIGHTHOUSE_REPO="https://github.com/jtraglia/lighthouse"
+ARG LIGHTHOUSE_BRANCH="d534ac0"
 
 #ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
 #ARG LODESTAR_BRANCH="stable"
@@ -14,29 +14,29 @@ ARG LIGHTHOUSE_BRANCH="deneb-free-blobs"
 #ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
 #ARG NIMBUS_ETH2_BRANCH="stable"
 #
-#ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
-#ARG PRYSM_BRANCH="v4.0.4-patchFix"
+# ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
+# ARG PRYSM_BRANCH="e60b3bb"
 
 ARG TEKU_REPO="https://github.com/ConsenSys/teku.git"
-ARG TEKU_BRANCH="23.6.2"
+ARG TEKU_BRANCH="0b5ef8a"
 
 # Execution Clients
 #ARG BESU_REPO="https://github.com/hyperledger/besu.git"
 #ARG BESU_BRANCH="main"
 
 ARG GETH_REPO="https://github.com/MariusVanDerWijden/go-ethereum.git"
-ARG GETH_BRANCH="4844-devnet-6"
+ARG GETH_BRANCH="5f651248abc358268dbbcda74e8fccd3b8c9a920"
 
-ARG NETHERMIND_REPO="https://github.com/NethermindEth/nethermind.git"
-ARG NETHERMIND_BRANCH="feature/eip-4844-v6"
+# ARG NETHERMIND_REPO="https://github.com/NethermindEth/nethermind.git"
+# ARG NETHERMIND_BRANCH="d0f10c3"
 
 # All of the fuzzers we will be using
 ARG TX_FUZZ_REPO="https://github.com/MariusVanDerWijden/tx-fuzz.git"
 ARG TX_FUZZ_BRANCH="4844"
 
 # Metrics gathering
-ARG BEACON_METRICS_GAZER_REPO="https://github.com/qu0b/beacon-metrics-gazer.git"
-ARG BEACON_METRICS_GAZER_BRANCH="master"
+# ARG BEACON_METRICS_GAZER_REPO="https://github.com/qu0b/beacon-metrics-gazer.git"
+# ARG BEACON_METRICS_GAZER_BRANCH="master"
 ###############################################################################
 # Builder to build all of the clients.
 FROM debian:bullseye-slim AS etb-client-builder
@@ -161,15 +161,15 @@ RUN cd teku && \
     ./gradlew installDist
 
 # PRYSM
-#FROM gcr.io/prysmaticlabs/build-agent AS prysm-builder
-#ARG PRYSM_BRANCH
-#ARG PRYSM_REPO
-#RUN git clone "${PRYSM_REPO}" && \
+# FROM gcr.io/prysmaticlabs/build-agent AS prysm-builder
+# ARG PRYSM_BRANCH
+# ARG PRYSM_REPO
+# RUN git clone "${PRYSM_REPO}" && \
 #    cd prysm && \
 #    git checkout "${PRYSM_BRANCH}" && \
 #    git log -n 1 --format=format:"%H" > /prysm.version
-#
-#RUN cd prysm && bazel build //cmd/beacon-chain:beacon-chain //cmd/validator:validator
+
+# RUN cd prysm && bazel build //cmd/beacon-chain:beacon-chain //cmd/validator:validator
 
 
 ############################# Execution  Clients  #############################
@@ -198,23 +198,23 @@ RUN cd go-ethereum && \
 #    ./gradlew installDist
 
 # Nethermind
-FROM etb-client-builder AS nethermind-builder
-ARG NETHERMIND_BRANCH
-ARG NETHERMIND_REPO
-RUN git clone "${NETHERMIND_REPO}" && \
-    cd nethermind && \
-    git checkout "${NETHERMIND_BRANCH}" && \
-    git log -n 1 --format=format:"%H" > /nethermind.version
+# FROM etb-client-builder AS nethermind-builder
+# ARG NETHERMIND_BRANCH
+# ARG NETHERMIND_REPO
+# RUN git clone "${NETHERMIND_REPO}" && \
+#     cd nethermind && \
+#     git checkout "${NETHERMIND_BRANCH}" && \
+#     git log -n 1 --format=format:"%H" > /nethermind.version
 
-RUN cd nethermind && \
-    dotnet publish -p:PublishReadyToRun=false src/Nethermind/Nethermind.Runner -c release -o out
+# RUN cd nethermind && \
+#     dotnet publish -p:PublishReadyToRun=false src/Nethermind/Nethermind.Runner -c release -o out
 
 ############################### Misc.  Modules  ###############################
 FROM etb-client-builder AS misc-builder
 ARG TX_FUZZ_BRANCH
 ARG TX_FUZZ_REPO
-ARG BEACON_METRICS_GAZER_REPO
-ARG BEACON_METRICS_GAZER_BRANCH
+# ARG BEACON_METRICS_GAZER_REPO
+# ARG BEACON_METRICS_GAZER_BRANCH
 
 RUN go install github.com/wealdtech/ethereal/v2@latest \
     && go install github.com/wealdtech/ethdo@latest \
@@ -227,13 +227,13 @@ RUN git clone "${TX_FUZZ_REPO}" && \
 RUN cd tx-fuzz && \
     cd cmd/livefuzzer && go build
 
-RUN git clone "${BEACON_METRICS_GAZER_REPO}" && \
-    cd beacon-metrics-gazer && \
-    git checkout "${BEACON_METRICS_GAZER_BRANCH}"
+# RUN git clone "${BEACON_METRICS_GAZER_REPO}" && \
+#     cd beacon-metrics-gazer && \
+#     git checkout "${BEACON_METRICS_GAZER_BRANCH}"
 
-RUN cd beacon-metrics-gazer && \
-    cargo update -p proc-macro2 && \
-    cargo build --release
+# RUN cd beacon-metrics-gazer && \
+#     cargo update -p proc-macro2 && \
+#     cargo build --release
 ########################### etb-all-clients runner  ###########################
 FROM debian:bullseye-slim
 
@@ -280,7 +280,7 @@ COPY --from=misc-builder /root/go/bin/eth2-val-tools /usr/local/bin/eth2-val-too
 # tx-fuzz
 COPY --from=misc-builder /git/tx-fuzz/cmd/livefuzzer/livefuzzer /usr/local/bin/livefuzzer
 # beacon-metrics-gazer
-COPY --from=misc-builder /git/beacon-metrics-gazer/target/release/beacon-metrics-gazer /usr/local/bin/beacon-metrics-gazer
+# COPY --from=misc-builder /git/beacon-metrics-gazer/target/release/beacon-metrics-gazer /usr/local/bin/beacon-metrics-gazer
 
 # consensus clients
 #COPY --from=nimbus-eth2-builder /git/nimbus-eth2/build/nimbus_beacon_node /usr/local/bin/nimbus_beacon_node
@@ -293,10 +293,10 @@ COPY --from=teku-builder  /git/teku/build/install/teku/. /opt/teku
 COPY --from=teku-builder /teku.version /teku.version
 RUN ln -s /opt/teku/bin/teku /usr/local/bin/teku
 
-#COPY --from=prysm-builder /prysm/bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /usr/local/bin/beacon-chain
-#COPY --from=prysm-builder /prysm/bazel-bin/cmd/validator/validator_/validator /usr/local/bin/validator
-#COPY --from=prysm-builder /prysm.version /prysm.version
-#
+# COPY --from=prysm-builder /prysm/bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /usr/local/bin/beacon-chain
+# COPY --from=prysm-builder /prysm/bazel-bin/cmd/validator/validator_/validator /usr/local/bin/validator
+# COPY --from=prysm-builder /prysm.version /prysm.version
+# #
 #COPY --from=lodestar-builder /git/lodestar /git/lodestar
 #COPY --from=lodestar-builder /lodestar.version /lodestar.version
 #RUN ln -s /git/lodestar/node_modules/.bin/lodestar /usr/local/bin/lodestar
@@ -309,6 +309,6 @@ COPY --from=geth-builder /root/go/bin/geth /usr/local/bin/geth
 #COPY --from=besu-builder /git/besu/build/install/besu/. /opt/besu
 #RUN ln -s /opt/besu/bin/besu /usr/local/bin/besu
 
-COPY --from=nethermind-builder /nethermind.version /nethermind.version
-COPY --from=nethermind-builder /git/nethermind/out /nethermind/
-RUN ln -s /nethermind/Nethermind.Runner /usr/local/bin/nethermind
+# COPY --from=nethermind-builder /nethermind.version /nethermind.version
+# COPY --from=nethermind-builder /git/nethermind/out /nethermind/
+# RUN ln -s /nethermind/Nethermind.Runner /usr/local/bin/nethermind
