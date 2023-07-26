@@ -143,6 +143,8 @@ RUN cd lighthouse && \
 #
 #RUN cd nimbus-eth2 && \
 #    make -j16 nimbus_beacon_node NIMFLAGS="-d:disableMarchNative --cc:clang --clang.exe:clang-15 --clang.linkerexe:clang-15 --passC:'-fsanitize=thread' --passL:'-fsanitize=thread'"
+#    make -j16 nimbus_beacon_node NIMFLAGS="-d:disableMarchNative --cc:clang --clang.exe:clang-15 --clang.linkerexe:clang-15 --passC:'-fsanitize=leak' --passL:'-fsanitize=leak' -d:useMalloc"
+
 
 # TEKU
 FROM etb-client-builder AS teku-builder
