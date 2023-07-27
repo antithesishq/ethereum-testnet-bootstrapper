@@ -144,7 +144,7 @@ client-instances:
   # teku-geth:
   #   # docker-compose
   #   image: "etb-all-clients"
-  #   tag: "deneb-devnet-7"
+  #   tag: "latest-deneb"
   #   start-ip-address: "10.0.20.20"
   #   num-nodes: 2
 
@@ -157,7 +157,7 @@ client-instances:
   lighthouse-geth:
     # docker-compose
     image: "etb-all-clients"
-    tag: "deneb-devnet-7"
+    tag: "latest-deneb"
     start-ip-address: "10.0.20.30"
     num-nodes: 2
 
@@ -170,7 +170,7 @@ client-instances:
   teku-besu:
     # docker-compose
     image: "etb-all-clients"
-    tag: "deneb-devnet-7"
+    tag: "latest-deneb"
     start-ip-address: "10.0.20.70"
     num-nodes: 1
 
@@ -183,7 +183,7 @@ client-instances:
   lighthouse-besu:
     # docker-compose
     image: "etb-all-clients"
-    tag: "deneb-devnet-7"
+    tag: "latest-deneb"
     start-ip-address: "10.0.20.80"
     num-nodes: 1
 
@@ -196,7 +196,7 @@ client-instances:
   # teku-nethermind:
   #   # docker-compose
   #   image: "etb-all-clients"
-  #   tag: "deneb-devnet-7"
+  #   tag: "latest-deneb"
   #   start-ip-address: "10.0.20.120"
   #   num-nodes: 1
 
@@ -209,7 +209,7 @@ client-instances:
   # lighthouse-nethermind:
   #   # docker-compose
   #   image: "etb-all-clients"
-  #   tag: "deneb-devnet-7"
+  #   tag: "latest-deneb"
   #   start-ip-address: "10.0.20.130"
   #   num-nodes: 1
 
@@ -225,7 +225,7 @@ client-instances:
   # teku-nethermind:
   #   # docker-compose
   #   image: "etb-all-clients"
-  #   tag: "deneb-devnet-7"
+  #   tag: "latest-deneb"
   #   start-ip-address: "10.0.20.120"
   #   num-nodes: 1
 
@@ -238,7 +238,7 @@ client-instances:
   # lighthouse-nethermind:
   #   # docker-compose
   #   image: "etb-all-clients"
-  #   tag: "deneb-devnet-7"
+  #   tag: "latest-deneb"
   #   start-ip-address: "10.0.20.130"
   #   num-nodes: 1
 
@@ -283,7 +283,7 @@ generic-instances:
 
   tx-spammer:
     image: "etb-all-clients"
-    tag: "deneb-devnet-7"
+    tag: "latest-deneb"
     start-ip-address: "10.0.20.204"
     num-nodes: 1
     # runs on the first prysm geth node.
