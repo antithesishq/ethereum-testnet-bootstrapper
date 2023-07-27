@@ -290,7 +290,7 @@ client-instances:
 
     # consensus-info
     consensus-config: "lighthouse-consensus-client"
-    execution-config: "geth-execution-config"
+    execution-config: "besu-execution-config"
 
     validator-offset-start: 28
 

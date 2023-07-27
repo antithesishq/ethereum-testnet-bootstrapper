@@ -21,14 +21,14 @@ ARG TEKU_REPO="https://github.com/ConsenSys/teku.git"
 ARG TEKU_BRANCH="0b5ef8a"
 
 # Execution Clients
-#ARG BESU_REPO="https://github.com/hyperledger/besu.git"
-#ARG BESU_BRANCH="main"
+ARG BESU_REPO="https://github.com/hyperledger/besu.git"
+ARG BESU_BRANCH="403297b874b68cb414c4bf13e98549b3597c61ca"
 
 ARG GETH_REPO="https://github.com/MariusVanDerWijden/go-ethereum.git"
 ARG GETH_BRANCH="5f651248abc358268dbbcda74e8fccd3b8c9a920"
 
-# ARG NETHERMIND_REPO="https://github.com/NethermindEth/nethermind.git"
-# ARG NETHERMIND_BRANCH="d0f10c3"
+ARG NETHERMIND_REPO="https://github.com/NethermindEth/nethermind.git"
+ARG NETHERMIND_BRANCH="d0f10c3"
 
 # All of the fuzzers we will be using
 ARG TX_FUZZ_REPO="https://github.com/MariusVanDerWijden/tx-fuzz.git"
@@ -186,28 +186,28 @@ RUN cd go-ethereum && \
     go install ./...
 
 # Besu
-#FROM etb-client-builder AS besu-builder
-#ARG BESU_BRANCH
-#ARG BESU_REPO
-#RUN git clone "${BESU_REPO}" && \
-#    cd besu && \
-#    git checkout "${BESU_BRANCH}" && \
-#    git log -n 1 --format=format:"%H" > /besu.version
-#
-#RUN cd besu && \
-#    ./gradlew installDist
+FROM etb-client-builder AS besu-builder
+ARG BESU_BRANCH
+ARG BESU_REPO
+RUN git clone "${BESU_REPO}" && \
+   cd besu && \
+   git checkout "${BESU_BRANCH}" && \
+   git log -n 1 --format=format:"%H" > /besu.version
+
+RUN cd besu && \
+   ./gradlew installDist
 
 # Nethermind
-# FROM etb-client-builder AS nethermind-builder
-# ARG NETHERMIND_BRANCH
-# ARG NETHERMIND_REPO
-# RUN git clone "${NETHERMIND_REPO}" && \
-#     cd nethermind && \
-#     git checkout "${NETHERMIND_BRANCH}" && \
-#     git log -n 1 --format=format:"%H" > /nethermind.version
+FROM etb-client-builder AS nethermind-builder
+ARG NETHERMIND_BRANCH
+ARG NETHERMIND_REPO
+RUN git clone "${NETHERMIND_REPO}" && \
+    cd nethermind && \
+    git checkout "${NETHERMIND_BRANCH}" && \
+    git log -n 1 --format=format:"%H" > /nethermind.version
 
-# RUN cd nethermind && \
-#     dotnet publish -p:PublishReadyToRun=false src/Nethermind/Nethermind.Runner -c release -o out
+RUN cd nethermind && \
+    dotnet publish -p:PublishReadyToRun=false src/Nethermind/Nethermind.Runner -c release -o out
 
 ############################### Misc.  Modules  ###############################
 FROM etb-client-builder AS misc-builder
@@ -305,10 +305,10 @@ RUN ln -s /opt/teku/bin/teku /usr/local/bin/teku
 COPY --from=geth-builder /geth.version /geth.version
 COPY --from=geth-builder /root/go/bin/geth /usr/local/bin/geth
 
-#COPY --from=besu-builder /besu.version /besu.version
-#COPY --from=besu-builder /git/besu/build/install/besu/. /opt/besu
-#RUN ln -s /opt/besu/bin/besu /usr/local/bin/besu
+COPY --from=besu-builder /besu.version /besu.version
+COPY --from=besu-builder /git/besu/build/install/besu/. /opt/besu
+RUN ln -s /opt/besu/bin/besu /usr/local/bin/besu
 
-# COPY --from=nethermind-builder /nethermind.version /nethermind.version
-# COPY --from=nethermind-builder /git/nethermind/out /nethermind/
-# RUN ln -s /nethermind/Nethermind.Runner /usr/local/bin/nethermind
+COPY --from=nethermind-builder /nethermind.version /nethermind.version
+COPY --from=nethermind-builder /git/nethermind/out /nethermind/
+RUN ln -s /nethermind/Nethermind.Runner /usr/local/bin/nethermind

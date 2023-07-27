@@ -159,13 +159,67 @@ client-instances:
     image: "etb-all-clients"
     tag: "deneb-devnet-7"
     start-ip-address: "10.0.20.30"
-    num-nodes: 3
+    num-nodes: 2
 
     # consensus-info
     consensus-config: "lighthouse-consensus-client"
     execution-config: "geth-execution-config"
 
     validator-offset-start: 0
+
+  teku-besu:
+    # docker-compose
+    image: "etb-all-clients"
+    tag: "deneb-devnet-7"
+    start-ip-address: "10.0.20.70"
+    num-nodes: 1
+
+    # consensus-info
+    consensus-config: "teku-consensus-client"
+    execution-config: "besu-execution-config"
+
+    validator-offset-start: 30
+
+  lighthouse-besu:
+    # docker-compose
+    image: "etb-all-clients"
+    tag: "deneb-devnet-7"
+    start-ip-address: "10.0.20.80"
+    num-nodes: 1
+
+    # consensus-info
+    consensus-config: "lighthouse-consensus-client"
+    execution-config: "besu-execution-config"
+
+    validator-offset-start: 45
+
+  # teku-nethermind:
+  #   # docker-compose
+  #   image: "etb-all-clients"
+  #   tag: "deneb-devnet-7"
+  #   start-ip-address: "10.0.20.120"
+  #   num-nodes: 1
+
+  #   # consensus-info
+  #   consensus-config: "teku-consensus-client"
+  #   execution-config: "nethermind-execution-config"
+
+  #   validator-offset-start: 60
+
+  # lighthouse-nethermind:
+  #   # docker-compose
+  #   image: "etb-all-clients"
+  #   tag: "deneb-devnet-7"
+  #   start-ip-address: "10.0.20.130"
+  #   num-nodes: 1
+
+  #   # consensus-info
+  #   consensus-config: "lighthouse-consensus-client"
+  #   execution-config: "nethermind-execution-config"
+
+  #   validator-offset-start: 75
+
+
 
   # Nethermind clients
   # teku-nethermind:

@@ -45,15 +45,6 @@ else
   touch $log_file
 fi
 
-# log_file="/logs/service_$CONTAINER_NAME--besu"
-
-# if [ -f "$log_file" ]; then
-#   echo "Log file $log_file exists"
-# else
-#   mkdir /logs
-#   touch $log_file
-# fi
-
 besu \
   --logging="$EXECUTION_LOG_LEVEL" \
   --bootnodes="$EXECUTION_BOOTNODE" \
@@ -80,4 +71,4 @@ besu \
   --data-storage-format="BONSAI" \
   --kzg-trusted-setup="$TRUSTED_SETUP_TXT_FILE" \
   --engine-rpc-port="$EXECUTION_ENGINE_HTTP_PORT" \
-  > /logs/"service_$CONTAINER_NAME--besu" 2>&1
+  > /data/logs/"service_$CONTAINER_NAME--besu" 2>&1
