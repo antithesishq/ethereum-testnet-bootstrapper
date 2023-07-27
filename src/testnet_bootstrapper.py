@@ -290,7 +290,7 @@ class EthereumTestnetBootstrapper:
         enabled and pair them. @param etb_config: config of
         experiment @return:
         """
-        admin_api_filter: re.Pattern[str] = re.compile(r"(admin|ADMIN)")
+        admin_api_filter: re.Pattern[str] = re.compile(r"(admin|ADMIN|Admin)")
         el_clients_to_pair: list[ClientInstance] = []
         # lots of retries as clients can take a while to start.
         # node_info_rpc_request = admin_nodeInfo(max_retries=20, timeout=global_timeout)
@@ -432,7 +432,7 @@ class EthereumTestnetBootstrapper:
 
         :return: (block_hash, block_number)
         """
-        el_eth_regex = re.compile(r"(eth|ETH)")
+        el_eth_regex = re.compile(r"(eth|ETH|Eth)")
         plausible_instances: list[ClientInstance] = []
         for instance in etb_config.get_client_instances():
             if el_eth_regex.search(",".join(instance.execution_config.http_apis)):
