@@ -9,11 +9,11 @@ import subprocess
 
 class LiveFuzzer:
     def __init__(
-        self, binary_path: pathlib.Path = pathlib.Path("/usr/local/bin/livefuzzer")
+            self, binary_path: pathlib.Path = pathlib.Path("/usr/local/bin/livefuzzer")
     ):
         self.binary_path = binary_path
 
-    def start_fuzzer(self, rpc_path: str, fuzz_mode: str, private_key: str, no_al:bool = False, tx_count:int = 500):
+    def start_fuzzer(self, rpc_path: str, fuzz_mode: str, private_key: str, no_al: bool = False, tx_count: int = 500):
         """Start the livefuzzer binary with the given parameters.
 
         @param rpc_path: path to the livefuzzer binary @param fuzz_mode:
@@ -39,3 +39,14 @@ class LiveFuzzer:
             subprocess.run(cmd, check=True)
         except subprocess.CalledProcessError as e:
             raise Exception(e)
+
+    def run_indefinitely(self, rpc_path: str, fuzz_mode: str, private_key: str, no_al: bool = False,
+                         tx_count: int = 500):
+        logging.info("Running livefuzzer indefinitely.")
+        while True:
+            try:
+                logging.debug("Starting livefuzzer run.")
+                self.start_fuzzer(rpc_path, fuzz_mode, private_key, no_al, tx_count)
+            except Exception as e:
+                logging.error(f"Error while running livefuzzer: {e}")
+                continue

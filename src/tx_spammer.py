@@ -92,6 +92,13 @@ if __name__ == "__main__":
         help="tx-count to pass to tx-fuzz (defaults to 500)",
     )
 
+    parser.add_argument(
+        "--run-indefinitely",
+        dest="run_indefinitely",
+        action="store_true",
+        help="if set, tx-fuzz will run indefinitely.",
+    )
+
     args = parser.parse_args()
 
     create_logger(name="tx-fuzz", log_level=args.log_level)
@@ -136,6 +143,15 @@ if __name__ == "__main__":
 
     logging.info(f"Waiting for start epoch {args.epoch_delay}")
     testnet_monitor.wait_for_epoch(args.epoch_delay)
+
+    if args.run_indefinitely:
+        live_fuzzer_interface.run_indefinitely(
+            rpc_path=rpc_path,
+            fuzz_mode=args.fuzz_mode,
+            private_key=private_key,
+            no_al=args.no_al,
+            tx_count=args.tx_count,
+        )
 
     live_fuzzer_interface.start_fuzzer(
         rpc_path=rpc_path,

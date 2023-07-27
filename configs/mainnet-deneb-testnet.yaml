@@ -54,10 +54,10 @@ testnet-config:
     bellatrix-fork-epoch: 0
 
     capella-fork-version: 0x04000666
-    capella-fork-epoch: 0
+    capella-fork-epoch: 1
 
     deneb-fork-version: 0x05000666
-    deneb-fork-epoch: 1
+    deneb-fork-epoch: 2
 
     sharding-fork-version: 0x06000666
 #    sharding-fork-epoch: 18446744073709551615 # far future
@@ -82,7 +82,7 @@ execution-configs:
   besu-execution-config:
     client: "besu"
     launcher: "/source/deps/launchers/el/launch-besu.sh"
-    log-level: "info"
+    log-level: "debug"
     http-apis: "ADMIN,ETH,NET,TXPOOL,WEB3,ENGINE"
     ws-apis: "ADMIN,ETH,NET,TXPOOL,WEB3,ENGINE"
     http-port: 8645
@@ -94,7 +94,7 @@ execution-configs:
 
   nethermind-execution-config:
     client: "nethermind"
-    log-level: "info"
+    log-level: "debug"
     launcher: "/source/deps/launchers/el/launch-nethermind.sh"
     http-apis: "net,eth,consensus,subscribe,web3,admin"
     ws-apis: "net,eth,consensus,subscribe,web3,admin"
@@ -141,7 +141,7 @@ client-instances:
 ###############################################################################
 
   # Geth clients
-  teku-geth:
+  teku-besu:
     # docker-compose
     image: "etb-all-clients"
     tag: "mainnet-deneb"
@@ -150,11 +150,11 @@ client-instances:
 
     # consensus-info
     consensus-config: "teku-consensus-client"
-    execution-config: "geth-execution-config"
+    execution-config: "besu-execution-config"
 
     validator-offset-start: 0
 
-  lighthouse-geth:
+  lighthouse-besu:
     # docker-compose
     image: "etb-all-clients"
     tag: "mainnet-deneb"
@@ -163,7 +163,7 @@ client-instances:
 
     # consensus-info
     consensus-config: "lighthouse-consensus-client"
-    execution-config: "geth-execution-config"
+    execution-config: "besu-execution-config"
 
     validator-offset-start: 15
 
@@ -233,4 +233,4 @@ generic-instances:
     start-ip-address: "10.0.20.204"
     num-nodes: 1
     # runs on the first prysm geth node.
-    entrypoint: "python3 /source/src/tx_spammer.py --target-ip 10.0.20.20 --target-port 8645 --epoch-delay 1 --fuzz-mode spam --no-al --tx-count 100 --tx-fuzz-path /usr/local/bin/livefuzzer"
+    entrypoint: "python3 /source/src/tx_spammer.py --run-indefinitely --target-ip 10.0.20.20 --target-port 8645 --epoch-delay 1 --fuzz-mode spam --no-al --tx-count 100 --tx-fuzz-path /usr/local/bin/livefuzzer"
