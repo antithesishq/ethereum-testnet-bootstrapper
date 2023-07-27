@@ -2,9 +2,9 @@
 log_level ?= "info"
 # Build ethereum-testnet-bootstrapper image
 build-bootstrapper:
-	docker build -t ethereum-testnet-bootstrapper -f bootstrapper.Dockerfile .
+	docker build -t ethereum-testnet-bootstrapper -t ethereum-testnet-bootstrapper:latest-deneb -f bootstrapper.Dockerfile .
 rebuild-bootstrapper:
-	docker build --no-cache -t ethereum-testnet-bootstrapper -f bootstrapper.Dockerfile .
+	docker build --no-cache -t ethereum-testnet-bootstrapper -t ethereum-testnet-bootstrapper:latest-deneb -f bootstrapper.Dockerfile .
 
 build-config:
 	docker build -t etb-mainnet-config -f config.Dockerfile .
