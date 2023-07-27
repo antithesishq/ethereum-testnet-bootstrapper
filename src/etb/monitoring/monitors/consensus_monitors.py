@@ -464,8 +464,10 @@ class ConsensusLayerPeeringSummary:
                 elif peered_client.direction == "outbound":
                     outbound_peer_map[client].append(peered_client_name)
         for client in clients_to_monitor:
-            out += f"{client.name}:\n"
-            out += f"\tinbound: {inbound_peer_map[client]}\n"
-            out += f"\toutbound: {outbound_peer_map[client]}\n"
+            if client in inbound_peer_map and client in outbound_peer_map:
+                # avoid issues for clients that don't respond in all messages.
+                out += f"{client.name}:\n"
+                out += f"\tinbound: {inbound_peer_map[client]}\n"
+                out += f"\toutbound: {outbound_peer_map[client]}\n"
 
         return out
