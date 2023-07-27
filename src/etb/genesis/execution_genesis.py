@@ -150,7 +150,7 @@ class ExecutionGenesisWriter:
             "baseFeePerGas": "0x3B9ACA00",
             "difficulty": "0x01",
             "extraData": "",
-            "gasLimit": "0x400000",
+            "gasLimit": "0x17D7840",
             "nonce": "0x1234",
             "mixhash": "0x0000000000000000000000000000000000000000000000000000000000000000",
             "parentHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
@@ -167,9 +167,7 @@ class ExecutionGenesisWriter:
                 "istanbulBlock": 0,
                 "berlinBlock": 0,
                 "londonBlock": 0,
-                "mergeForkBlock": self.merge_fork_block,
-                "arrowGlacierBlock": self.merge_fork_block,
-                "grayGlacierBlock": self.merge_fork_block,
+                "preMergeForkBlock": self.merge_fork_block,
                 "shanghaiTime": self.shanghai_fork_time,
                 "terminalTotalDifficulty": 0,
                 "ethash": {},
@@ -198,7 +196,7 @@ class ExecutionGenesisWriter:
         """
         self.genesis = {
             "name": "Local-ETB-Testnet",
-            "engine": {},
+            "engine": {"Ethash": {}},
             "params": {
                 "gasLimitBoundDivisor": "0x400",
                 "registrar": "0x0000000000000000000000000000000000000000",
@@ -209,6 +207,8 @@ class ExecutionGenesisWriter:
                     int(self.etb_config.testnet_config.execution_layer.chain_id)
                 ),
                 "MergeForkIdTransition": "0x0",
+                "maxCodeSize": "0x6000",
+                "maxCodeSizeTransition": "0x0",
                 "eip150Transition": "0x0",
                 "eip158Transition": "0x0",
                 "eip160Transition": "0x0",
@@ -255,23 +255,12 @@ class ExecutionGenesisWriter:
                 "timestamp": hex(self.etb_config.genesis_time),
                 "parentHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
                 "extraData": "",
-                "gasLimit": "0x400000",
+                "gasLimit": "0x17D7840",
             },
             "accounts": self.get_allocs(),
             "nodes": [],
         }
 
-        self.genesis["engine"]["Ethash"] = {
-            "params": {
-                "minimumDifficulty": "0x20000",
-                "difficultyBoundDivisor": "0x800",
-                "durationLimit": "0xd",
-                "blockReward": {"0x0": "0x1BC16D674EC80000"},
-                "homesteadTransition": "0x0",
-                "eip100bTransition": "0x0",
-                "difficultyBombDelays": {},
-            }
-        }
         # for next based experiments
         if self.etb_config.is_deneb:
             self.genesis["params"][

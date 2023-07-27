@@ -18,11 +18,12 @@ ARG TEKU_REPO="https://github.com/ConsenSys/teku.git"
 ARG TEKU_BRANCH="23.6.1"
 
 # Execution Clients
-#ARG BESU_REPO="https://github.com/hyperledger/besu.git"
-#ARG BESU_BRANCH="main"
+ARG BESU_REPO="https://github.com/jflo/besu.git"
+ARG BESU_BRANCH="EIP-4844"
 
-ARG GETH_REPO="https://github.com/MariusVanDerWijden/go-ethereum.git"
-ARG GETH_BRANCH="4844-devnet-6"
+# broken due to rebase
+#ARG GETH_REPO="https://github.com/MariusVanDerWijden/go-ethereum.git"
+#ARG GETH_BRANCH="4844-devnet-6"
 
 ARG NETHERMIND_REPO="https://github.com/NethermindEth/nethermind.git"
 ARG NETHERMIND_BRANCH="feature/eip-4844-v6"
@@ -124,32 +125,32 @@ RUN cd lighthouse && \
     cargo build --release --manifest-path lighthouse/Cargo.toml --bin lighthouse
 
 # LODESTAR
-#FROM etb-client-builder AS lodestar-builder
-#ARG LODESTAR_BRANCH
-#ARG LODESTAR_REPO
-#RUN git clone "${LODESTAR_REPO}" && \
-#    cd lodestar && \
-#    git checkout "${LODESTAR_BRANCH}" && \
-#    git log -n 1 --format=format:"%H" > /lodestar.version
-#
-#RUN cd lodestar && \
-#    yarn install --non-interactive --frozen-lockfile && \
-#    yarn build && \
-#    yarn install --non-interactive --frozen-lockfile --production
+FROM etb-client-builder AS lodestar-builder
+ARG LODESTAR_BRANCH
+ARG LODESTAR_REPO
+RUN git clone "${LODESTAR_REPO}" && \
+    cd lodestar && \
+    git checkout "${LODESTAR_BRANCH}" && \
+    git log -n 1 --format=format:"%H" > /lodestar.version
+
+RUN cd lodestar && \
+    yarn install --non-interactive --frozen-lockfile && \
+    yarn build && \
+    yarn install --non-interactive --frozen-lockfile --production
 
 # NIMBUS
-#FROM etb-client-builder AS nimbus-eth2-builder
-#ARG NIMBUS_ETH2_BRANCH
-#ARG NIMBUS_ETH2_REPO
-#RUN git clone "${NIMBUS_ETH2_REPO}" && \
-#    cd nimbus-eth2 && \
-#    git checkout "${NIMBUS_ETH2_BRANCH}" && \
-#    git log -n 1 --format=format:"%H" > /nimbus.version && \
-#    make -j16 update
-#
-#RUN cd nimbus-eth2 && \
-#    arch=$(arch | sed s/aarch64/arm64/ | sed s/x86_64/amd64/) && \
-#    make -j16 nimbus_beacon_node NIMFLAGS="-d:disableMarchNative --cpu:${arch} --cc:clang --clang.exe:clang-15 --clang.linkerexe:clang-15 --passC:-fno-lto --passL:-fno-lto"
+FROM etb-client-builder AS nimbus-eth2-builder
+ARG NIMBUS_ETH2_BRANCH
+ARG NIMBUS_ETH2_REPO
+RUN git clone "${NIMBUS_ETH2_REPO}" && \
+    cd nimbus-eth2 && \
+    git checkout "${NIMBUS_ETH2_BRANCH}" && \
+    git log -n 1 --format=format:"%H" > /nimbus.version && \
+    make -j16 update
+
+RUN cd nimbus-eth2 && \
+    arch=$(arch | sed s/aarch64/arm64/ | sed s/x86_64/amd64/) && \
+    make -j16 nimbus_beacon_node NIMFLAGS="-d:disableMarchNative --cpu:${arch} --cc:clang --clang.exe:clang-15 --clang.linkerexe:clang-15 --passC:-fno-lto --passL:-fno-lto"
 
 # TEKU
 FROM etb-client-builder AS teku-builder
@@ -165,17 +166,17 @@ RUN cd teku && \
     ./gradlew installDist
 
 # PRYSM
-#FROM gcr.io/prysmaticlabs/build-agent AS prysm-builder
-#ARG PRYSM_BRANCH
-#ARG PRYSM_REPO
-#RUN go install github.com/bazelbuild/bazelisk@latest
-#RUN git clone "${PRYSM_REPO}" && \
-#    cd prysm && \
-#    git checkout "${PRYSM_BRANCH}" && \
-#    git log -n 1 --format=format:"%H" > /prysm.version
-#
-#RUN cd prysm && \
-#    /root/go/bin/bazelisk build --config=release //cmd/beacon-chain:beacon-chain //cmd/validator:validator
+FROM gcr.io/prysmaticlabs/build-agent AS prysm-builder
+ARG PRYSM_BRANCH
+ARG PRYSM_REPO
+RUN go install github.com/bazelbuild/bazelisk@latest
+RUN git clone "${PRYSM_REPO}" && \
+    cd prysm && \
+    git checkout "${PRYSM_BRANCH}" && \
+    git log -n 1 --format=format:"%H" > /prysm.version
+
+RUN cd prysm && \
+    /root/go/bin/bazelisk build --config=release //cmd/beacon-chain:beacon-chain //cmd/validator:validator
 
 
 
@@ -193,16 +194,16 @@ RUN cd go-ethereum && \
     go install ./...
 
 # Besu
-#FROM etb-client-builder AS besu-builder
-#ARG BESU_BRANCH
-#ARG BESU_REPO
-#RUN git clone "${BESU_REPO}" && \
-#    cd besu && \
-#    git checkout "${BESU_BRANCH}" && \
-#    git log -n 1 --format=format:"%H" > /besu.version
-#
-#RUN cd besu && \
-#    ./gradlew installDist
+FROM etb-client-builder AS besu-builder
+ARG BESU_BRANCH
+ARG BESU_REPO
+RUN git clone "${BESU_REPO}" && \
+    cd besu && \
+    git checkout "${BESU_BRANCH}" && \
+    git log -n 1 --format=format:"%H" > /besu.version
+
+RUN cd besu && \
+    ./gradlew installDist
 
 # Nethermind
 FROM etb-client-builder AS nethermind-builder
@@ -310,12 +311,12 @@ RUN ln -s /opt/teku/bin/teku /usr/local/bin/teku
 #RUN ln -s /git/lodestar/node_modules/.bin/lodestar /usr/local/bin/lodestar
 
 # execution clients
-COPY --from=geth-builder /geth.version /geth.version
-COPY --from=geth-builder /root/go/bin/geth /usr/local/bin/geth
+#COPY --from=geth-builder /geth.version /geth.version
+#COPY --from=geth-builder /root/go/bin/geth /usr/local/bin/geth
 
-#COPY --from=besu-builder /besu.version /besu.version
-#COPY --from=besu-builder /git/besu/build/install/besu/. /opt/besu
-#RUN ln -s /opt/besu/bin/besu /usr/local/bin/besu
+COPY --from=besu-builder /besu.version /besu.version
+COPY --from=besu-builder /git/besu/build/install/besu/. /opt/besu
+RUN ln -s /opt/besu/bin/besu /usr/local/bin/besu
 
 COPY --from=nethermind-builder /nethermind.version /nethermind.version
 COPY --from=nethermind-builder /git/nethermind/out /nethermind/
