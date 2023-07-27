@@ -1,4 +1,4 @@
-FROM ethereum-testnet-bootstrapper:latest-deneb as builder
+FROM ethereum-testnet-bootstrapper as builder
 
 RUN mkdir /data
 
