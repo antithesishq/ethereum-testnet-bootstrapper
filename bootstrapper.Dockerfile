@@ -30,7 +30,8 @@ RUN apt-get update && \
         ca-certificates build-essential python python3-dev python3-pip gettext-base golang git curl && \
     apt-get autoremove -y && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* \
+    jq
 
 RUN pip3 install ruamel.yaml web3
 COPY --from=builder /go/bin/eth2-testnet-genesis /usr/local/bin/eth2-testnet-genesis
