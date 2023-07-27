@@ -26,7 +26,7 @@ jobs:
     - name: Build all images
       timeout-minutes: 500
       run: |
-          make rebuild-all-images
+          make build-all-images
     - name: Push images
       timeout-minutes: 500
       run: |
