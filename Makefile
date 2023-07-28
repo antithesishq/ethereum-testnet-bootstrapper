@@ -16,12 +16,19 @@ rebuild-config:
 build-client-images:
 	cd deps/dockers && ./build-dockers.sh
 
+build-client-images-inst:
+	cd deps/dockers && ./build-dockers-inst.sh
+
 # a rebuild uses --no-cache in the docker build step.
 rebuild-client-images:
 	cd deps/dockers && REBUILD_IMAGES=1 ./build-dockers.sh
 
+rebuild-client-images-inst:
+	cd deps/dockers && REBUILD_IMAGES=1 ./build-dockers-inst.sh
+
 build-all-images: build-bootstrapper build-client-images build-config
 rebuild-all-images: rebuild-bootstrapper rebuild-client-images rebuild-config
+
 
 # init the testnet dirs and all files needed to later bootstrap the testnet.
 init-testnet:

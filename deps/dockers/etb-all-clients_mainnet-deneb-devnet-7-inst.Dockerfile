@@ -249,8 +249,8 @@ RUN cd besu && \
 FROM etb-client-builder AS misc-builder
 ARG TX_FUZZ_BRANCH
 ARG TX_FUZZ_REPO
-ARG BEACON_METRICS_GAZER_REPO
-ARG BEACON_METRICS_GAZER_BRANCH
+# ARG BEACON_METRICS_GAZER_REPO
+# ARG BEACON_METRICS_GAZER_BRANCH
 
 RUN go install github.com/wealdtech/ethereal/v2@latest \
     && go install github.com/wealdtech/ethdo@latest \
@@ -263,9 +263,9 @@ RUN git clone "${TX_FUZZ_REPO}" && \
 RUN cd tx-fuzz && \
     cd cmd/livefuzzer && go build
 
-RUN git clone "${BEACON_METRICS_GAZER_REPO}" && \
-    cd beacon-metrics-gazer && \
-    git checkout "${BEACON_METRICS_GAZER_BRANCH}"
+# RUN git clone "${BEACON_METRICS_GAZER_REPO}" && \
+#     cd beacon-metrics-gazer && \
+#     git checkout "${BEACON_METRICS_GAZER_BRANCH}"
 
 RUN cd beacon-metrics-gazer && \
     cargo update -p proc-macro2 && \
@@ -321,7 +321,7 @@ COPY --from=misc-builder /root/go/bin/eth2-val-tools /usr/local/bin/eth2-val-too
 # tx-fuzz
 COPY --from=misc-builder /git/tx-fuzz/cmd/livefuzzer/livefuzzer /usr/local/bin/livefuzzer
 # beacon-metrics-gazer
-COPY --from=misc-builder /git/beacon-metrics-gazer/target/release/beacon-metrics-gazer /usr/local/bin/beacon-metrics-gazer
+# COPY --from=misc-builder /git/beacon-metrics-gazer/target/release/beacon-metrics-gazer /usr/local/bin/beacon-metrics-gazer
 
 # consensus clients
 #COPY --from=nimbus-eth2-builder /git/nimbus-eth2/build/nimbus_beacon_node /usr/local/bin/nimbus_beacon_node
