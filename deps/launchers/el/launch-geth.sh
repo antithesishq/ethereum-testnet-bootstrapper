@@ -70,7 +70,7 @@ if [ "$IS_DENEB" == 1 ]; then
     --netrestrict="$IP_SUBNET" \
     --syncmode=full \
     --ipcdisable=true \
-    --vmodule=rpc=5 \
+    --log.vmodule=rpc=5 \
     --discovery.dns="" \
     --verbosity $EXECUTION_LOG_LEVEL \
   > /data/logs/"service_$CONTAINER_NAME--geth" 2>&1
@@ -98,7 +98,7 @@ else
     --netrestrict="$IP_SUBNET" \
     --syncmode=full \
     --ipcdisable=true \
-    --vmodule=rpc=5 \
+    --log.vmodule=rpc=5 \
     --discovery.dns="" \
     --verbosity $EXECUTION_LOG_LEVEL \
   > /data/logs/"service_$CONTAINER_NAME--geth" 2>&1

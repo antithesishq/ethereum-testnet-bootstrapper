@@ -29,11 +29,11 @@ function container_builder() {
 # log_step "building mainnet-current"
 # build_image "etb-all-clients:mainnet-current" "etb-all-clients_mainnet-current.Dockerfile"
 
-# log_step "building mainnet-deneb-devnet-7"
-# build_image "etb-all-clients:latest-deneb" "etb-all-clients_mainnet-deneb-devnet-7.Dockerfile"
+log_step "building mainnet-deneb"
+build_image "etb-all-clients:deneb-devnet-7" "etb-all-clients_mainnet-deneb.Dockerfile"
 
-log_step "building mainnet-deneb-devnet-7"
-build_image "etb-all-clients:deneb-devnet-7" "etb-all-clients_mainnet-deneb-devnet-7.Dockerfile"
+# log_step "building mainnet-deneb-devnet-7"
+# build_image "etb-all-clients:deneb-devnet-7" "etb-all-clients_mainnet-deneb-devnet-7.Dockerfile"
 
 # log_step "building mainnet-deneb instrumentation"
 # build_image "etb-all-clients:mainnet-deneb-inst" "etb-all-clients_mainnet-deneb-inst.Dockerfile"

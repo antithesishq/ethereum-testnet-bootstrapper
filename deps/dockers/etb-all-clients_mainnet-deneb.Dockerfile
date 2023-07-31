@@ -2,11 +2,11 @@
 #           Dockerfile to build all clients minimal mainnet preset.           #
 ###############################################################################
 # Consensus Clients
+ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse.git"
+ARG LIGHTHOUSE_BRANCH="deneb-free-blobs"
+
 # ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse.git"
 # ARG LIGHTHOUSE_BRANCH="deneb-free-blobs"
-
-ADD LIGHTHOUSE_REPO="https://github.com/qu0b/lighthouse.git"
-ARG LIGHTHOUSE_BRANCH="deneb-free-blobs"
 
 #ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
 #ARG LODESTAR_BRANCH="stable"

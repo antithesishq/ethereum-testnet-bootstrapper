@@ -144,7 +144,7 @@ client-instances:
   teku-besu:
     # docker-compose
     image: "etb-all-clients"
-    tag: "mainnet-deneb"
+    tag: "deneb-devnet-7"
     start-ip-address: "10.0.20.20"
     num-nodes: 3
 
@@ -157,7 +157,7 @@ client-instances:
   lighthouse-besu:
     # docker-compose
     image: "etb-all-clients"
-    tag: "mainnet-deneb"
+    tag: "deneb-devnet-7"
     start-ip-address: "10.0.20.30"
     num-nodes: 3
 
@@ -171,7 +171,7 @@ client-instances:
   teku-nethermind:
     # docker-compose
     image: "etb-all-clients"
-    tag: "mainnet-deneb"
+    tag: "deneb-devnet-7"
     start-ip-address: "10.0.20.120"
     num-nodes: 3
 
@@ -184,7 +184,7 @@ client-instances:
   lighthouse-nethermind:
     # docker-compose
     image: "etb-all-clients"
-    tag: "mainnet-deneb"
+    tag: "deneb-devnet-7"
     start-ip-address: "10.0.20.130"
     num-nodes: 3
 
@@ -225,11 +225,11 @@ generic-instances:
     tag: "latest"
     start-ip-address: "10.0.20.203"
     num-nodes: 1
-    entrypoint: "python3 /source/src/node_watch.py --log-level info --monitor heads:slot --monitor checkpoints:slot --monitor peers:slot --max-retries 3"
+    entrypoint: "python3 /source/src/node_watch.py --log-level info --monitor heads:slot --monitor checkpoints:slot --monitor peers:epoch --max-retries 3"
 
   tx-spammer:
     image: "etb-all-clients"
-    tag: "mainnet-deneb"
+    tag: "deneb-devnet-7"
     start-ip-address: "10.0.20.204"
     num-nodes: 1
     # runs on the first prysm geth node.
