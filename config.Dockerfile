@@ -1,8 +1,10 @@
 FROM ethereum-testnet-bootstrapper as builder
 
+ARG CONFIG_PATH="configs/mainnet-deneb-testnet.yaml"
+
 RUN mkdir /data
 
-RUN /source/entrypoint.sh --config configs/deneb-devnet-7.yaml --init-testnet --log-level debug
+RUN /source/entrypoint.sh --config ${CONFIG_PATH} --init-testnet --log-level debug
 
 FROM scratch
 

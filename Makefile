@@ -7,10 +7,10 @@ rebuild-bootstrapper:
 	docker build --no-cache -t ethereum-testnet-bootstrapper -f bootstrapper.Dockerfile .
 
 build-config:
-	docker build -t etb-mainnet-config -f config.Dockerfile .
+	docker build --build-arg="CONFIG_PATH=$(config)" -t etb-mainnet-config -f config.Dockerfile .
 
 rebuild-config:
-	docker build --no-cache -t etb-mainnet-config -f config.Dockerfile .
+	docker build --no-cache --build-arg="CONFIG_PATH=$(config)" -t etb-mainnet-config -f config.Dockerfile .
 
 # Build the etb-all-clients images:
 build-client-images:
