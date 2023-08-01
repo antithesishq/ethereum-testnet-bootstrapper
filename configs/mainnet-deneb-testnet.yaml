@@ -113,7 +113,7 @@ consensus-configs:
     launcher: "/source/deps/launchers/cl/launch-teku.sh"
     log-level: "INFO"
 
-    num-validators: 5       # number of validators for every client node
+    num-validators: 8       # number of validators for every client node
 
     p2p-port: 4000    # start port used for discovery
     beacon-api-port: 5000   # start port used for the beacon rest API
@@ -125,7 +125,7 @@ consensus-configs:
   lighthouse-consensus-client:
     client: "lighthouse"
     launcher: "/source/deps/launchers/cl/launch-lighthouse.sh"
-    num-validators: 5       # number of validators for every client node
+    num-validators: 8       # number of validators for every client node
     # start ports increment each time we have a node.
     log-level: "debug"
     p2p-port: 4000    # start port used for discovery
@@ -146,7 +146,7 @@ client-instances:
     image: "etb-all-clients"
     tag: "deneb-devnet-7"
     start-ip-address: "10.0.20.20"
-    num-nodes: 3
+    num-nodes: 2
 
     # consensus-info
     consensus-config: "teku-consensus-client"
@@ -159,7 +159,7 @@ client-instances:
     image: "etb-all-clients"
     tag: "deneb-devnet-7"
     start-ip-address: "10.0.20.30"
-    num-nodes: 3
+    num-nodes: 2
 
     # consensus-info
     consensus-config: "lighthouse-consensus-client"
@@ -173,7 +173,7 @@ client-instances:
     image: "etb-all-clients"
     tag: "deneb-devnet-7"
     start-ip-address: "10.0.20.120"
-    num-nodes: 3
+    num-nodes: 2
 
     # consensus-info
     consensus-config: "teku-consensus-client"
@@ -186,7 +186,7 @@ client-instances:
     image: "etb-all-clients"
     tag: "deneb-devnet-7"
     start-ip-address: "10.0.20.130"
-    num-nodes: 3
+    num-nodes: 2
 
     # consensus-info
     consensus-config: "lighthouse-consensus-client"
