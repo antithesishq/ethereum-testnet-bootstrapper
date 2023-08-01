@@ -5,9 +5,6 @@
 ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse.git"
 ARG LIGHTHOUSE_BRANCH="deneb-free-blobs"
 
-# ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse.git"
-# ARG LIGHTHOUSE_BRANCH="deneb-free-blobs"
-
 #ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
 #ARG LODESTAR_BRANCH="stable"
 #
@@ -77,7 +74,7 @@ ENV PATH="$PATH:/root/.dotnet/"
 
 WORKDIR /git
 
-# set up clang 15 (nimbus+deps)
+# set up clang 15 (nimbus+lighthouse+deps)
 RUN wget --no-check-certificate https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh 15
 ENV LLVM_CONFIG=llvm-config-15
 
