@@ -233,7 +233,7 @@ generic-instances:
     start-ip-address: "10.0.20.204"
     num-nodes: 1
     # runs on the first prysm geth node.
-    entrypoint: "python3 /source/src/tx_spammer.py --run-indefinitely --target-ip 10.0.20.120 --target-port 8645 --epoch-delay 2 --fuzz-mode spam --no-al --tx-count 100 --tx-fuzz-path /usr/local/bin/livefuzzer"
+    entrypoint: "python3 /source/src/tx_spammer.py --run-indefinitely --log-level debug --target-ip 10.0.20.120 --target-port 8645 --epoch-delay 2 --fuzz-mode spam --no-al --tx-count 100 --tx-fuzz-path /usr/local/bin/livefuzzer"
 
   antithesis-checker:
     image: "ethereum-testnet-bootstrapper"

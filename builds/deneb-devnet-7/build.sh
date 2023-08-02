@@ -26,5 +26,5 @@ function container_builder() {
 log_step "building all clients"
 build_image "etb-all-clients:deneb-devnet-7" "etb-all-clients_mainnet.Dockerfile"
 
-log_step "building all clients instrumented"
-build_image "etb-all-clients-inst:deneb-devnet-7" "etb-all-clients_mainnet-inst.Dockerfile"
+# log_step "building all clients instrumented"
+# build_image "etb-all-clients-inst:deneb-devnet-7" "etb-all-clients_mainnet-inst.Dockerfile"

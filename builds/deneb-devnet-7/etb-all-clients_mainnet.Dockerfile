@@ -20,9 +20,12 @@ ARG BESU_BRANCH="403297b874b68cb414c4bf13e98549b3597c61ca"
 ARG NETHERMIND_REPO="https://github.com/NethermindEth/nethermind.git"
 ARG NETHERMIND_BRANCH="d0f10c32ba584f765819779bf20dd5b78e0611c0"
 
+ARG NETHERMINED_BLOB_SPAMMER="https://github.com/NethermindEth/nethermind.git"
+ARG NETHERMIND_BLOB_SPAMMER_BRANCH="101bfe45a9c1e52e04708157a70c36c2e9b128c8"
+
 # All of the fuzzers we will be using
-ARG TX_FUZZ_REPO="https://github.com/MariusVanDerWijden/tx-fuzz.git"
-ARG TX_FUZZ_BRANCH="4844"
+ARG TX_FUZZ_REPO="https://github.com/qu0b/tx-fuzz.git"
+ARG TX_FUZZ_BRANCH="debug"
 
 # Metrics gathering
 ARG BEACON_METRICS_GAZER_REPO="https://github.com/qu0b/beacon-metrics-gazer.git"
@@ -149,6 +152,8 @@ ARG TX_FUZZ_BRANCH
 ARG TX_FUZZ_REPO
 ARG BEACON_METRICS_GAZER_REPO
 ARG BEACON_METRICS_GAZER_BRANCH
+ARG NETHERMINED_BLOB_SPAMMER
+ARG NETHERMIND_BLOB_SPAMMER_BRANCH
 
 RUN go install github.com/wealdtech/ethereal/v2@latest \
     && go install github.com/wealdtech/ethdo@latest \
@@ -160,6 +165,13 @@ RUN git clone "${TX_FUZZ_REPO}" && \
 
 RUN cd tx-fuzz && \
     cd cmd/livefuzzer && go build
+
+RUN git clone "${NETHERMINED_BLOB_SPAMMER}" && \
+    cd nethermind && \
+    git checkout "${NETHERMIND_BLOB_SPAMMER_BRANCH}"
+
+RUN cd nethermind && \
+    dotnet publish ./src/Nethermind/Nethermind.SendBlobs/Nethermind.SendBlobs.csproj --sc -o out
 
 RUN git clone "${BEACON_METRICS_GAZER_REPO}" && \
     cd beacon-metrics-gazer && \
@@ -216,6 +228,9 @@ COPY --from=misc-builder /git/tx-fuzz/cmd/livefuzzer/livefuzzer /usr/local/bin/l
 
 # beacon-metrics-gazer
 COPY --from=misc-builder /git/beacon-metrics-gazer/target/release/beacon-metrics-gazer /usr/local/bin/beacon-metrics-gazer
+
+# nethermind blob sender
+COPY --from=misc-builder /git/nethermind/out/Nethermind.SendBlobs /usr/local/bin/Nethermind.SendBlobs
 
 COPY --from=lighthouse-builder /lighthouse.version /lighthouse.version
 COPY --from=lighthouse-builder /git/lighthouse/target/release/lighthouse /usr/local/bin/lighthouse
