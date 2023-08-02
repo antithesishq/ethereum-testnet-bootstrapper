@@ -6,14 +6,19 @@ ARG LIGHTHOUSE_REPO="https://github.com/jtraglia/lighthouse"
 ARG LIGHTHOUSE_BRANCH="d534ac0"
 
 ARG TEKU_REPO="https://github.com/ConsenSys/teku.git"
-ARG TEKU_BRANCH="23.6.2"
+ARG TEKU_BRANCH="23.6.1"
 
 # Execution Clients
-ARG BESU_REPO="https://github.com/hyperledger/besu.git"
+# ARG BESU_REPO="https://github.com/hyperledger/besu.git"
+# ARG BESU_BRANCH="403297b874b68cb414c4bf13e98549b3597c61ca"
+
+ARG BESU_REPO="https://github.com/jflo/besu.git"
+# ARG BESU_BRANCH="EIP-4844"
 ARG BESU_BRANCH="403297b874b68cb414c4bf13e98549b3597c61ca"
 
+
 ARG NETHERMIND_REPO="https://github.com/NethermindEth/nethermind.git"
-ARG NETHERMIND_BRANCH="d0f10c3"
+ARG NETHERMIND_BRANCH="d0f10c32ba584f765819779bf20dd5b78e0611c0"
 
 # All of the fuzzers we will be using
 ARG TX_FUZZ_REPO="https://github.com/MariusVanDerWijden/tx-fuzz.git"
