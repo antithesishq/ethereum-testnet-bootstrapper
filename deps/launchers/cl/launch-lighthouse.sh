@@ -65,7 +65,7 @@ if [ "$IS_DENEB" == 1 ]; then
         --port="$CONSENSUS_P2P_PORT" \
         --metrics \
         --metrics-address=0.0.0.0 \
-        --metrics-allow-origin * \
+        --metrics-allow-origin="*" \
         --execution-endpoints="http://127.0.0.1:$EXECUTION_ENGINE_HTTP_PORT" \
         --enable-private-discovery \
         --enr-address "$IP_ADDRESS" \
@@ -92,7 +92,7 @@ if [ "$IS_DENEB" == 1 ]; then
         --init-slashing-protection \
         --metrics \
         --metrics-address=0.0.0.0 \
-        --metrics-allow-origin * \
+        --metrics-allow-origin="*" \
         --beacon-nodes="http://127.0.0.1:$CONSENSUS_BEACON_API_PORT" \
         --graffiti="$CONSENSUS_GRAFFITI" \
         --http --http-port="$CONSENSUS_VALIDATOR_RPC_PORT" \
@@ -114,7 +114,7 @@ else
         --port="$CONSENSUS_P2P_PORT" \
         --metrics \
         --metrics-address=0.0.0.0 \
-        --metrics-allow-origin * \
+        --metrics-allow-origin="*" \
         --execution-endpoints="http://127.0.0.1:$EXECUTION_ENGINE_HTTP_PORT" \
         --enable-private-discovery \
         --enr-address "$IP_ADDRESS" \
@@ -139,7 +139,7 @@ else
         --init-slashing-protection \
         --metrics \
         --metrics-address=0.0.0.0 \
-        --metrics-allow-origin * \
+        --metrics-allow-origin="*" \
         --beacon-nodes="http://127.0.0.1:$CONSENSUS_BEACON_API_PORT" \
         --graffiti="$CONSENSUS_GRAFFITI" \
         --http --http-port="$CONSENSUS_VALIDATOR_RPC_PORT" \
