@@ -63,6 +63,9 @@ if [ "$IS_DENEB" == 1 ]; then
         --http-allow-sync-stalled \
         --listen-address=0.0.0.0 \
         --port="$CONSENSUS_P2P_PORT" \
+        --metrics \
+        --metrics-address=0.0.0.0 \
+        --metrics-allow-origin * \
         --execution-endpoints="http://127.0.0.1:$EXECUTION_ENGINE_HTTP_PORT" \
         --enable-private-discovery \
         --enr-address "$IP_ADDRESS" \
@@ -87,6 +90,9 @@ if [ "$IS_DENEB" == 1 ]; then
         --validators-dir "$CONSENSUS_NODE_DIR/keys" \
         --secrets-dir "$CONSENSUS_NODE_DIR/secrets" \
         --init-slashing-protection \
+        --metrics \
+        --metrics-address=0.0.0.0 \
+        --metrics-allow-origin * \
         --beacon-nodes="http://127.0.0.1:$CONSENSUS_BEACON_API_PORT" \
         --graffiti="$CONSENSUS_GRAFFITI" \
         --http --http-port="$CONSENSUS_VALIDATOR_RPC_PORT" \
@@ -106,6 +112,9 @@ else
         --http-allow-sync-stalled \
         --listen-address=0.0.0.0 \
         --port="$CONSENSUS_P2P_PORT" \
+        --metrics \
+        --metrics-address=0.0.0.0 \
+        --metrics-allow-origin * \
         --execution-endpoints="http://127.0.0.1:$EXECUTION_ENGINE_HTTP_PORT" \
         --enable-private-discovery \
         --enr-address "$IP_ADDRESS" \
@@ -128,6 +137,9 @@ else
         --validators-dir "$CONSENSUS_NODE_DIR/keys" \
         --secrets-dir "$CONSENSUS_NODE_DIR/secrets" \
         --init-slashing-protection \
+        --metrics \
+        --metrics-address=0.0.0.0 \
+        --metrics-allow-origin * \
         --beacon-nodes="http://127.0.0.1:$CONSENSUS_BEACON_API_PORT" \
         --graffiti="$CONSENSUS_GRAFFITI" \
         --http --http-port="$CONSENSUS_VALIDATOR_RPC_PORT" \
