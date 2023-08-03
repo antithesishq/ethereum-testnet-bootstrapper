@@ -21,7 +21,11 @@ ARG NETHERMIND_BRANCH="d0f10c32ba584f765819779bf20dd5b78e0611c0"
 
 # All of the fuzzers we will be using
 ARG TX_FUZZ_REPO="https://github.com/MariusVanDerWijden/tx-fuzz.git"
-ARG TX_FUZZ_BRANCH="4844"
+ARG TX_FUZZ_BRANCH="4225d9c8c1f8c57c6d0cc655cb549acd84925c99"
+
+# Add the nethermind blob spammer
+ARG NETHERMINED_BLOB_SPAMMER="https://github.com/NethermindEth/nethermind.git"
+ARG NETHERMIND_BLOB_SPAMMER_BRANCH="101bfe45a9c1e52e04708157a70c36c2e9b128c8"
 
 # Metrics gathering
 ARG BEACON_METRICS_GAZER_REPO="https://github.com/qu0b/beacon-metrics-gazer.git"
@@ -160,6 +164,8 @@ ARG TX_FUZZ_BRANCH
 ARG TX_FUZZ_REPO
 ARG BEACON_METRICS_GAZER_REPO
 ARG BEACON_METRICS_GAZER_BRANCH
+ARG NETHERMINED_BLOB_SPAMMER
+ARG NETHERMIND_BLOB_SPAMMER_BRANCH
 
 RUN go install github.com/wealdtech/ethereal/v2@latest \
     && go install github.com/wealdtech/ethdo@latest \
@@ -171,6 +177,13 @@ RUN git clone "${TX_FUZZ_REPO}" && \
 
 RUN cd tx-fuzz && \
     cd cmd/livefuzzer && go build
+
+RUN git clone "${NETHERMINED_BLOB_SPAMMER}" && \
+    cd nethermind && \
+    git checkout "${NETHERMIND_BLOB_SPAMMER_BRANCH}"
+
+RUN cd nethermind && \
+    dotnet publish ./src/Nethermind/Nethermind.SendBlobs/Nethermind.SendBlobs.csproj --sc -o out
 
 RUN git clone "${BEACON_METRICS_GAZER_REPO}" && \
     cd beacon-metrics-gazer && \
@@ -230,8 +243,12 @@ COPY --from=misc-builder /root/go/bin/ethdo /usr/local/bin/ethdo
 COPY --from=misc-builder /root/go/bin/eth2-val-tools /usr/local/bin/eth2-val-tools
 # tx-fuzz
 COPY --from=misc-builder /git/tx-fuzz/cmd/livefuzzer/livefuzzer /usr/local/bin/livefuzzer
+
 # beacon-metrics-gazer
 COPY --from=misc-builder /git/beacon-metrics-gazer/target/release/beacon-metrics-gazer /usr/local/bin/beacon-metrics-gazer
+
+# nethermind blob sender
+COPY --from=misc-builder /git/nethermind/out/Nethermind.SendBlobs /usr/local/bin/Nethermind.SendBlobs
 
 COPY --from=lighthouse-builder /lighthouse.version /lighthouse.version
 COPY --from=lighthouse-builder /git/lighthouse/target/release/lighthouse_uninstrumented /usr/local/bin/lighthouse_uninstrumented
