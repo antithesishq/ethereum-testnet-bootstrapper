@@ -9,8 +9,8 @@ RUN git clone --depth=1 --branch="${BRANCH}" https://github.com/NethermindEth/ne
 WORKDIR /git/nethermind
 
 RUN git log -n 1 --format=format:"%H" > /nethermind.version
-RUN dotnet publish src/Nethermind/Nethermind.Runner -c release -o out
-
+# RUN dotnet publish src/Nethermind/Nethermind.Runner -c release -o out
+RUN dotnet publish -p:PublishReadyToRun=false src/Nethermind/Nethermind.Runner -c release -o out
 
 FROM scratch
 
