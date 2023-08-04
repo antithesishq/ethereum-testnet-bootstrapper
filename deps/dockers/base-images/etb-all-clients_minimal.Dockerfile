@@ -20,7 +20,7 @@ RUN ln -s /opt/besu/bin/besu /usr/local/bin/besu
 
 COPY --from=nethermind_builder /nethermind/ /nethermind/
 COPY --from=nethermind_builder /nethermind.version /nethermind.version
-RUN ln -s /nethermind/Nethermind.Runner /usr/local/bin/nethermind
+RUN ln -s /nethermind/nethermind /usr/local/bin/nethermind
 
 COPY --from=lh_builder /usr/local/bin/lighthouse_uninstrumented /usr/local/bin/lighthouse
 COPY --from=lh_builder /lighthouse.version /lighthouse.version
