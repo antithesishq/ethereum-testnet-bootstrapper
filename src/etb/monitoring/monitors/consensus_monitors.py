@@ -12,11 +12,13 @@ from abc import abstractmethod
 from concurrent.futures import Future, ThreadPoolExecutor
 from typing import Union, Any, Callable, Optional
 import logging
+import json
 
 import requests
 
 from ...config.etb_config import ClientInstance
 from ...interfaces.client_request import (
+    ExecutionJSONRPCRequest,
     ClientInstanceRequest,
     perform_batched_request,
     BeaconAPIgetBlockV2,
@@ -235,8 +237,56 @@ class ConsensusMetricMonitor(ClientMetricMonitor):
         self.collect_metrics(clients_to_monitor)
         return self.report_metric()
 
-
 ClientHead = tuple[int, str, str]
+
+class HeadsMonitorExecutionAvailabilityCheck(ClientMetricMonitor):
+    """
+    A monitor that reports the heads of the clients.
+    It will retry the query up to max_retries_for_consensus times.
+    """
+
+    def __init__(
+        self, max_retries: int = 3, timeout: int = 5, max_retries_for_consensus: int = 3
+    ):
+        # curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getBlockByNumber","params":["latest", false],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+        payload = {
+            "jsonrpc": "2.0",
+            "method": "eth_getBlockByNumber",
+            "params": ["latest", False],
+            "id": 1
+        }
+        self.query = ExecutionJSONRPCRequest(payload=payload, max_retries=max_retries, timeout=timeout)
+        self.max_retry_for_consensus = max_retries_for_consensus
+
+        super().__init__(
+            client_query=self.query.perform_request,
+            response_parser=self._get_client_head_from_block,
+        )
+
+    def _get_client_head_from_block(
+        self, response: requests.Response
+    ) -> Optional[ClientHead]:
+        try:
+            if (self.query.is_valid(response)) :
+                hash = response.json()["result"]["hash"]
+                print(f"block {hash}")
+                return hash
+        except Exception as e:
+            logging.debug(f"Exception parsing response: {e}")
+            return None
+
+    def report_metric(self) -> str:
+        """Report the results obtained from the measurements."""
+        out = []
+        for client, result in self.results.items():
+            out.append({"available_execution_clients": {"result": result, "client_pair": client.name, "client_ip": client.ip_address, "client_execution": client.collection_config.execution_config.client}})
+        if len(self.unreachable_clients) > 0:
+            out.append({"unreachable_execution_clients": [client.name for client in self.unreachable_clients]})
+            # out += f"Unreachable Clients: {[client.name for client in self.unreachable_clients]}\n"
+        if len(self.invalid_response_clients) > 0:
+            out.append({"invalid_response_execution_clients": [client.name for client in self.invalid_response_clients]})
+            # out += f"Invalid Response Clients: {[client.name for client in self.invalid_response_clients]}\n"
+        return json.dumps(out)
 
 
 class HeadsMonitor(ConsensusMetricMonitor):
@@ -278,7 +328,6 @@ class HeadsMonitor(ConsensusMetricMonitor):
         out = f"num_forks: {len(self.consensus_results) - 1}\n"
         out += super().report_metric()
         return out
-
 
 # (epoch, root)
 Checkpoint = tuple[int, str]
