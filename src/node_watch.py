@@ -22,6 +22,7 @@ from etb.monitoring.monitors.consensus_monitors import (
     CheckpointsMonitor,
     ConsensusLayerPeeringSummary,
     BlobMonitor,
+    HeadsMonitorExecutionAvailabilityCheck
 )
 from etb.monitoring.testnet_monitor import (
     TestnetMonitor,
@@ -96,6 +97,27 @@ class PeersMonitorAction(TestnetMonitorAction):
             f"{self.get_peering_summary_monitor.run(self.instances_to_monitor)}\n"
         )
 
+class HeadsMonitorExecutionAvailabilityCheckAction(TestnetMonitorAction):
+    def __init__(
+        self,
+        client_instances: list[ClientInstance],
+        max_retries: int,
+        timeout: int,
+        max_retries_for_consensus: int,  # not used.
+        interval: TestnetMonitorActionInterval,
+    ):
+        super().__init__(name="head-hash-execution", interval=interval)
+        self.get_heads_monitor_execution_availability_check = HeadsMonitorExecutionAvailabilityCheck(
+            max_retries=max_retries,
+            timeout=timeout,
+            max_retries_for_consensus=max_retries_for_consensus,
+        )
+        self.instances_to_monitor = client_instances
+    
+    def perform_action(self):
+        logging.info("heads:")
+        logging.info(f"{self.get_heads_monitor_execution_availability_check.run(self.instances_to_monitor)}\n")
+
 class BlobMonitorAction(TestnetMonitorAction):
     def __init__(
         self,
@@ -151,12 +173,13 @@ class NodeWatch:
         @return: a TestnetMonitor.
         """
         metrics: dict[
-            str, Type[Union[HeadsMonitorAction, CheckpointsMonitorAction, PeersMonitorAction]]
+            str, Type[Union[HeadsMonitorAction, CheckpointsMonitorAction, PeersMonitorAction, HeadsMonitorExecutionAvailabilityCheckAction]]
         ] = {
             "heads": HeadsMonitorAction,
             "checkpoints": CheckpointsMonitorAction,
             "peers": PeersMonitorAction,
             "blob": BlobMonitorAction,
+            "execution_availability": HeadsMonitorExecutionAvailabilityCheckAction
         }
 
         intervals = {
