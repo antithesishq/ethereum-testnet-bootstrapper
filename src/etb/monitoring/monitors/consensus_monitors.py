@@ -277,15 +277,13 @@ class HeadsMonitorExecutionAvailabilityCheck(ClientMetricMonitor):
 
     def report_metric(self) -> str:
         """Report the results obtained from the measurements."""
-        out = []
-        for client, result in self.results.items():
-            out.append({"available_execution_clients": {"result": result, "client_pair": client.name, "client_ip": client.ip_address, "client_execution": client.collection_config.execution_config.client}})
+        out = {}
+        if len(self.results.items()) > 0:
+            out["available_execution_clients"] = [{"result": result, "client_pair": client.name, "client_ip": client.ip_address, "client_execution": client.collection_config.execution_config.client} for client, result in  self.results.items()]
         if len(self.unreachable_clients) > 0:
-            out.append({"unreachable_execution_clients": [client.name for client in self.unreachable_clients]})
-            # out += f"Unreachable Clients: {[client.name for client in self.unreachable_clients]}\n"
+            out["unreachable_execution_clients"] = [{"client_pair": client.name, "client_ip": client.ip_address, "client_execution": client.collection_config.execution_config.client} for client in self.unreachable_clients]
         if len(self.invalid_response_clients) > 0:
-            out.append({"invalid_response_execution_clients": [client.name for client in self.invalid_response_clients]})
-            # out += f"Invalid Response Clients: {[client.name for client in self.invalid_response_clients]}\n"
+            out["invalid_response_execution_clients"] = [{"client_pair": client.name, "client_ip": client.ip_address, "client_execution": client.collection_config.execution_config.client} for client in self.invalid_response_clients]
         return json.dumps(out)
 
 
