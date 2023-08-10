@@ -312,7 +312,7 @@ deposit_contract_json = {
 
 
 # eip4788
-eip4788_contract_address = "0x0b"
+eip4788_contract_address = "0x0b00000000000000000000000000000000000000"
 
 eip4788_contract_json = {
         "nonce": 1,
