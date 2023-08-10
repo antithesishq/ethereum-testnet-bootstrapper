@@ -87,6 +87,8 @@ class ExecutionGenesisWriter:
             self.etb_config.testnet_config.deposit_contract_address
         ] = deposit_contract_json
 
+        allocs[eip4788_contract_address] = eip4788_contract_json
+
         return allocs
 
     def create_geth_genesis(self) -> dict:
@@ -307,3 +309,13 @@ deposit_contract_json = {
     },
 }
 # pylint: enable=line-too-long
+
+
+# eip4788
+eip4788_contract_address = "0x0b"
+
+eip4788_contract_json = {
+        "nonce": 1,
+        "balance": 0,
+        "code": "0x3373fffffffffffffffffffffffffffffffffffffffe14604457602036146024575f5ffd5b620180005f350680545f35146037575f5ffd5b6201800001545f5260205ff35b42620180004206555f3562018000420662018000015500"
+}
