@@ -279,7 +279,7 @@ class HeadsMonitorExecutionAvailabilityCheck(ClientMetricMonitor):
         """Report the results obtained from the measurements."""
         out = {}
         if len(self.results.items()) > 0:
-            out["available_execution_clients"] = [{"result": result, "client_pair": client.name, "client_ip": client.ip_address, "client_execution": client.collection_config.execution_config.client} for client, result in  self.results.items()]
+            out["available_execution_clients"] = [{"client_pair": client.name, "client_ip": client.ip_address, "client_execution": client.collection_config.execution_config.client} for client, _result in  self.results.items()]
         if len(self.unreachable_clients) > 0:
             out["unreachable_execution_clients"] = [{"client_pair": client.name, "client_ip": client.ip_address, "client_execution": client.collection_config.execution_config.client} for client in self.unreachable_clients]
         if len(self.invalid_response_clients) > 0:
