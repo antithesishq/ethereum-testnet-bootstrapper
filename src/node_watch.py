@@ -22,7 +22,8 @@ from etb.monitoring.monitors.consensus_monitors import (
     CheckpointsMonitor,
     ConsensusLayerPeeringSummary,
     BlobMonitor,
-    HeadsMonitorExecutionAvailabilityCheck
+    HeadsMonitorExecutionAvailabilityCheck,
+    HeadsMonitorConsensusAvailabilityCheck
 )
 from etb.monitoring.testnet_monitor import (
     TestnetMonitor,
@@ -115,8 +116,29 @@ class HeadsMonitorExecutionAvailabilityCheckAction(TestnetMonitorAction):
         self.instances_to_monitor = client_instances
     
     def perform_action(self):
-        logging.info("heads:")
+        # logging.info("heads:")
         logging.info(f"{self.get_heads_monitor_execution_availability_check.run(self.instances_to_monitor)}\n")
+
+class HeadsMonitorConsensusAvailabilityCheckAction(TestnetMonitorAction):
+    def __init__(
+        self,
+        client_instances: list[ClientInstance],
+        max_retries: int,
+        timeout: int,
+        max_retries_for_consensus: int,  # not used.
+        interval: TestnetMonitorActionInterval,
+    ):
+        super().__init__(name="head-slot-consensus", interval=interval)
+        self.get_heads_monitor_consensus_availability_check = HeadsMonitorConsensusAvailabilityCheck(
+            max_retries=max_retries,
+            timeout=timeout,
+            max_retries_for_consensus=max_retries_for_consensus,
+        )
+        self.instances_to_monitor = client_instances
+    
+    def perform_action(self):
+        # logging.info("heads:")
+        logging.info(f"{self.get_heads_monitor_consensus_availability_check.run(self.instances_to_monitor)}\n")
 
 class BlobMonitorAction(TestnetMonitorAction):
     def __init__(
@@ -173,13 +195,14 @@ class NodeWatch:
         @return: a TestnetMonitor.
         """
         metrics: dict[
-            str, Type[Union[HeadsMonitorAction, CheckpointsMonitorAction, PeersMonitorAction, HeadsMonitorExecutionAvailabilityCheckAction]]
+            str, Type[Union[HeadsMonitorAction, CheckpointsMonitorAction, PeersMonitorAction, HeadsMonitorExecutionAvailabilityCheckAction, HeadsMonitorConsensusAvailabilityCheckAction]]
         ] = {
             "heads": HeadsMonitorAction,
             "checkpoints": CheckpointsMonitorAction,
             "peers": PeersMonitorAction,
             "blob": BlobMonitorAction,
-            "execution_availability": HeadsMonitorExecutionAvailabilityCheckAction
+            "execution_availability": HeadsMonitorExecutionAvailabilityCheckAction,
+            "consensus_availability": HeadsMonitorConsensusAvailabilityCheckAction
         }
 
         intervals = {
