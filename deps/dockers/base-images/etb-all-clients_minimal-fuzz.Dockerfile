@@ -1,5 +1,5 @@
 # custom ethdo
-FROM golang:1.18 as go_builder
+FROM golang:1.20.7 as go_builder
 
 RUN go install github.com/0xTylerHolmes/ethdo@fuzz
 

@@ -6,11 +6,11 @@ RUN make clean && make -j2 shared_lib
 RUN mkdir -p /rocksdb/lib && cp librocksdb.so* /rocksdb/lib/
 
 
-FROM golang:1.18 as go_builder
+FROM golang:1.20.7 as go_builder
 
-RUN go install github.com/wealdtech/ethereal/v2@latest \
-    && go install github.com/wealdtech/ethdo@latest \
-    && go install github.com/protolambda/eth2-val-tools@latest
+RUN go install github.com/wealdtech/ethereal/v2@v2.8.7
+RUN go install github.com/wealdtech/ethdo@v1.33.0 
+RUN go install github.com/protolambda/eth2-val-tools@v0.1.1
 
 
 FROM debian:bullseye-slim
