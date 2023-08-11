@@ -271,6 +271,7 @@ class HeadsMonitorExecutionAvailabilityCheck(ClientMetricMonitor):
                 hash = response.json()["result"]["hash"]
                 print(f"block {hash}")
                 return hash
+            return None
         except Exception as e:
             logging.debug(f"Exception parsing response: {e}")
             return None
@@ -285,7 +286,6 @@ class HeadsMonitorExecutionAvailabilityCheck(ClientMetricMonitor):
         if len(self.invalid_response_clients) > 0:
             out["invalid_response_execution_clients"] = [{"client_pair": client.name, "client_ip": client.ip_address, "client_execution": client.collection_config.execution_config.client} for client in self.invalid_response_clients]
         return json.dumps(out)
-
 
 class HeadsMonitor(ConsensusMetricMonitor):
     """
@@ -326,6 +326,35 @@ class HeadsMonitor(ConsensusMetricMonitor):
         out = f"num_forks: {len(self.consensus_results) - 1}\n"
         out += super().report_metric()
         return out
+
+
+class HeadsMonitorConsensusAvailabilityCheck(HeadsMonitor):
+    """
+    A monitor that reports the heads of the clients.
+    It will retry the query up to max_retries_for_consensus times.
+    """
+    def _get_client_head_from_block(
+        self, response: requests.Response
+    ) -> Optional[ClientHead]:
+        try:
+            block = self.query.get_block(response)
+            slot = block["slot"]
+            return slot
+        except Exception as e:
+            logging.debug(f"Exception parsing response: {e}")
+            return None
+
+    def report_metric(self) -> str:
+        """Report the results obtained from the measurements."""
+        out = {}
+        if len(self.results.items()) > 0:
+            out["available_consensus_clients"] = [{"client_pair": client.name, "client_ip": client.ip_address, "client_consensus": client.collection_config.consensus_config.client} for client, _result in  self.results.items()]
+        if len(self.unreachable_clients) > 0:
+            out["unreachable_consensus_clients"] = [{"client_pair": client.name, "client_ip": client.ip_address, "client_consensus": client.collection_config.consensus_config.client} for client in self.unreachable_clients]
+        if len(self.invalid_response_clients) > 0:
+            out["invalid_response_consensus_clients"] = [{"client_pair": client.name, "client_ip": client.ip_address, "client_consensus": client.collection_config.consensus_config.client} for client in self.invalid_response_clients]
+        return json.dumps(out)
+
 
 # (epoch, root)
 Checkpoint = tuple[int, str]
