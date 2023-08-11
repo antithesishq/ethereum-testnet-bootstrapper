@@ -17,6 +17,7 @@ RUN git clone --depth=1 --branch="${BRANCH}" https://github.com/AgeManning/light
 WORKDIR /git/lighthouse 
 
 RUN git log -n 1 --format=format:"%H" > /lighthouse.version
+RUN cargo update -p proc-macro2
 RUN LD_LIBRARY_PATH=/usr/lib/ RUSTFLAGS="-Cpasses=sancov-module -Cllvm-args=-sanitizer-coverage-level=3 -Cllvm-args=-sanitizer-coverage-trace-pc-guard -Ccodegen-units=1 -Cdebuginfo=2 -L/usr/lib/ -lvoidstar" cargo +nightly build --release --manifest-path lighthouse/Cargo.toml --target x86_64-unknown-linux-gnu --features spec-minimal --verbose --bin lighthouse
 
 
