@@ -59,7 +59,7 @@ testnet-config:
     deneb-fork-version: 0x05000666
     deneb-fork-epoch: 2
 
-    sharding-fork-version: 0x06000666
+    # sharding-fork-version: 0x06000666
 #    sharding-fork-epoch: 18446744073709551615 # far future
 
 # configuration options used for execution clients
@@ -210,7 +210,7 @@ client-instances:
   # teku-besu:
   #   # docker-compose
   #   image: "etb-all-clients"
-  #   tag: "deneb-devnet-7"
+  #   tag: "dencun-devnet-8"
   #   start-ip-address: "10.0.20.20"
   #   num-nodes: 1
 
@@ -223,7 +223,7 @@ client-instances:
   # lighthouse-besu:
   #   # docker-compose
   #   image: "etb-all-clients"
-  #   tag: "deneb-devnet-7"
+  #   tag: "dencun-devnet-8"
   #   start-ip-address: "10.0.20.30"
   #   num-nodes: 3
 
@@ -237,7 +237,7 @@ client-instances:
   # teku-nethermind:
   #   # docker-compose
   #   image: "etb-all-clients"
-  #   tag: "deneb-devnet-7"
+  #   tag: "dencun-devnet-8"
   #   start-ip-address: "10.0.20.120"
   #   num-nodes: 2
 
@@ -250,7 +250,7 @@ client-instances:
   # lighthouse-nethermind:
   #   # docker-compose
   #   image: "etb-all-clients"
-  #   tag: "deneb-devnet-7"
+  #   tag: "dencun-devnet-8"
   #   start-ip-address: "10.0.20.130"
   #   num-nodes: 2
 
@@ -265,7 +265,7 @@ generic-instances:
 # the bootstrapper that builds the network.
   ethereum-testnet-bootstrapper:
     image: "ethereum-testnet-bootstrapper"
-    tag: "deneb-devnet-7"
+    tag: "dencun-devnet-8"
     start-ip-address: "10.0.20.201"
     num-nodes: 1
     entrypoint: "/source/entrypoint.sh --bootstrap-testnet --log-level debug"
@@ -273,7 +273,7 @@ generic-instances:
   # required instance, bootnode to connect all CL clients together
   eth2-bootnode:
     image: "ethereum-testnet-bootstrapper"
-    tag: "deneb-devnet-7"
+    tag: "dencun-devnet-8"
     start-ip-address: "10.0.20.202"
     entrypoint: "/source/deps/launchers/bootnodes/launch-eth2-bootnode.sh"
     num-nodes: 1 # this is a special case, we only want one instance of this.
@@ -288,22 +288,22 @@ generic-instances:
   # not required, but useful for debugging. This watches the network and shows the head & checkpoints of the CLs.
   node-watch:
     image: "ethereum-testnet-bootstrapper"
-    tag: "deneb-devnet-7"
+    tag: "dencun-devnet-8"
     start-ip-address: "10.0.20.203"
     num-nodes: 1
     entrypoint: "python3 /source/src/node_watch.py --log-level info --monitor heads:slot --monitor checkpoints:slot --monitor peers:epoch --max-retries 3"
 
   tx-spammer:
     image: "etb-all-clients"
-    tag: "deneb-devnet-7"
+    tag: "dencun-devnet-8"
     start-ip-address: "10.0.20.204"
     num-nodes: 1
     # runs on the first prysm geth node.
-    entrypoint: "python3 /source/src/tx_spammer.py --run-indefinitely --log-level debug --target-ip 10.0.20.120 --target-port 8645 --epoch-delay 2 --fuzz-mode spam --no-al --tx-count 100 --tx-fuzz-path /usr/local/bin/livefuzzer"
+    entrypoint: "python3 /source/src/tx_spammer.py --run-indefinitely --log-level debug --target-ip 10.0.20.30 --target-port 8645 --epoch-delay 2 --fuzz-mode spam --no-al --tx-count 100 --tx-fuzz-path /usr/local/bin/livefuzzer"
 
   antithesis-checker:
     image: "ethereum-testnet-bootstrapper"
-    tag: "deneb-devnet-7"
+    tag: "dencun-devnet-8"
     start-ip-address: "10.0.20.205"
     num-nodes: 1
     entrypoint: "python3 /source/src/antithesis_checker.py --config /data/etb-config.yaml

@@ -33,7 +33,7 @@ ARG NETHERMIND_BRANCH="feature/eip-4844-v6"
 
 # All of the fuzzers we will be using
 ARG TX_FUZZ_REPO="https://github.com/MariusVanDerWijden/tx-fuzz.git"
-ARG TX_FUZZ_BRANCH="4844"
+ARG TX_FUZZ_BRANCH="4225d9c8c1f8c57c6d0cc655cb549acd84925c99"
 
 # Metrics gathering
 ARG BEACON_METRICS_GAZER_REPO="https://github.com/qu0b/beacon-metrics-gazer.git"
