@@ -91,6 +91,7 @@ RUN arch=$(arch | sed s/aarch64/arm64/ | sed s/x86_64/amd64/) && \
 RUN ln -s /usr/local/go/bin/go /usr/local/bin/go && \
     ln -s /usr/local/go/bin/gofmt /usr/local/bin/gofmt
 
+
 ENV PATH="$PATH:/root/go/bin"
 
 # setup nodejs (lodestar)
@@ -169,17 +170,16 @@ RUN cd teku && \
     ./gradlew installDist
 
 # PRYSM
-FROM gcr.io/prysmaticlabs/build-agent AS prysm-builder
+FROM etb-client-builder AS prysm-builder
 ARG PRYSM_BRANCH
 ARG PRYSM_REPO
-RUN go install github.com/bazelbuild/bazelisk@latest
 RUN git clone "${PRYSM_REPO}" && \
     cd prysm && \
     git checkout "${PRYSM_BRANCH}" && \
     git log -n 1 --format=format:"%H" > /prysm.version
 
 RUN cd prysm && \
-    /root/go/bin/bazelisk build --config=release //cmd/beacon-chain:beacon-chain //cmd/validator:validator
+    bazelisk build --config=release //cmd/beacon-chain:beacon-chain //cmd/validator:validator
 
 
 ############################# Execution  Clients  #############################
