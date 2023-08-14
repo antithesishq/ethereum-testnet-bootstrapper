@@ -142,31 +142,31 @@ RUN cd lodestar && \
     yarn install --non-interactive --frozen-lockfile --production
 
 # NIMBUS
-FROM etb-client-builder AS nimbus-eth2-builder
-ARG NIMBUS_ETH2_BRANCH
-ARG NIMBUS_ETH2_REPO
-RUN git clone "${NIMBUS_ETH2_REPO}" && \
-    cd nimbus-eth2 && \
-    git checkout "${NIMBUS_ETH2_BRANCH}" && \
-    git log -n 1 --format=format:"%H" > /nimbus.version && \
-    make -j16 update
+# FROM etb-client-builder AS nimbus-eth2-builder
+# ARG NIMBUS_ETH2_BRANCH
+# ARG NIMBUS_ETH2_REPO
+# RUN git clone "${NIMBUS_ETH2_REPO}" && \
+#     cd nimbus-eth2 && \
+#     git checkout "${NIMBUS_ETH2_BRANCH}" && \
+#     git log -n 1 --format=format:"%H" > /nimbus.version && \
+#     make -j16 update
 
-RUN cd nimbus-eth2 && \
-    arch=$(arch | sed s/aarch64/arm64/ | sed s/x86_64/amd64/) && \
-    make -j16 nimbus_beacon_node NIMFLAGS="-d:disableMarchNative --cpu:${arch} --cc:clang --clang.exe:clang-15 --clang.linkerexe:clang-15 --passC:-fno-lto --passL:-fno-lto"
+# RUN cd nimbus-eth2 && \
+#     arch=$(arch | sed s/aarch64/arm64/ | sed s/x86_64/amd64/) && \
+#     make -j16 nimbus_beacon_node NIMFLAGS="-d:disableMarchNative --cpu:${arch} --cc:clang --clang.exe:clang-15 --clang.linkerexe:clang-15 --passC:-fno-lto --passL:-fno-lto"
 
 # TEKU
-FROM etb-client-builder AS teku-builder
-ARG TEKU_BRANCH
-ARG TEKU_REPO
-RUN git clone "${TEKU_REPO}" && \
-    cd teku && \
-    git checkout "${TEKU_BRANCH}" && \
-    git submodule update --init --recursive && \
-    git log -n 1 --format=format:"%H" > /teku.version
+# FROM etb-client-builder AS teku-builder
+# ARG TEKU_BRANCH
+# ARG TEKU_REPO
+# RUN git clone "${TEKU_REPO}" && \
+#     cd teku && \
+#     git checkout "${TEKU_BRANCH}" && \
+#     git submodule update --init --recursive && \
+#     git log -n 1 --format=format:"%H" > /teku.version
 
-RUN cd teku && \
-    ./gradlew installDist
+# RUN cd teku && \
+#     ./gradlew installDist
 
 # PRYSM
 FROM gcr.io/prysmaticlabs/build-agent AS prysm-builder
@@ -196,28 +196,28 @@ RUN cd go-ethereum && \
     go install ./...
 
 # Besu
-FROM etb-client-builder AS besu-builder
-ARG BESU_BRANCH
-ARG BESU_REPO
-RUN git clone "${BESU_REPO}" && \
-    cd besu && \
-    git checkout "${BESU_BRANCH}" && \
-    git log -n 1 --format=format:"%H" > /besu.version
+# FROM etb-client-builder AS besu-builder
+# ARG BESU_BRANCH
+# ARG BESU_REPO
+# RUN git clone "${BESU_REPO}" && \
+#     cd besu && \
+#     git checkout "${BESU_BRANCH}" && \
+#     git log -n 1 --format=format:"%H" > /besu.version
 
-RUN cd besu && \
-    ./gradlew installDist
+# RUN cd besu && \
+#     ./gradlew installDist
 
 # Nethermind
-FROM etb-client-builder AS nethermind-builder
-ARG NETHERMIND_BRANCH
-ARG NETHERMIND_REPO
-RUN git clone "${NETHERMIND_REPO}" && \
-    cd nethermind && \
-    git checkout "${NETHERMIND_BRANCH}" && \
-    git log -n 1 --format=format:"%H" > /nethermind.version
+# FROM etb-client-builder AS nethermind-builder
+# ARG NETHERMIND_BRANCH
+# ARG NETHERMIND_REPO
+# RUN git clone "${NETHERMIND_REPO}" && \
+#     cd nethermind && \
+#     git checkout "${NETHERMIND_BRANCH}" && \
+#     git log -n 1 --format=format:"%H" > /nethermind.version
 
-RUN cd nethermind && \
-    dotnet publish -p:PublishReadyToRun=false src/Nethermind/Nethermind.Runner -c release -o out
+# RUN cd nethermind && \
+#     dotnet publish -p:PublishReadyToRun=false src/Nethermind/Nethermind.Runner -c release -o out
 
 ############################### Misc.  Modules  ###############################
 FROM etb-client-builder AS misc-builder
@@ -301,9 +301,9 @@ COPY --from=misc-builder /git/beacon-metrics-gazer/target/release/beacon-metrics
 COPY --from=lighthouse-builder /lighthouse.version /lighthouse.version
 COPY --from=lighthouse-builder /git/lighthouse/target/release/lighthouse /usr/local/bin/lighthouse
 
-COPY --from=teku-builder  /git/teku/build/install/teku/. /opt/teku
-COPY --from=teku-builder /teku.version /teku.version
-RUN ln -s /opt/teku/bin/teku /usr/local/bin/teku
+# COPY --from=teku-builder  /git/teku/build/install/teku/. /opt/teku
+# COPY --from=teku-builder /teku.version /teku.version
+# RUN ln -s /opt/teku/bin/teku /usr/local/bin/teku
 
 COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /usr/local/bin/beacon-chain
 COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/validator/validator_/validator /usr/local/bin/validator
