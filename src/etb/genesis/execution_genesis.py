@@ -241,6 +241,11 @@ class ExecutionGenesisWriter:
                 "eip3855TransitionTimestamp": f"0x{self.shanghai_fork_time:08x}",
                 "eip3651TransitionTimestamp": f"0x{self.shanghai_fork_time:08x}",
                 "eip3860TransitionTimestamp": f"0x{self.shanghai_fork_time:08x}",
+                "eip4844TransitionTimestamp": f"0x{self.cancun_fork_time:08x}",
+                "eip4788TransitionTimestamp": f"0x{self.cancun_fork_time:08x}",
+                "eip1153TransitionTimestamp": f"0x{self.cancun_fork_time:08x}",
+                "eip5656TransitionTimestamp": f"0x{self.cancun_fork_time:08x}",
+                "eip6780TransitionTimestamp": f"0x{self.cancun_fork_time:08x}",
                 "terminalTotalDifficulty": f"0x{0:08x}",
             },
             "genesis": {
