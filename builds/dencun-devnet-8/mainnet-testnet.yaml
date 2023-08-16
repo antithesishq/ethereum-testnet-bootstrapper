@@ -125,7 +125,7 @@ consensus-configs:
     launcher: "/source/deps/launchers/cl/launch-teku.sh"
     log-level: "INFO"
 
-    num-validators: 8       # number of validators for every client node
+    num-validators: 10       # number of validators for every client node
 
     p2p-port: 4000    # start port used for discovery
     beacon-api-port: 5000   # start port used for the beacon rest API
@@ -177,6 +177,19 @@ client-instances:
     additional-env:
       validator-password: "testnet-password"
 
+  teku-geth:
+    # docker-compose
+    image: "etb-all-clients"
+    tag: "dencun-devnet-8"
+    start-ip-address: "10.0.20.20"
+    num-nodes: 1
+
+    # consensus-info
+    consensus-config: "teku-consensus-client"
+    execution-config: "geth-execution-config"
+
+    validator-offset-start: 20
+
   lighthouse-geth:
     # docker-compose
     image: "etb-all-clients"
@@ -188,23 +201,20 @@ client-instances:
     consensus-config: "lighthouse-consensus-client"
     execution-config: "geth-execution-config"
 
-    validator-offset-start: 20
+    validator-offset-start: 30
 
-  lodestar-geth:
-    # docker-compose
-    image: "etb-all-clients"
-    tag: "dencun-devnet-8"
-    start-ip-address: "10.0.20.40"
-    num-nodes: 1
+  # lodestar-geth:
+  #   # docker-compose
+  #   image: "etb-all-clients"
+  #   tag: "dencun-devnet-8"
+  #   start-ip-address: "10.0.20.40"
+  #   num-nodes: 1
 
-    # consensus-info
-    consensus-config: "lodestar-consensus-client"
-    execution-config: "geth-execution-config"
+  #   # consensus-info
+  #   consensus-config: "lodestar-consensus-client"
+  #   execution-config: "geth-execution-config"
 
-    validator-offset-start: 40
-
-
-
+  #   validator-offset-start: 40
 
   # Geth clients
   # teku-besu:

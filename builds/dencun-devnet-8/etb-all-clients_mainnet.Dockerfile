@@ -15,7 +15,7 @@ ARG LODESTAR_BRANCH="f1a22910374e2f955641c9886b74eed189b27b97"
 #ARG NIMBUS_ETH2_BRANCH="stable"
 
 ARG TEKU_REPO="https://github.com/ConsenSys/teku.git"
-ARG TEKU_BRANCH="edcd21551421dad2c6b7d590053937077310402a"
+ARG TEKU_BRANCH="3c74f07bd13bc79024d0935e5388f4aa479df76d"
 
 # Execution Clients
 # ARG BESU_REPO="https://github.com/jflo/besu.git"
@@ -157,17 +157,17 @@ RUN cd lodestar && \
 #     make -j16 nimbus_beacon_node NIMFLAGS="-d:disableMarchNative --cpu:${arch} --cc:clang --clang.exe:clang-15 --clang.linkerexe:clang-15 --passC:-fno-lto --passL:-fno-lto"
 
 # TEKU
-# FROM etb-client-builder AS teku-builder
-# ARG TEKU_BRANCH
-# ARG TEKU_REPO
-# RUN git clone "${TEKU_REPO}" && \
-#     cd teku && \
-#     git checkout "${TEKU_BRANCH}" && \
-#     git submodule update --init --recursive && \
-#     git log -n 1 --format=format:"%H" > /teku.version
+FROM etb-client-builder AS teku-builder
+ARG TEKU_BRANCH
+ARG TEKU_REPO
+RUN git clone "${TEKU_REPO}" && \
+    cd teku && \
+    git checkout "${TEKU_BRANCH}" && \
+    git submodule update --init --recursive && \
+    git log -n 1 --format=format:"%H" > /teku.version
 
-# RUN cd teku && \
-#     ./gradlew installDist
+RUN cd teku && \
+    ./gradlew installDist
 
 # PRYSM
 FROM etb-client-builder AS prysm-builder
@@ -301,9 +301,9 @@ COPY --from=misc-builder /git/beacon-metrics-gazer/target/release/beacon-metrics
 COPY --from=lighthouse-builder /lighthouse.version /lighthouse.version
 COPY --from=lighthouse-builder /git/lighthouse/target/release/lighthouse /usr/local/bin/lighthouse
 
-# COPY --from=teku-builder  /git/teku/build/install/teku/. /opt/teku
-# COPY --from=teku-builder /teku.version /teku.version
-# RUN ln -s /opt/teku/bin/teku /usr/local/bin/teku
+COPY --from=teku-builder  /git/teku/build/install/teku/. /opt/teku
+COPY --from=teku-builder /teku.version /teku.version
+RUN ln -s /opt/teku/bin/teku /usr/local/bin/teku
 
 COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /usr/local/bin/beacon-chain
 COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/validator/validator_/validator /usr/local/bin/validator

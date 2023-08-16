@@ -69,6 +69,7 @@ beacon-chain \
   --suggested-fee-recipient=0x00000000219ab540356cbb839cbe05303d7705fa \
   --execution-endpoint="http://127.0.0.1:$EXECUTION_ENGINE_HTTP_PORT" \
   --min-sync-peers 1 \
+  --aggregate-parallel \
   > /data/logs/"service_$CONTAINER_NAME--prysm-bn" 2>&1 &
 
 sleep 10
