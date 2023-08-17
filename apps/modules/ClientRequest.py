@@ -85,11 +85,11 @@ class ClientRequest(object):
             try:
                 if self.req_type == RequestType.ExecutionRPCRequest:
                     self.response = requests.post(
-                        base_url, json=self.payload, timeout=self.timeout
+                        base_url, json=self.payload #, timeout=self.timeout
                     )
                 else:
                     self.response = requests.get(
-                        f"{base_url}{self.payload}", timeout=self.timeout
+                        f"{base_url}{self.payload}" #, timeout=self.timeout
                     )
 
                 if self.response.status_code == 200:
