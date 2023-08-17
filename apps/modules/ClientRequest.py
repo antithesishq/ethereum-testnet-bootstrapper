@@ -141,7 +141,7 @@ class ClientRequest(object):
 
 
 def perform_batched_request(req: ClientRequest, clients: list[ClientInstance]):
-    with ThreadPoolExecutor(max_workers=2) as executor:
+    with ThreadPoolExecutor(max_workers=len(clients)) as executor:
         results = executor.map(req.perform_request, clients)
     return zip(clients, results)
 
