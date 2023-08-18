@@ -46,7 +46,7 @@ done
 bootnode_enr=`cat $CONSENSUS_BOOTNODE_FILE`
 
 echo "Launching Lodestar."
-
+# export LODESTAR_PRESET=minimal
 lodestar beacon \
     --dataDir="$CONSENSUS_NODE_DIR" \
     --paramsFile="$CONSENSUS_CONFIG_FILE" \
@@ -70,6 +70,7 @@ lodestar beacon \
     --subscribeAllSubnets=true \
     --eth1.depositContractDeployBlock=0 \
     --suggestedFeeRecipient=0x00000000219ab540356cbb839cbe05303d7705fa \
+    --chain.trustedSetup "$TRUSTED_SETUP_TXT_FILE" \
     > /data/logs/"service_$CONTAINER_NAME--lodestar-bn" 2>&1 &
 
 sleep 10

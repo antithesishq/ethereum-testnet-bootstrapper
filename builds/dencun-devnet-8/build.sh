@@ -26,5 +26,11 @@ function container_builder() {
 log_step "building all clients"
 build_image "etb-all-clients:dencun-devnet-8" "etb-all-clients_mainnet.Dockerfile"
 
-# log_step "building all clients instrumented"
-# build_image "etb-all-clients-inst:dencun-devnet-8" "etb-all-clients_mainnet-inst.Dockerfile"
+log_step "building all clients instrumented"
+build_image "etb-all-clients-inst:dencun-devnet-8" "etb-all-clients_mainnet-inst.Dockerfile"
+
+# log_step "building all minimal clients"
+# build_image "etb-all-clients-minimal:dencun-devnet-8" "etb-all-clients_minimal.Dockerfile"
+
+# log_step "building all minimal instrumented clients"
+# build_image "etb-all-clients-minimal-inst:dencun-devnet-8" "etb-all-clients_minimal-inst.Dockerfile"
