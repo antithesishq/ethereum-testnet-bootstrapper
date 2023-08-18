@@ -8,6 +8,9 @@ BOOTSTRAPPER="ethereum-testnet-bootstrapper"
 CONFIG_IMAGE="etb-mainnet-config"
 CONFIG_IMAGE_INST="etb-mainnet-config-inst"
 
+CONFIG_IMAGE_MINIMAL="etb-minimal-config"
+CONFIG_IMAGE_MINIMAL_INST="etb-minimal-config-inst"
+
 CONTAINER_REPOSITORY="us-central1-docker.pkg.dev/molten-verve-216720/ethereum-repository"
 
 # build the images
@@ -27,6 +30,11 @@ docker tag "$CONFIG_IMAGE:latest" "$CONTAINER_REPOSITORY/$CONFIG_IMAGE:$TAG"
 make build-config config=builds/dencun-devnet-8/mainnet-testnet-inst.yaml
 docker tag "$CONFIG_IMAGE:latest" "$CONTAINER_REPOSITORY/$CONFIG_IMAGE_INST:$TAG"
 
+# make build-config config=builds/dencun-devnet-8/minimal-testnet.yaml
+# docker tag "$CONFIG_IMAGE:latest" "$CONTAINER_REPOSITORY/$CONFIG_IMAGE_MINIMAL:$TAG"
+
+# make build-config config=builds/dencun-devnet-8/minimal-testnet-inst.yaml
+# docker tag "$CONFIG_IMAGE:latest" "$CONTAINER_REPOSITORY/$CONFIG_IMAGE_MINIMAL_INST:$TAG"
 
 docker tag "$BOOTSTRAPPER:latest" "$CONTAINER_REPOSITORY/$BOOTSTRAPPER:$TAG"
 docker tag "$ETB_ALL_CLIENTS:dencun-devnet-8" "$CONTAINER_REPOSITORY/$ETB_ALL_CLIENTS:$TAG"

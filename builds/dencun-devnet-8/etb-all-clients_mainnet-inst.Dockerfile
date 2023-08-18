@@ -1,18 +1,18 @@
 ###############################################################################
-#           Dockerfile to build all clients minimal mainnet preset.           #
+#           Dockerfile to build all clients mainnet preset.           #
 ###############################################################################
 # Consensus Clients
 ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
-ARG LIGHTHOUSE_BRANCH="7f7ad799b34fa1a36f25ccd16006d05b6ea0f238" 
+ARG LIGHTHOUSE_BRANCH="f031a570ce351a6fc852997c086f5b1822b2ca01" 
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
-ARG PRYSM_BRANCH="6009300238f7c36f4446ef4796ba5217ae78f556"
+ARG PRYSM_BRANCH="a01eec24fe8fda3690dc188c618488fdef763931"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
 ARG LODESTAR_BRANCH="f1a22910374e2f955641c9886b74eed189b27b97"
 #
-#ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
-#ARG NIMBUS_ETH2_BRANCH="stable"
+ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
+ARG NIMBUS_ETH2_BRANCH="a150bc93a6bfa30505fef0f995402082b3183eb0"
 
 ARG TEKU_REPO="https://github.com/ConsenSys/teku.git"
 ARG TEKU_BRANCH="3c74f07bd13bc79024d0935e5388f4aa479df76d"
@@ -26,14 +26,14 @@ ARG GETH_REPO="https://github.com/lightclient/go-ethereum.git"
 ARG GETH_BRANCH="bc8c22ed88cee78eddcec5e1ce8bda7a85ca7b17"
 
 ARG NETHERMIND_REPO="https://github.com/NethermindEth/nethermind.git"
-ARG NETHERMIND_BRANCH="feature/eip-4844-v6"
+ARG NETHERMIND_BRANCH="27f44c591219facf52d61699024faded1392464c"
 
-# ARG ETHEREUMJS_REPO="https://github.com/ethereumjs/ethereumjs-monorepo.git"
-# ARG ETHEREUMJS_BRANCH="c47d2c7351f04f35744de0f2082c37d5f2d2afd0"
+ARG ETHEREUMJS_REPO="https://github.com/ethereumjs/ethereumjs-monorepo.git"
+ARG ETHEREUMJS_BRANCH="c47d2c7351f04f35744de0f2082c37d5f2d2afd0"
 
 # All of the fuzzers we will be using
 ARG TX_FUZZ_REPO="https://github.com/MariusVanDerWijden/tx-fuzz.git"
-ARG TX_FUZZ_BRANCH="4225d9c8c1f8c57c6d0cc655cb549acd84925c99"
+ARG TX_FUZZ_BRANCH="536d4aa79b09f83a2c58f7278536fd875ba390c5"
 
 # Metrics gathering
 ARG BEACON_METRICS_GAZER_REPO="https://github.com/qu0b/beacon-metrics-gazer.git"
@@ -138,7 +138,7 @@ RUN cd lighthouse && \
 
 # Antithesis instrumented lighthouse binary
 RUN cd lighthouse && \ 
-LD_LIBRARY_PATH=/usr/lib/ RUSTFLAGS="-Cpasses=sancov-module -Cllvm-args=-sanitizer-coverage-level=3 -Cllvm-args=-sanitizer-coverage-trace-pc-guard -Ccodegen-units=1 -Cdebuginfo=2 -L/usr/lib/ -lvoidstar" cargo build --release --manifest-path lighthouse/Cargo.toml --features spec-minimal --bin lighthouse
+LD_LIBRARY_PATH=/usr/lib/ RUSTFLAGS="-Cpasses=sancov-module -Cllvm-args=-sanitizer-coverage-level=3 -Cllvm-args=-sanitizer-coverage-trace-pc-guard -Ccodegen-units=1 -Cdebuginfo=2 -L/usr/lib/ -lvoidstar" cargo build --release --manifest-path lighthouse/Cargo.toml --bin lighthouse
 
 # LODESTAR
 FROM etb-client-builder AS lodestar-builder
@@ -155,18 +155,18 @@ RUN cd lodestar && \
     yarn install --non-interactive --frozen-lockfile --production
 
 # NIMBUS
-# FROM etb-client-builder AS nimbus-eth2-builder
-# ARG NIMBUS_ETH2_BRANCH
-# ARG NIMBUS_ETH2_REPO
-# RUN git clone "${NIMBUS_ETH2_REPO}" && \
-#     cd nimbus-eth2 && \
-#     git checkout "${NIMBUS_ETH2_BRANCH}" && \
-#     git log -n 1 --format=format:"%H" > /nimbus.version && \
-#     make -j16 update
+FROM etb-client-builder AS nimbus-eth2-builder
+ARG NIMBUS_ETH2_BRANCH
+ARG NIMBUS_ETH2_REPO
+RUN git clone "${NIMBUS_ETH2_REPO}" && \
+    cd nimbus-eth2 && \
+    git checkout "${NIMBUS_ETH2_BRANCH}" && \
+    git log -n 1 --format=format:"%H" > /nimbus.version && \
+    make -j16 update
 
-# RUN cd nimbus-eth2 && \
-#     arch=$(arch | sed s/aarch64/arm64/ | sed s/x86_64/amd64/) && \
-#     make -j16 nimbus_beacon_node NIMFLAGS="-d:disableMarchNative --cpu:${arch} --cc:clang --clang.exe:clang-15 --clang.linkerexe:clang-15 --passC:-fno-lto --passL:-fno-lto"
+RUN cd nimbus-eth2 && \
+    arch=$(arch | sed s/aarch64/arm64/ | sed s/x86_64/amd64/) && \
+    make -j16 nimbus_beacon_node NIMFLAGS="-d:disableMarchNative --cpu:${arch} --cc:clang --clang.exe:clang-15 --clang.linkerexe:clang-15 --passC:-fno-lto --passL:-fno-lto"
 
 # TEKU
 FROM etb-client-builder AS teku-builder
@@ -248,16 +248,16 @@ RUN cd geth_instrumented/customer && \
 #     ./gradlew installDist
 
 # Nethermind
-# FROM etb-client-builder AS nethermind-builder
-# ARG NETHERMIND_BRANCH
-# ARG NETHERMIND_REPO
-# RUN git clone "${NETHERMIND_REPO}" && \
-#     cd nethermind && \
-#     git checkout "${NETHERMIND_BRANCH}" && \
-#     git log -n 1 --format=format:"%H" > /nethermind.version
+FROM etb-client-builder AS nethermind-builder
+ARG NETHERMIND_BRANCH
+ARG NETHERMIND_REPO
+RUN git clone "${NETHERMIND_REPO}" && \
+    cd nethermind && \
+    git checkout "${NETHERMIND_BRANCH}" && \
+    git log -n 1 --format=format:"%H" > /nethermind.version
 
-# RUN cd nethermind && \
-#     dotnet publish -p:PublishReadyToRun=false src/Nethermind/Nethermind.Runner -c release -o out
+RUN cd nethermind && \
+    dotnet publish -p:PublishReadyToRun=false src/Nethermind/Nethermind.Runner -c release -o out
 
 ############################### Misc.  Modules  ###############################
 FROM etb-client-builder AS misc-builder
@@ -342,8 +342,8 @@ COPY --from=misc-builder /git/tx-fuzz/cmd/livefuzzer/livefuzzer /usr/local/bin/l
 COPY --from=misc-builder /git/beacon-metrics-gazer/target/release/beacon-metrics-gazer /usr/local/bin/beacon-metrics-gazer
 
 # consensus clients
-#COPY --from=nimbus-eth2-builder /git/nimbus-eth2/build/nimbus_beacon_node /usr/local/bin/nimbus_beacon_node
-#COPY --from=nimbus-eth2-builder /nimbus.version /nimbus.version
+COPY --from=nimbus-eth2-builder /git/nimbus-eth2/build/nimbus_beacon_node /usr/local/bin/nimbus_beacon_node
+COPY --from=nimbus-eth2-builder /nimbus.version /nimbus.version
 
 COPY --from=lighthouse-builder /lighthouse.version /lighthouse.version
 COPY --from=lighthouse-builder /git/lighthouse/target/release/lighthouse_uninstrumented /usr/local/bin/lighthouse_uninstrumented
@@ -363,9 +363,9 @@ COPY --from=prysm-builder /prysm.version /prysm.version
 COPY --from=prysm-builder /git/prysm_instrumented/symbols/* /opt/antithesis/symbols/
 COPY --from=prysm-builder /git/prysm_instrumented/customer /prysm_instrumented_code
 #
-# COPY --from=lodestar-builder /git/lodestar /git/lodestar
-# COPY --from=lodestar-builder /lodestar.version /lodestar.version
-# RUN ln -s /git/lodestar/node_modules/.bin/lodestar /usr/local/bin/lodestar
+COPY --from=lodestar-builder /git/lodestar /git/lodestar
+COPY --from=lodestar-builder /lodestar.version /lodestar.version
+RUN ln -s /git/lodestar/node_modules/.bin/lodestar /usr/local/bin/lodestar
 
 # execution clients
 COPY --from=geth-builder /geth.version /geth.version
@@ -380,6 +380,6 @@ COPY --from=geth-builder /git/geth_instrumented/customer /geth_instrumented_code
 # COPY --from=besu-builder /git/besu/build/install/besu/. /opt/besu
 # RUN ln -s /opt/besu/bin/besu /usr/local/bin/besu
 
-# COPY --from=nethermind-builder /nethermind.version /nethermind.version
-# COPY --from=nethermind-builder /git/nethermind/out /nethermind/
-# RUN ln -s /nethermind/Nethermind.Runner /usr/local/bin/nethermind
+COPY --from=nethermind-builder /nethermind.version /nethermind.version
+COPY --from=nethermind-builder /git/nethermind/out /nethermind/
+RUN ln -s /nethermind/nethermind /usr/local/bin/nethermind

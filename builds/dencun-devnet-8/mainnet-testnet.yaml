@@ -32,7 +32,7 @@ testnet-config:
 
   # used for generating the consensus config placed in /data/eth2-config.yaml
   consensus-layer:
-    preset-base: 'mainnet'
+    preset-base: 'mainnet-custom'
     config-name: "local-mainnet-testnet"
 
     min-genesis-active-validator-count: 60 # custom pre-seeded into genesis state.
@@ -150,7 +150,7 @@ consensus-configs:
   lodestar-consensus-client:
     client: "lodestar"
     launcher: "/source/deps/launchers/cl/launch-lodestar.sh"
-    num-validators: 5       # number of validators for every client node
+    num-validators: 10       # number of validators for every client node
     # start ports increment each time we have a node.
     log-level: "debug"
     p2p-port: 4000    # start port used for discovery
@@ -160,20 +160,33 @@ consensus-configs:
     beacon-metric-port: 8000 # start port used for beacon node metrics.
     validator-metric-port: 9000 # start port used for validator client metrics.
 
+  nimbus-consensus-client:
+    client: "nimbus"
+    launcher: "/source/deps/launchers/cl/launch-nimbus.sh"
+    num-validators: 10       # number of validators for every client node
+    # start ports increment each time we have a node.
+    log-level: "debug"
+
+    p2p-port: 4000    # start port used for discovery
+    beacon-api-port: 5000   # start port used for the beacon rest API
+    beacon-rpc-port: 5500
+    validator-rpc-port: 6500
+    beacon-metric-port: 8000 # start port used for beacon node metrics.
+    validator-metric-port: 9000 # start port used for validator client metrics.
+
 client-instances:
+   # Geth clients
   prysm-geth:
     # docker-compose
     image: "etb-all-clients"
     tag: "dencun-devnet-8"
     start-ip-address: "10.0.20.10"
-    num-nodes: 2
+    num-nodes: 1
 
     # consensus-info
     consensus-config: "prysm-consensus-client"
     execution-config: "geth-execution-config"
-
     validator-offset-start: 0
-
     additional-env:
       validator-password: "testnet-password"
 
@@ -188,7 +201,7 @@ client-instances:
     consensus-config: "teku-consensus-client"
     execution-config: "geth-execution-config"
 
-    validator-offset-start: 20
+    validator-offset-start: 10
 
   lighthouse-geth:
     # docker-compose
@@ -201,22 +214,34 @@ client-instances:
     consensus-config: "lighthouse-consensus-client"
     execution-config: "geth-execution-config"
 
+    validator-offset-start: 20
+
+  lodestar-geth:
+    # docker-compose
+    image: "etb-all-clients"
+    tag: "dencun-devnet-8"
+    start-ip-address: "10.0.20.40"
+    num-nodes: 1
+
+    # consensus-info
+    consensus-config: "lodestar-consensus-client"
+    execution-config: "geth-execution-config"
+
     validator-offset-start: 30
 
-  # lodestar-geth:
+  # nimbus-geth:
   #   # docker-compose
   #   image: "etb-all-clients"
   #   tag: "dencun-devnet-8"
-  #   start-ip-address: "10.0.20.40"
+  #   start-ip-address: "10.0.20.50"
   #   num-nodes: 1
 
   #   # consensus-info
-  #   consensus-config: "lodestar-consensus-client"
+  #   consensus-config: "nimbus-consensus-client"
   #   execution-config: "geth-execution-config"
 
-  #   validator-offset-start: 40
+  #   validator-offset-start: 30
 
-  # Geth clients
   # teku-besu:
   #   # docker-compose
   #   image: "etb-all-clients"
@@ -244,31 +269,72 @@ client-instances:
   #   validator-offset-start: 15
 
   # Nethermind clients
-  # teku-nethermind:
-  #   # docker-compose
-  #   image: "etb-all-clients"
-  #   tag: "dencun-devnet-8"
-  #   start-ip-address: "10.0.20.120"
-  #   num-nodes: 2
 
-  #   # consensus-info
-  #   consensus-config: "teku-consensus-client"
-  #   execution-config: "nethermind-execution-config"
+  prysm-nethermind:
+    # docker-compose
+    image: "etb-all-clients"
+    tag: "dencun-devnet-8"
+    start-ip-address: "10.0.20.110"
+    num-nodes: 1
 
-  #   validator-offset-start: 30
+    # consensus-info
+    consensus-config: "prysm-consensus-client"
+    execution-config: "nethermind-execution-config"
+    validator-offset-start: 40
+    additional-env:
+      validator-password: "testnet-password"
+
+  teku-nethermind:
+    # docker-compose
+    image: "etb-all-clients"
+    tag: "dencun-devnet-8"
+    start-ip-address: "10.0.20.120"
+    num-nodes: 1
+
+    # consensus-info
+    consensus-config: "teku-consensus-client"
+    execution-config: "nethermind-execution-config"
+
+    validator-offset-start: 50
 
   # lighthouse-nethermind:
   #   # docker-compose
   #   image: "etb-all-clients"
   #   tag: "dencun-devnet-8"
   #   start-ip-address: "10.0.20.130"
-  #   num-nodes: 2
+  #   num-nodes: 1
 
   #   # consensus-info
   #   consensus-config: "lighthouse-consensus-client"
   #   execution-config: "nethermind-execution-config"
 
   #   validator-offset-start: 45
+
+  lodestar-nethermind:
+    # docker-compose
+    image: "etb-all-clients"
+    tag: "dencun-devnet-8"
+    start-ip-address: "10.0.20.140"
+    num-nodes: 1
+
+    # consensus-info
+    consensus-config: "lodestar-consensus-client"
+    execution-config: "nethermind-execution-config"
+
+    validator-offset-start: 60
+
+  # nimbus-nethermind:
+  #   # docker-compose
+  #   image: "etb-all-clients"
+  #   tag: "dencun-devnet-8"
+  #   start-ip-address: "10.0.20.150"
+  #   num-nodes: 1
+
+  #   # consensus-info
+  #   consensus-config: "nimbus-consensus-client"
+  #   execution-config: "nethermind-execution-config"
+
+  #   validator-offset-start: 70
 
 # generic instances that run fuzzers/health checks/etc.
 generic-instances:

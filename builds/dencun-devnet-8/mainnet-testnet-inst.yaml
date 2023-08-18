@@ -160,6 +160,20 @@ consensus-configs:
     beacon-metric-port: 8000 # start port used for beacon node metrics.
     validator-metric-port: 9000 # start port used for validator client metrics.
 
+  nimbus-consensus-client:
+    client: "nimbus"
+    launcher: "/source/deps/launchers/cl/launch-nimbus.sh"
+    num-validators: 10       # number of validators for every client node
+    # start ports increment each time we have a node.
+    log-level: "debug"
+
+    p2p-port: 4000    # start port used for discovery
+    beacon-api-port: 5000   # start port used for the beacon rest API
+    beacon-rpc-port: 5500
+    validator-rpc-port: 6500
+    beacon-metric-port: 8000 # start port used for beacon node metrics.
+    validator-metric-port: 9000 # start port used for validator client metrics.
+
 client-instances:
   prysm-geth:
     # docker-compose
