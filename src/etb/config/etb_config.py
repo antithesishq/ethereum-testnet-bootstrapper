@@ -250,6 +250,8 @@ class ConsensusLayerTestnetConfig(Config):
             self.preset_base = MinimalPreset
         elif config["preset-base"] == "mainnet":
             self.preset_base = MainnetPreset
+        elif config["preset-base"] == "mainnet-custom":
+            self.preset_base = MainnetPreset
         else:
             raise Exception(f"Unknown preset-base {config['preset-base']}")
 

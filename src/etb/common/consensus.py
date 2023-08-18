@@ -55,7 +55,13 @@ class MinimalPreset(PresetEnum, Enum):
     ATTESTATION_SUBNET_EXTRA_BITS = 0
     ATTESTATION_SUBNET_PREFIX_BITS = 6
     # deneb
-    FIELD_ELEMENTS_PER_BLOB = 4
+    # [customized]
+    FIELD_ELEMENTS_PER_BLOB: 4
+    # [customized]
+    MAX_BLOB_COMMITMENTS_PER_BLOCK: 16
+    # `uint64(6)`
+    MAX_BLOBS_PER_BLOCK: 6
+    
 
 
 class MainnetPreset(PresetEnum, Enum):
@@ -67,7 +73,7 @@ class MainnetPreset(PresetEnum, Enum):
     # configs
     # timing
     SECONDS_PER_SLOT = 12
-    SECONDS_PER_ETH1_BLOCK = 14
+    SECONDS_PER_ETH1_BLOCK = 1
     MIN_VALIDATOR_WITHDRAWABILITY_DELAY = 256
     SHARD_COMMITTEE_PERIOD = 256
     ETH1_FOLLOW_DISTANCE = 2048
@@ -96,8 +102,56 @@ class MainnetPreset(PresetEnum, Enum):
     ATTESTATION_SUBNET_EXTRA_BITS = 0
     ATTESTATION_SUBNET_PREFIX_BITS = 6
     # deneb
-    FIELD_ELEMENTS_PER_BLOB = 4096
+    FIELD_ELEMENTS_PER_BLOB: 4096
+    # `uint64(2**12)` (= 4096)
+    MAX_BLOB_COMMITMENTS_PER_BLOCK: 4096
+    # `uint64(6)`
+    MAX_BLOBS_PER_BLOCK: 6
 
+
+class MainnetCustomPreset(PresetEnum, Enum):
+    """Mainnet cusom presets, values used in mainnet."""
+
+    # presets
+    SLOTS_PER_EPOCH = 32
+    EPOCHS_PER_ETH1_VOTING_PERIOD = 64
+    # configs
+    # timing
+    SECONDS_PER_SLOT = 8
+    SECONDS_PER_ETH1_BLOCK = 1
+    MIN_VALIDATOR_WITHDRAWABILITY_DELAY = 256
+    SHARD_COMMITTEE_PERIOD = 256
+    ETH1_FOLLOW_DISTANCE = 2048
+    # validator cycle
+    INACTIVITY_SCORE_BIAS = 4
+    INACTIVITY_SCORE_RECOVERY_RATE = 16
+    EJECTION_BALANCE = 16000000000
+    MIN_PER_EPOCH_CHURN_LIMIT = 4
+    CHURN_LIMIT_QUOTIENT = 65536
+    # fork choice
+    PROPOSER_SCORE_BOOST = 40
+    # networking
+    GOSSIP_MAX_SIZE = 10485760
+    MAX_REQUEST_BLOCKS = 1024
+    EPOCHS_PER_SUBNET_SUBSCRIPTION = 256
+    MIN_EPOCHS_FOR_BLOCK_REQUESTS = 33024
+    MAX_CHUNK_SIZE = 10485760
+    TTFB_TIMEOUT = 5
+    RESP_TIMEOUT = 10
+    ATTESTATION_PROPAGATION_SLOT_RANGE = 32
+    MAXIMUM_GOSSIP_CLOCK_DISPARITY = 500
+    MESSAGE_DOMAIN_INVALID_SNAPPY = 0x00000000
+    MESSAGE_DOMAIN_VALID_SNAPPY = 0x01000000
+    SUBNETS_PER_NODE = 2
+    ATTESTATION_SUBNET_COUNT = 64
+    ATTESTATION_SUBNET_EXTRA_BITS = 0
+    ATTESTATION_SUBNET_PREFIX_BITS = 6
+    # deneb
+    FIELD_ELEMENTS_PER_BLOB: 4096
+    # `uint64(2**12)` (= 4096)
+    MAX_BLOB_COMMITMENTS_PER_BLOCK: 4096
+    # `uint64(6)`
+    MAX_BLOBS_PER_BLOCK: 6
 
 # Consensus values related to the merge, note that we only support post merge
 # testnets, however some clients still use these values for genesis.
