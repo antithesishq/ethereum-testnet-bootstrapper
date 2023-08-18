@@ -319,5 +319,5 @@ COPY --from=geth-builder /root/go/bin/geth /usr/local/bin/geth
 
 COPY --from=nethermind-builder /nethermind.version /nethermind.version
 COPY --from=nethermind-builder /git/nethermind/out /nethermind/
-RUN ln -s /nethermind/Nethermind.Runner /usr/local/bin/nethermindd/
-RUN ln -s /nethermind/Nethermind.Runner /usr/local/bin/nethermind
+RUN ln -s /nethermind/nethermind /usr/local/bin/nethermindd/
+RUN ln -s /nethermind/nethermind /usr/local/bin/nethermind

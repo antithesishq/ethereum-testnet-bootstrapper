@@ -26,7 +26,7 @@ ARG NETHERMIND_BLOB_SPAMMER_BRANCH="101bfe45a9c1e52e04708157a70c36c2e9b128c8"
 
 # All of the fuzzers we will be using
 ARG TX_FUZZ_REPO="https://github.com/MariusVanDerWijden/tx-fuzz.git"
-ARG TX_FUZZ_BRANCH="4225d9c8c1f8c57c6d0cc655cb549acd84925c99"
+ARG TX_FUZZ_BRANCH="536d4aa79b09f83a2c58f7278536fd875ba390c5"
 
 # Metrics gathering
 ARG BEACON_METRICS_GAZER_REPO="https://github.com/qu0b/beacon-metrics-gazer.git"
@@ -247,4 +247,4 @@ RUN ln -s /opt/besu/bin/besu /usr/local/bin/besu
 
 COPY --from=nethermind-builder /nethermind.version /nethermind.version
 COPY --from=nethermind-builder /git/nethermind/out /nethermind/
-RUN ln -s /nethermind/Nethermind.Runner /usr/local/bin/nethermind
+RUN ln -s /nethermind/nethermind /usr/local/bin/nethermind

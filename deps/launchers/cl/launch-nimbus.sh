@@ -50,7 +50,7 @@ echo "Launching nimbus in ${CONTAINER_NAME}"
 nimbus_beacon_node \
     --non-interactive \
     --data-dir="$CONSENSUS_NODE_DIR" \
-    --log-file="$CONSENSUS_NODE_DIR/beacon-log.txt" --log-level="$CONSENSUS_LOG_LEVEL" \
+    --log-level="$CONSENSUS_LOG_LEVEL" \
     --network="$COLLECTION_DIR/" \
     --secrets-dir="$CONSENSUS_NODE_DIR/secrets" --validators-dir="$CONSENSUS_NODE_DIR/keys" \
     --rest \

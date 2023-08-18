@@ -21,7 +21,7 @@ ARG NETHERMIND_BRANCH="d0f10c32ba584f765819779bf20dd5b78e0611c0"
 
 # All of the fuzzers we will be using
 ARG TX_FUZZ_REPO="https://github.com/MariusVanDerWijden/tx-fuzz.git"
-ARG TX_FUZZ_BRANCH="4225d9c8c1f8c57c6d0cc655cb549acd84925c99"
+ARG TX_FUZZ_BRANCH="536d4aa79b09f83a2c58f7278536fd875ba390c5"
 
 # Add the nethermind blob spammer
 ARG NETHERMINED_BLOB_SPAMMER="https://github.com/NethermindEth/nethermind.git"
@@ -265,4 +265,4 @@ RUN ln -s /opt/besu/bin/besu /usr/local/bin/besu
 
 COPY --from=nethermind-builder /nethermind.version /nethermind.version
 COPY --from=nethermind-builder /git/nethermind/out /nethermind/
-RUN ln -s /nethermind/Nethermind.Runner /usr/local/bin/nethermind
+RUN ln -s /nethermind/nethermind /usr/local/bin/nethermind
