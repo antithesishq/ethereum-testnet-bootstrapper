@@ -32,7 +32,7 @@ testnet-config:
 
   # used for generating the consensus config placed in /data/eth2-config.yaml
   consensus-layer:
-    preset-base: 'mainnet-custom'
+    preset-base: 'mainnet'
     config-name: "local-mainnet-testnet"
 
     min-genesis-active-validator-count: 60 # custom pre-seeded into genesis state.
@@ -208,7 +208,7 @@ client-instances:
     image: "etb-all-clients"
     tag: "dencun-devnet-8"
     start-ip-address: "10.0.20.30"
-    num-nodes: 2
+    num-nodes: 1
 
     # consensus-info
     consensus-config: "lighthouse-consensus-client"
@@ -229,18 +229,18 @@ client-instances:
 
     validator-offset-start: 30
 
-  # nimbus-geth:
-  #   # docker-compose
-  #   image: "etb-all-clients"
-  #   tag: "dencun-devnet-8"
-  #   start-ip-address: "10.0.20.50"
-  #   num-nodes: 1
+  nimbus-geth:
+    # docker-compose
+    image: "etb-all-clients"
+    tag: "dencun-devnet-8"
+    start-ip-address: "10.0.20.50"
+    num-nodes: 1
 
-  #   # consensus-info
-  #   consensus-config: "nimbus-consensus-client"
-  #   execution-config: "geth-execution-config"
+    # consensus-info
+    consensus-config: "nimbus-consensus-client"
+    execution-config: "geth-execution-config"
 
-  #   validator-offset-start: 30
+    validator-offset-start: 40
 
   # teku-besu:
   #   # docker-compose
@@ -280,7 +280,7 @@ client-instances:
     # consensus-info
     consensus-config: "prysm-consensus-client"
     execution-config: "nethermind-execution-config"
-    validator-offset-start: 40
+    validator-offset-start: 50
     additional-env:
       validator-password: "testnet-password"
 
@@ -295,7 +295,7 @@ client-instances:
     consensus-config: "teku-consensus-client"
     execution-config: "nethermind-execution-config"
 
-    validator-offset-start: 50
+    validator-offset-start: 60
 
   # lighthouse-nethermind:
   #   # docker-compose
@@ -321,20 +321,20 @@ client-instances:
     consensus-config: "lodestar-consensus-client"
     execution-config: "nethermind-execution-config"
 
-    validator-offset-start: 60
+    validator-offset-start: 70
 
-  # nimbus-nethermind:
-  #   # docker-compose
-  #   image: "etb-all-clients"
-  #   tag: "dencun-devnet-8"
-  #   start-ip-address: "10.0.20.150"
-  #   num-nodes: 1
+  nimbus-nethermind:
+    # docker-compose
+    image: "etb-all-clients"
+    tag: "dencun-devnet-8"
+    start-ip-address: "10.0.20.150"
+    num-nodes: 1
 
-  #   # consensus-info
-  #   consensus-config: "nimbus-consensus-client"
-  #   execution-config: "nethermind-execution-config"
+    # consensus-info
+    consensus-config: "nimbus-consensus-client"
+    execution-config: "nethermind-execution-config"
 
-  #   validator-offset-start: 70
+    validator-offset-start: 80
 
 # generic instances that run fuzzers/health checks/etc.
 generic-instances:
