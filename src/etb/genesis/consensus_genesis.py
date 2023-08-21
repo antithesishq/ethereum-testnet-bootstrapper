@@ -7,6 +7,7 @@ from ..common.consensus import (
     MinimalPreset,
     Epoch,
     MainnetPreset,
+    MainnetCustomPreset,
     ConsensusFork,
 )
 from ..config.etb_config import ETBConfig
@@ -27,6 +28,8 @@ class ConsensusGenesisWriter:
         if preset == MinimalPreset:
             preset_name = "minimal"
         elif preset == MainnetPreset:
+            preset_name = "mainnet"
+        elif preset == MainnetCustomPreset:
             preset_name = "mainnet"
         else:
             raise Exception(f"Unknown preset: {preset}")
@@ -173,6 +176,8 @@ BLOB_SIDECAR_SUBNET_COUNT: 6
         if preset == MinimalPreset:
             preset_base_str = "minimal"
         elif preset == MainnetPreset:
+            preset_base_str = "mainnet"
+        elif preset == MainnetCustomPreset:
             preset_base_str = "mainnet"
         else:
             raise Exception(f"Unknown preset: {preset}")  # should never happen

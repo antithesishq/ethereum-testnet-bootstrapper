@@ -10,6 +10,7 @@ from ..common.consensus import (
     PresetEnum,
     MinimalPreset,
     MainnetPreset,
+    MainnetCustomPreset,
     ForkVersionName,
     Epoch,
 )
@@ -251,7 +252,7 @@ class ConsensusLayerTestnetConfig(Config):
         elif config["preset-base"] == "mainnet":
             self.preset_base = MainnetPreset
         elif config["preset-base"] == "mainnet-custom":
-            self.preset_base = MainnetPreset
+            self.preset_base = MainnetCustomPreset
         else:
             raise Exception(f"Unknown preset-base {config['preset-base']}")
 
