@@ -118,7 +118,7 @@ consensus-configs:
     beacon-rpc-port: 5500
     validator-rpc-port: 6500
     beacon-metric-port: 5054 # start port used for beacon node metrics.
-    beacon-metric-port: 5064 # start port used for validator client metrics.
+    validator-metric-port: 5064 # start port used for validator client metrics.
 
   teku-consensus-client:
     client: "teku"
@@ -132,7 +132,7 @@ consensus-configs:
     beacon-rpc-port: 5500
     validator-rpc-port: 6500
     beacon-metric-port: 5054 # start port used for beacon node metrics.
-    beacon-metric-port: 5064 # start port used for validator client metrics.
+    validator-metric-port: 5064 # start port used for validator client metrics.
 
   lighthouse-consensus-client:
     client: "lighthouse"
@@ -145,7 +145,7 @@ consensus-configs:
     beacon-rpc-port: 5500
     validator-rpc-port: 6500
     beacon-metric-port: 5054 # start port used for beacon node metrics.
-    beacon-metric-port: 5064 # start port used for validator client metrics.
+    validator-metric-port: 5064 # start port used for validator client metrics.
 
   lodestar-consensus-client:
     client: "lodestar"
@@ -158,7 +158,7 @@ consensus-configs:
     beacon-rpc-port: 5500
     validator-rpc-port: 6500
     beacon-metric-port: 5054 # start port used for beacon node metrics.
-    beacon-metric-port: 5064 # start port used for validator client metrics.
+    validator-metric-port: 5064 # start port used for validator client metrics.
 
   nimbus-consensus-client:
     client: "nimbus"
@@ -172,7 +172,7 @@ consensus-configs:
     beacon-rpc-port: 5500
     validator-rpc-port: 6500
     beacon-metric-port: 5054 # start port used for beacon node metrics.
-    beacon-metric-port: 5064 # start port used for validator client metrics.
+    validator-metric-port: 5064 # start port used for validator client metrics.
 
 client-instances:
    # Geth clients
