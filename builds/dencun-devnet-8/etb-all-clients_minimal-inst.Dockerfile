@@ -6,7 +6,7 @@ ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
 ARG LIGHTHOUSE_BRANCH="f031a570ce351a6fc852997c086f5b1822b2ca01" 
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
-ARG PRYSM_BRANCH="00aaeb91572511d5b1fadce9a3af0ef596f8339d"
+ARG PRYSM_BRANCH="fc45d3be11ba1bfd99f3d718be5b5dee71064162"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
 ARG LODESTAR_BRANCH="f1a22910374e2f955641c9886b74eed189b27b97"
@@ -18,8 +18,8 @@ ARG TEKU_REPO="https://github.com/ConsenSys/teku.git"
 ARG TEKU_BRANCH="7e5e6bcbc19e5dda6940a8c3cd98f3f71ab86496"
 
 # Execution Clients
-ARG BESU_REPO="https://github.com/pinges/besu.git"
-ARG BESU_BRANCH="0ade8c477b89fb2d39eca47c47c7759252f8bdf6"
+ARG BESU_REPO="https://github.com/hyperledger/besu.git"
+ARG BESU_BRANCH="059a94c6751b2002b13fcf204598160edf859344"
 
 # broken due to rebase
 ARG GETH_REPO="https://github.com/lightclient/go-ethereum.git"
