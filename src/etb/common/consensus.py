@@ -117,7 +117,7 @@ class MainnetCustomPreset(PresetEnum, Enum):
     EPOCHS_PER_ETH1_VOTING_PERIOD = 64
     # configs
     # timing
-    SECONDS_PER_SLOT = 6
+    SECONDS_PER_SLOT = 3
     SECONDS_PER_ETH1_BLOCK = 1
     MIN_VALIDATOR_WITHDRAWABILITY_DELAY = 256
     SHARD_COMMITTEE_PERIOD = 256
