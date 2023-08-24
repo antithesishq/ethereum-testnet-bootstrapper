@@ -123,4 +123,4 @@ else
 fi
 
 # antithesis: disable log color and set destination to CONSOLE
-teku "${teku_args[@]}" >/logs/"service_$CONTAINER_NAME--teku" 2>&1
+teku "${teku_args[@]}" > /data/logs/"service_$CONTAINER_NAME--teku" 2>&1

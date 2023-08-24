@@ -75,4 +75,4 @@ beacon_args=(
   --doppelganger-detection=off
 )
 
-nimbus_beacon_node "${beacon_args[@]}" >/logs/"service_$CONTAINER_NAME--nimbus" 2>&1
+nimbus_beacon_node "${beacon_args[@]}" > /data/logs/"service_$CONTAINER_NAME--nimbus" 2>&1

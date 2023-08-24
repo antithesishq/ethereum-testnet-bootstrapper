@@ -85,4 +85,4 @@ else
     --log $EXECUTION_LOG_LEVEL
   )
 fi
-nethermind "${nethermind_args[@]}" >/logs/"service_$CONTAINER_NAME--nethermind" 2>&1
+nethermind "${nethermind_args[@]}" > /data/logs/"service_$CONTAINER_NAME--nethermind" 2>&1

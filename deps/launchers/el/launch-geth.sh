@@ -101,4 +101,4 @@ else
   )
 fi
 
-geth "${geth_args[@]}" >/logs/"service_$CONTAINER_NAME--geth" 2>&1
+geth "${geth_args[@]}" > /data/logs/"service_$CONTAINER_NAME--geth" 2>&1

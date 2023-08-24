@@ -47,9 +47,9 @@ beacon_args=(
   --metrics=true
   --metrics.port="$CONSENSUS_BEACON_METRIC_PORT"
   --metrics.address="$IP_ADDRESS"
-  --dataDir="$NODE_DIR"
-  --paramsFile="$TESTNET_DIR/config.yaml"
-  --genesisStateFile="$TESTNET_DIR/genesis.ssz"
+  --dataDir="$CONSENSUS_NODE_DIR"
+  --paramsFile="$CONSENSUS_CONFIG_FILE"
+  --genesisStateFile="$CONSENSUS_GENESIS_FILE"
   --execution.urls="http://127.0.0.1:$EXECUTION_ENGINE_HTTP_PORT"
   --jwt-secret="$JWT_SECRET_FILE"
   --bootnodes="$bootnode_enr"
@@ -63,7 +63,7 @@ beacon_args=(
   --logFile="$CONSENSUS_NODE_DIR/beacon.log"
   --enr.ip="$IP_ADDRESS"
   --enr.tcp="$CONSENSUS_P2P_PORT"
-  --enr.udp="$CONSENSUS_CONSENSUS_P2P_PORT"
+  --enr.udp="$CONSENSUS_P2P_PORT"
   --subscribeAllSubnets=true
   --eth1.depositContractDeployBlock=0
   --suggestedFeeRecipient=0x00000000219ab540356cbb839cbe05303d7705fa
@@ -74,7 +74,7 @@ validator_args=(
   --metrics.port="$CONSENSUS_VALIDATOR_METRIC_PORT"
   --metrics.address="$IP_ADDRESS"
   --dataDir="$CONSENSUS_NODE_DIR"
-  --paramsFile="$TESTNET_DIR/config.yaml"
+  --paramsFile="$CONSENSUS_CONFIG_FILE"
   --keystoresDir="$CONSENSUS_NODE_DIR/keys/"
   --secretsDir="$CONSENSUS_NODE_DIR/secrets/"
   --beaconNodes="http://127.0.0.1:$CONSENSUS_BEACON_API_PORT"
@@ -85,10 +85,10 @@ validator_args=(
   --force
 )
 
-lodestar beacon "${beacon_args[@]}" >/logs/"service_$CONTAINER_NAME--lodestar-bn" 2>&1 &
+lodestar beacon "${beacon_args[@]}" > /data/logs/"service_$CONTAINER_NAME--lodestar-bn" 2>&1 &
 
 sleep 10
 
 echo "Launching Lodestar validator client in ${CONTAINER_NAME}"
 
-lodestar validator "${validator_args[@]}" >/logs/"service_$CONTAINER_NAME--lodestar-vc" 2>&1
+lodestar validator "${validator_args[@]}" > /data/logs/"service_$CONTAINER_NAME--lodestar-vc" 2>&1

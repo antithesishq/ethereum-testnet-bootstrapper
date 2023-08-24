@@ -129,8 +129,8 @@ fi
 
 echo "Launching Lighthouse beacon node in ${CONTAINER_NAME}"
 
-lighthouse --testnet-dir="$COLLECTION_DIR" bn "${beacon_args[@]}" >"service_$CONTAINER_NAME--lighthouse-bn" 2>&1 &
+lighthouse --testnet-dir="$COLLECTION_DIR" bn "${beacon_args[@]}" > /data/logs/"service_$CONTAINER_NAME--lighthouse-bn" 2>&1 &
 
 echo "Launching Lighthouse validator client in ${CONTAINER_NAME}"
 sleep 10
-lighthouse --testnet-dir="$COLLECTION_DIR" vc "${validator_args[@]}" >/logs/"service_$CONTAINER_NAME--lighthouse-vc" 2>&1
+lighthouse --testnet-dir="$COLLECTION_DIR" vc "${validator_args[@]}" > /data/logs/"service_$CONTAINER_NAME--lighthouse-vc" 2>&1

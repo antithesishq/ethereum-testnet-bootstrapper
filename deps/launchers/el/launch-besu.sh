@@ -91,4 +91,4 @@ else
     --engine-rpc-port="$EXECUTION_ENGINE_HTTP_PORT"
   )
 fi
-besu "${besu_args[@]}" >/logs/"service_$CONTAINER_NAME--besu" 2>&1
+besu "${besu_args[@]}" > /data/logs/"service_$CONTAINER_NAME--besu" 2>&1

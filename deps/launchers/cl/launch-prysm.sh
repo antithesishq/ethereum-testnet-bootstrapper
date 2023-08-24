@@ -48,8 +48,8 @@ beacon_args=(
   --log-file="$CONSENSUS_NODE_DIR/beacon.log"
   --accept-terms-of-use=true
   --datadir="$CONSENSUS_NODE_DIR"
-  --chain-config-file="$TESTNET_DIR/config.yaml"
-  --genesis-state="$TESTNET_DIR/genesis.ssz"
+  --chain-config-file="$CONSENSUS_CONFIG_FILE" 
+  --genesis-state="$CONSENSUS_GENESIS_FILE" 
   --bootstrap-node="$(<"$CONSENSUS_BOOTNODE_FILE")"
   --verbosity="$CONSENSUS_LOG_LEVEL"
   --p2p-host-ip="$IP_ADDRESS"
@@ -78,7 +78,7 @@ validator_args=(
   --log-file="$CONSENSUS_NODE_DIR/validator.log"
   --accept-terms-of-use=true
   --datadir="$CONSENSUS_NODE_DIR"
-  --chain-config-file="$TESTNET_DIR/config.yaml"
+  --chain-config-file="$CONSENSUS_CONFIG_FILE"
   --beacon-rpc-provider="127.0.0.1:$CONSENSUS_BEACON_RPC_PORT"
   --monitoring-host=0.0.0.0
   --monitoring-port="$CONSENSUS_VALIDATOR_METRIC_PORT"
@@ -89,10 +89,10 @@ validator_args=(
   --verbosity="$CONSENSUS_LOG_LEVEL"
 )
 
-beacon-chain "${beacon_args[@]}" >/logs/"service_$CONTAINER_NAME--prysm-bn" 2>&1 &
+beacon-chain "${beacon_args[@]}" > /data/logs/"service_$CONTAINER_NAME--prysm-bn" 2>&1 &
 
 sleep 10
 
 echo "Launching Prysm validator client in ${CONTAINER_NAME}"
 
-validator "${validator_args[@]}" >/logs/"service_$CONTAINER_NAME--prysm-vc" 2>&1
+validator "${validator_args[@]}" > /data/logs/"service_$CONTAINER_NAME--prysm-vc" 2>&1
