@@ -40,6 +40,8 @@ jobs:
     - name: Push etb-all-clients images
       timeout-minutes: 500
       run: |
+          docker images
+
           docker tag etb-all-clients:latest-minimal ${REGISTRY}/${REPOSITORY}/etb-all-clients:latest-minimal
           docker push ${REGISTRY}/${REPOSITORY}/etb-all-clients:latest-minimal
 
@@ -49,8 +51,8 @@ jobs:
           docker tag etb-all-clients-inst:latest-minimal ${REGISTRY}/${REPOSITORY}/etb-all-clients-inst:latest-minimal
           docker push ${REGISTRY}/${REPOSITORY}/etb-all-clients-inst:latest-minimal
 
-          docker tag ethereum-testnet-bootstrapper ${REGISTRY}/${REPOSITORY}/ethereum-testnet-bootstrapper:latest-minimal
-          docker push ${REGISTRY}/${REPOSITORY}/ethereum-testnet-bootstrapper:latest-deneb
+          docker tag ethereum-testnet-bootstrapper ${REGISTRY}/${REPOSITORY}/ethereum-testnet-bootstrapper:latest
+          docker push ${REGISTRY}/${REPOSITORY}/ethereum-testnet-bootstrapper:latest
 
-          docker tag etb-mainnet-config ${REGISTRY}/${REPOSITORY}/etb-minimal-config:latest-minimal
-          docker push ${REGISTRY}/${REPOSITORY}/etb-mainnet-config:latest-deneb
+          docker tag etb-mainnet-config ${REGISTRY}/${REPOSITORY}/etb-minimal-config:capella-testing
+          docker push ${REGISTRY}/${REPOSITORY}/etb-minimal-config:capella-testing
