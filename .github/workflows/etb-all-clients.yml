@@ -36,7 +36,7 @@ jobs:
     - name: Build etb-all-clients images
       timeout-minutes: 500
       run: |
-          make build-etb-all-clients
+          make build-all-images
     - name: Push etb-all-clients images
       timeout-minutes: 500
       run: |
