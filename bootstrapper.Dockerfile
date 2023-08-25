@@ -42,5 +42,6 @@ COPY --from=builder /go/bin/ethdo /usr/local/bin/ethdo
 RUN chmod +x /usr/local/bin/bootnode
 
 COPY ./ /source
+WORKDIR /source
 
-ENTRYPOINT [ "/source/entrypoint.sh" ]
+ENTRYPOINT [ "./entrypoint.sh" ]

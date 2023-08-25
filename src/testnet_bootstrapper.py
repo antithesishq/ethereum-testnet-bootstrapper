@@ -508,20 +508,12 @@ if __name__ == "__main__":
     etb = EthereumTestnetBootstrapper()
 
     if args.init_testnet:
-        # make sure we are going from source.
-        if args.config.split("/")[0] != "source":
-            logging.debug(
-                "prepending source to the config path in order to map in the config file."
-            )
-            path_to_config = pathlib.Path(f"source/{args.config}")
-        else:
-            path_to_config = pathlib.Path(args.config)
-
+        path_to_config = pathlib.Path(args.config)
         etb.init_testnet(path_to_config)
         logging.debug("testnet_bootstrapper has finished init-ing the testnet.")
 
     if args.bootstrap_testnet:
         # the config path lies in /source/data/etb-config.yaml
-        path_to_config = pathlib.Path("source/data/etb-config.yaml")
+        path_to_config = pathlib.Path("/source/data/etb-config.yaml")
         etb.bootstrap_testnet(path_to_config)
         logging.debug("testnet_bootstrapper has finished bootstrapping the testnet.")
