@@ -40,4 +40,4 @@ run-bootstrapper:
 
 # remove last run.
 clean:
-	docker run -v $(shell pwd)/:/source/ -v $(shell pwd)/data/:/data ethereum-testnet-bootstrapper --clean --log-level $(log_level)
+	rm -rf docker-compose.yaml data/
