@@ -1,6 +1,6 @@
 FROM ethereum-testnet-bootstrapper as builder
 
-ARG CONFIG_PATH="configs/mainnet-deneb-testnet.yaml"
+ARG CONFIG_PATH="configs/capella-testing.yaml.yaml"
 
 RUN mkdir /data
 
