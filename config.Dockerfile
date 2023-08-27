@@ -9,8 +9,9 @@ RUN touch /source/data/testnet_bootstrapper.log
 
 RUN ls /source
 RUN ls /source/configs
+RUN ls /source/configs/minimal
 
-RUN /source/entrypoint.sh --config "/source/configs/capella-testing.yaml" --init-testnet --log-level debug
+RUN /source/entrypoint.sh --config "/source/configs/minimal/capella-testing.yaml" --init-testnet --log-level debug
 
 RUN ls /data
 RUN ls /source/data
