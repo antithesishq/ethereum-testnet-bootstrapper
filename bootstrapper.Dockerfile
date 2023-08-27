@@ -47,5 +47,6 @@ RUN mkdir /configs
 COPY ./ /source
 COPY configs/ /configs
 RUN ls
+RUN ls /source
 
 ENTRYPOINT [ "/source/entrypoint.sh" ]
