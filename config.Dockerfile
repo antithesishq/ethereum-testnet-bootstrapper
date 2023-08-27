@@ -4,7 +4,7 @@ ARG CONFIG_PATH="configs/capella-testing.yaml"
 
 RUN mkdir /data
 
-RUN /source/entrypoint.sh --config ${CONFIG_PATH} --init-testnet --log-level debug
+RUN /source/entrypoint.sh --config "configs/capella-testing.yaml" --init-testnet --log-level debug
 
 FROM scratch
 
