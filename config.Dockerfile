@@ -15,11 +15,13 @@ RUN /source/entrypoint.sh --config "/source/configs/minimal/capella-testing.yaml
 
 RUN ls /data
 RUN ls /source/data
+RUN cp /source/data/testnet_bootstrapper.log /data
+RUN ls /data
 
 FROM scratch
 
 COPY --from=builder /source/deps /deps 
-COPY --from=builder /source/src /src 
+#COPY --from=builder /source/src /src 
 COPY --from=builder /data /data 
 COPY --from=builder /source/configs /configs 
 COPY --from=builder /source/entrypoint.sh /entrypoint.sh 
