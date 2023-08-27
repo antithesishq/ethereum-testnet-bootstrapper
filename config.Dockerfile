@@ -4,6 +4,8 @@ ARG CONFIG_PATH="configs/capella-testing.yaml"
 
 RUN mkdir /data
 
+RUN touch /source/data/testnet_bootstrapper.log
+
 RUN /source/entrypoint.sh --config "configs/capella-testing.yaml" --init-testnet --log-level debug
 
 FROM scratch
