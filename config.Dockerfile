@@ -7,7 +7,10 @@ RUN mkdir /data
 RUN mkdir /source/data
 RUN touch /source/data/testnet_bootstrapper.log
 
-RUN /source/entrypoint.sh --config "configs/capella-testing.yaml" --init-testnet --log-level debug
+RUN /source/entrypoint.sh --config "/source/configs/capella-testing.yaml" --init-testnet --log-level debug
+
+RUN ls /data
+RUN ls /source/data
 
 FROM scratch
 
