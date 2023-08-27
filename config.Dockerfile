@@ -7,6 +7,9 @@ RUN mkdir /data
 RUN mkdir /source/data
 RUN touch /source/data/testnet_bootstrapper.log
 
+RUN ls /source
+RUN ls /source/configs
+
 RUN /source/entrypoint.sh --config "/source/configs/capella-testing.yaml" --init-testnet --log-level debug
 
 RUN ls /data
