@@ -25,7 +25,7 @@ rebuild-all-images: rebuild-bootstrapper rebuild-etb-all-clients rebuild-config
 
 # init the testnet dirs and all files needed to later bootstrap the testnet.
 init-testnet:
-	docker run -it -v $(shell pwd)/:/source/ -v $(shell pwd)/data/:/data ethereum-testnet-bootstrapper --config "configs/capella-testing.yaml" --init-testnet
+	docker run -it -v $(shell pwd)/:/source/ -v $(shell pwd)/data/:/data ethereum-testnet-bootstrapper --config $(config) --init-testnet
 
 # after an init this runs the bootstrapper and start up the testnet.
 run-bootstrapper:
