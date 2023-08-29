@@ -74,26 +74,6 @@ class EthereumTestnetBootstrapper:
     def __init__(self):
         pass
 
-    def clean(self):
-        """Cleans up the testnet root directory and docker-compose file.
-
-        @return:
-        """
-        files_config = FilesConfig()
-        logging.info(
-            f"Cleaning up the testnet directories: {files_config.testnet_root}"
-        )
-        docker_compose_file = files_config.docker_compose_file
-        if files_config.testnet_root.exists():
-            for root, dirs, files in os.walk(files_config.testnet_root):
-                for file in files:
-                    pathlib.Path(f"{root}/{file}").unlink()
-                for directory in dirs:
-                    shutil.rmtree(f"{root}/{directory}")
-
-        if docker_compose_file.exists():
-            docker_compose_file.unlink()
-
     def init_testnet(self, config_path: Path):
         """Initializes the testnet directory, 3 phases.
 
@@ -496,14 +476,6 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--clean",
-        dest="clean",
-        action="store_true",
-        default=False,
-        help="Clear the last run.",
-    )
-
-    parser.add_argument(
         "--init-testnet",
         dest="init_testnet",
         action="store_true",
@@ -535,25 +507,13 @@ if __name__ == "__main__":
 
     etb = EthereumTestnetBootstrapper()
 
-    if args.clean:
-        etb.clean()
-        logging.debug("testnet_bootstrapper has finished cleaning up.")
-
     if args.init_testnet:
-        # make sure we are going from source.
-        if args.config.split("/")[0] != "source":
-            logging.debug(
-                "prepending source to the config path in order to map in the config file."
-            )
-            path_to_config = pathlib.Path(f"source/{args.config}")
-        else:
-            path_to_config = pathlib.Path(args.config)
-
+        path_to_config = pathlib.Path(args.config)
         etb.init_testnet(path_to_config)
         logging.debug("testnet_bootstrapper has finished init-ing the testnet.")
 
     if args.bootstrap_testnet:
         # the config path lies in /source/data/etb-config.yaml
-        path_to_config = pathlib.Path("source/data/etb-config.yaml")
+        path_to_config = pathlib.Path("/source/data/etb-config.yaml")
         etb.bootstrap_testnet(path_to_config)
         logging.debug("testnet_bootstrapper has finished bootstrapping the testnet.")

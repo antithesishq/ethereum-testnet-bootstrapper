@@ -1,4 +1,7 @@
 .PHONY: clean
+
+REPO_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
+
 log_level ?= "info"
 # Build ethereum-testnet-bootstrapper image
 build-bootstrapper:
@@ -29,15 +32,20 @@ rebuild-client-images-inst:
 build-all-images: build-bootstrapper build-client-images build-config
 rebuild-all-images: rebuild-bootstrapper rebuild-client-images rebuild-config
 
+# remove last run.
+clean:
+	rm -rf docker-compose.yaml data/
+	mkdir -p data
 
 # init the testnet dirs and all files needed to later bootstrap the testnet.
-init-testnet:
-	docker run -v $(shell pwd)/:/source/ -v $(shell pwd)/data/:/data ethereum-testnet-bootstrapper --config $(config) --init-testnet --log-level $(log_level)
+init-testnet: clean
+	docker run -v $(REPO_DIR)/:/source/ -v $(REPO_DIR)/data/:/data ethereum-testnet-bootstrapper --config $(config) --init-testnet --log-level $(log_level)
+
+# get an interactive shell into the testnet-bootstrapper
+shell:
+	docker run --rm --entrypoint /bin/bash -it -v $(REPO_DIR)/:/source/ -v $(REPO_DIR)/data/:/data ethereum-testnet-bootstrapper
 
 # after an init this runs the bootstrapper and start up the testnet.
 run-bootstrapper:
-	docker run -it -v $(shell pwd)/:/source/ -v $(shell pwd)/data/:/data ethereum-testnet-bootstrapper --config $(config) --bootstrap-testnet --log-level $(log_level)
+	docker run -it -v $(REPO_DIR)/:/source/ -v $(REPO_DIR)/data/:/data ethereum-testnet-bootstrapper --config $(config) --bootstrap-testnet --log-level $(log_level)
 
-# remove last run.
-clean:
-	docker run -v $(shell pwd)/:/source/ -v $(shell pwd)/data/:/data ethereum-testnet-bootstrapper --clean --log-level $(log_level)
