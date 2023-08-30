@@ -514,6 +514,8 @@ class InstanceCollectionConfig(Config):
                     raise Exception(f"Duplicate key {key} in additional-env for {name}")
                 self.additional_env[key] = value
 
+        self.additional_volumes = config.get("additional-volumes", [])
+
     def get_env_vars(self) -> dict[str, str]:
         """Returns the environment variables used by the instance that can be
         derived from the config.
@@ -647,7 +649,7 @@ class Instance:
             "container_name": self.name,
             "hostname": self.name,
             "image": f"{self.collection_config.image}:{self.collection_config.tag}",
-            "volumes": docker_config.volumes,
+            "volumes": docker_config.volumes + self.collection_config.additional_volumes,
             "networks": {docker_config.network_name: {"ipv4_address": self.ip_address}},
         }
         if self.collection_config.entrypoint is not None:

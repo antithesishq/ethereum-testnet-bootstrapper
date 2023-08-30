@@ -12,6 +12,7 @@ import shutil
 import time
 from pathlib import Path
 from typing import Union, Any
+from collections import defaultdict
 
 import requests
 from ruamel import yaml
@@ -52,6 +53,60 @@ def move_trusted_setup_files(etb_config: ETBConfig):
     shutil.copy(trusted_setup_txt, etb_config.files.trusted_setup_txt_file)
     shutil.copy(trusted_setup_json, etb_config.files.trusted_setup_json_file)
 
+
+def make_prometheus_config(etb_config: dict[str, Any]) -> dict[str, Any]:
+    client_instances = etb_config["client-instances"]
+    consensus_configs = etb_config["consensus-configs"]
+    execution_configs = etb_config["execution-configs"]
+
+    metrics_paths: dict[str, str] = dict()
+    for config in consensus_configs.values():
+        metrics_paths[config["client"]] = config["metrics-path"]
+    for config in execution_configs.values():
+        metrics_paths[config["client"]] = config["metrics-path"]
+
+    targets = defaultdict(list)
+    for k, v in client_instances.items():
+        consensus_client = consensus_configs[v["consensus-config"]]
+        consensus_client_name = consensus_client["client"]
+        beacon_metric_port = consensus_client["beacon-metric-port"]
+        validator_metric_port = consensus_client["validator-metric-port"]
+
+        execution_client = execution_configs[v["execution-config"]]
+        execution_client_name = execution_client["client"]
+        execution_metric_port = execution_client["metric-port"]
+
+        nodes = [f"{k}-{n}" for n in range(v["num-nodes"])]
+        for n in nodes:
+            targets[consensus_client_name].append(f"{n}:{beacon_metric_port}")
+            targets[consensus_client_name].append(f"{n}:{validator_metric_port}")
+            targets[execution_client_name].append(f"{n}:{execution_metric_port}")
+
+    jobs = [
+        {
+            "job_name": k,
+            "static_configs": [{"targets": v}],
+            "metrics_path": metrics_paths[k],
+        }
+        for k, v in targets.items()
+    ]
+
+    jobs.append(
+        {
+            "job_name": "prometheus",
+            "static_configs": [{"targets": "localhost:9090"}],
+            "metrics_path": "/metrics",
+        }
+    )
+
+    prometheus_config = {
+        "global": {"scrape_interval": "10s", "evaluation_interval": "15s"},
+        "scrape_configs": jobs
+    }
+
+    return prometheus_config
+
+
 class EthereumTestnetBootstrapper:
     """The Testnet Bootstrapper wraps all the consensus and execution
     bootstrapper logic to bootstrap all the clients. It also handles the
@@ -75,7 +130,7 @@ class EthereumTestnetBootstrapper:
         pass
 
     def init_testnet(self, config_path: Path):
-        """Initializes the testnet directory, 3 phases.
+        """Initializes the testnet directory, 4 phases.
 
         1. populate client-specific static files:
             - client-directories
@@ -83,6 +138,7 @@ class EthereumTestnetBootstrapper:
             - validator keystores
         2. Write the etb-config file into the testnet-dir.
         3. Write the docker-compose file to use for bootstrapping later.
+        4. Write the prometheus.yaml file to the config directory.
         @param config_path: path to the etb-config file.
         @return:
         """
@@ -127,13 +183,14 @@ class EthereumTestnetBootstrapper:
 
         # write the etb-config file into the testnet-dir.
         logging.info("writing etb-config file..")
-        etb_config.write_config(etb_config.files.testnet_root / "etb-config.yaml")
+        etb_config_path = etb_config.files.testnet_root / "etb-config.yaml"
+        etb_config.write_config(etb_config_path)
 
         # if running a deneb experiment copy over the trusted_setup files.
         if etb_config.is_deneb:
             move_trusted_setup_files(etb_config)
 
-        # lastly write the docker-compose file to use for bootstrapping later.
+        # write the docker-compose file to use for bootstrapping later.
         logging.info("writing docker-compose file..")
         with open(
             etb_config.files.docker_compose_file, "w", encoding="utf-8"
@@ -151,6 +208,19 @@ class EthereumTestnetBootstrapper:
             docker_file.write(
                 yaml.dump(etb_config.get_docker_compose_repr(), Dumper=NoAliasDumper)
             )
+
+        # generate prometheus.yaml from the etb-config
+        # (just read the etb-config file back in and parse what's needed, it's
+        # less hassle)
+        with open(etb_config_path) as f:
+            prometheus_config = make_prometheus_config(yaml.safe_load(f))
+
+        prometheus_conf_dir = etb_config.files.testnet_root / "prometheus" / "conf"
+        prometheus_conf_dir.mkdir(exist_ok=True, parents=True)
+        with open(prometheus_conf_dir / "prometheus.yml", "w") as f:
+            yaml.dump(prometheus_config, f, default_flow_style=False, indent=2)
+
+
 
     def bootstrap_testnet(self, config_path: Path, global_timeout: int = 60):
         """Bootstraps the testnet. This happens in several phases, each
