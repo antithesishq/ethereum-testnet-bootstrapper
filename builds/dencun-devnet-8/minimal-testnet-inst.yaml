@@ -54,10 +54,10 @@ testnet-config:
     bellatrix-fork-epoch: 0
 
     capella-fork-version: 0x04000666
-    capella-fork-epoch: 1
+    capella-fork-epoch: 0
 
     deneb-fork-version: 0x05000666
-    deneb-fork-epoch: 2
+    deneb-fork-epoch: 1
 
     # sharding-fork-version: 0x06000666
 #    sharding-fork-epoch: 18446744073709551615 # far future
@@ -300,7 +300,7 @@ generic-instances:
     tag: "dencun-devnet-8"
     start-ip-address: "10.0.20.203"
     num-nodes: 1
-    entrypoint: "python3 /source/src/node_watch.py --log-level info --monitor execution_availability:epoch --monitor consensus_availability:epoch --monitor heads:slot --monitor checkpoints:slot --monitor peers:epoch --max-retries 3"
+    entrypoint: "python3 /source/src/node_watch.py --log-level info --monitor execution_availability:epoch --monitor consensus_availability:epoch --monitor heads:slot --monitor checkpoints:epoch --monitor peers:epoch --max-retries 3"
 
   tx-spammer:
     image: "etb-all-clients-inst"
@@ -308,7 +308,7 @@ generic-instances:
     start-ip-address: "10.0.20.204"
     num-nodes: 1
     # runs on the first prysm geth node.
-    entrypoint: "python3 /source/src/tx_spammer.py --run-indefinitely --log-level debug --target-ip 10.0.20.30 --target-port 8645 --epoch-delay 2 --fuzz-mode spam --no-al --tx-count 20 --tx-fuzz-path /usr/local/bin/livefuzzer"
+    entrypoint: "python3 /source/src/tx_spammer.py --run-indefinitely --log-level debug --target-ip 10.0.20.30 --target-port 8645 --epoch-delay 1 --fuzz-mode spam --no-al --tx-count 20 --tx-fuzz-path /usr/local/bin/livefuzzer"
 
   antithesis-checker:
     image: "ethereum-testnet-bootstrapper"
