@@ -126,7 +126,7 @@ class ExecutionGenesisWriter(object):
             acct = w3.eth.account.from_mnemonic(
                 mnemonic, account_path=acc, passphrase=password
             )
-            self.genesis["alloc"][acct.address]["privateKey"] = acct.privateKey.hex()[
+            self.genesis["alloc"][acct.address]["privateKey"] = acct.key.hex()[
                 2:
             ]
 
