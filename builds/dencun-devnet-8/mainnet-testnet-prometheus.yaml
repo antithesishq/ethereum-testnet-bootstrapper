@@ -398,8 +398,8 @@ generic-instances:
     tag: "latest"
     start-ip-address: "10.0.20.210"
     num-nodes: 1
-    entrypoint: [
-      "/opt/bitnami/prometheus/bin/prometheus",
+    entrypoint: "/opt/bitnami/prometheus/bin/prometheus"
+    command: [
       "--config.file=/opt/bitnami/prometheus/conf/prometheus.yml",
       "--storage.tsdb.path=/opt/bitnami/prometheus/data",
       "--web.console.libraries=/opt/bitnami/prometheus/conf/console_libraries",

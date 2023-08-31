@@ -507,6 +507,10 @@ class InstanceCollectionConfig(Config):
         if "entrypoint" in config:
             self.entrypoint: pathlib.Path = pathlib.Path(config["entrypoint"])
 
+        if "command" in config:
+            # for prometheus
+            self.docker_command: list[str] = config["command"]
+
         # special case for additional env
         if "additional-env" in config:
             for key, value in config["additional-env"].items():
@@ -657,8 +661,10 @@ class Instance:
         else:
             entry["entrypoint"] = ["/bin/sh", "-c"]
 
-        if hasattr(self, "docker-command"):
-            entry["command"] = self["docker-command"]
+        if hasattr(self.collection_config, "docker_command"):
+            entry["command"] = self.collection_config.docker_command
+        elif hasattr(self, "docker_command"):
+            entry["command"] = self.docker_command
 
         # don't modify the global env vars
         env_vars = global_env_vars.copy()
