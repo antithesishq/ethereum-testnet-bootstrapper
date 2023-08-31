@@ -38,67 +38,38 @@ geth init \
   --datadir "$EXECUTION_NODE_DIR" \
   "$EXECUTION_GENESIS_FILE"
 
-# Now start geth.
-if [ "$IS_DENEB" == 1 ]; then
-  echo "Launching deneb ready geth."
-  geth_args=(
-    --metrics
-    --metrics.port="$EXECUTION_METRIC_PORT"
-    --metrics.addr="$IP_ADDRESS"
-    --datadir="$EXECUTION_NODE_DIR"
-    --networkid="$CHAIN_ID"
-    --port "$EXECUTION_P2P_PORT"
-    --http --http.api "$EXECUTION_HTTP_APIS"
-    --http.port "$EXECUTION_HTTP_PORT"
-    --http.addr 0.0.0.0
-    --http.corsdomain "*"
-    --http.vhosts="*"
-    --ws --ws.api "$EXECUTION_WS_APIS"
-    --ws.port="$EXECUTION_WS_PORT"
-    --ws.addr 0.0.0.0
-    --gcmode=archive
-    --authrpc.port="$EXECUTION_ENGINE_HTTP_PORT"
-    --authrpc.addr=0.0.0.0
-    --authrpc.vhosts="*"
-    --authrpc.jwtsecret="$JWT_SECRET_FILE"
-    --nat "extip:$IP_ADDRESS"
-    --rpc.allow-unprotected-txs
-    --allow-insecure-unlock
-    --netrestrict="$IP_SUBNET"
-    --syncmode=full
-    --ipcdisable=true
-    --log.vmodule=rpc=5
-    --discovery.dns=""
-    --verbosity $EXECUTION_LOG_LEVEL
-  )
-else
-  geth_args=(
-    --datadir="$EXECUTION_NODE_DIR"
-    --networkid="$CHAIN_ID"
-    --port "$EXECUTION_P2P_PORT"
-    --http --http.api "$EXECUTION_HTTP_APIS"
-    --http.port "$EXECUTION_HTTP_PORT"
-    --http.addr 0.0.0.0
-    --http.corsdomain "*"
-    --http.vhosts="*"
-    --ws --ws.api "$EXECUTION_WS_APIS"
-    --ws.port="$EXECUTION_WS_PORT"
-    --ws.addr 0.0.0.0
-    --gcmode=archive
-    --authrpc.port="$EXECUTION_ENGINE_HTTP_PORT"
-    --authrpc.addr=0.0.0.0
-    --authrpc.vhosts="*"
-    --authrpc.jwtsecret="$JWT_SECRET_FILE"
-    --nat "extip:$IP_ADDRESS"
-    --rpc.allow-unprotected-txs
-    --allow-insecure-unlock
-    --netrestrict="$IP_SUBNET"
-    --syncmode=full
-    --ipcdisable=true
-    --log.vmodule=rpc=5
-    --discovery.dns=""
-    --verbosity $EXECUTION_LOG_LEVEL
-  )
-fi
+
+geth_args=(
+  --allow-insecure-unlock
+  --authrpc.addr=0.0.0.0
+  --authrpc.jwtsecret="$JWT_SECRET_FILE"
+  --authrpc.port="$EXECUTION_ENGINE_HTTP_PORT"
+  --authrpc.vhosts="*"
+  --datadir="$EXECUTION_NODE_DIR"
+  --discovery.dns=""
+  --gcmode=archive
+  --http
+  --http.api "$EXECUTION_HTTP_APIS"
+  --http.addr 0.0.0.0
+  --http.corsdomain "*"
+  --http.port "$EXECUTION_HTTP_PORT"
+  --http.vhosts="*"
+  --ipcdisable=true
+  --log.vmodule=rpc=5
+  --metrics
+  --metrics.addr="$IP_ADDRESS"
+  --metrics.port="$EXECUTION_METRIC_PORT"
+  --nat "extip:$IP_ADDRESS"
+  --netrestrict="$IP_SUBNET"
+  --networkid="$CHAIN_ID"
+  --port "$EXECUTION_P2P_PORT"
+  --rpc.allow-unprotected-txs
+  --syncmode=full
+  --verbosity "$EXECUTION_LOG_LEVEL"
+  --ws --ws.api "$EXECUTION_WS_APIS"
+  --ws.addr 0.0.0.0
+  --ws.port="$EXECUTION_WS_PORT"
+)
+echo "Launching geth"
 
 geth "${geth_args[@]}" > /data/logs/"service_$CONTAINER_NAME--geth" 2>&1
