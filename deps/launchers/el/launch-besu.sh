@@ -38,10 +38,10 @@ if [ "$IS_DENEB" == 1 ]; then
     --metrics-host="$IP_ADDRESS"
     --metrics-port="$EXECUTION_METRIC_PORT"
     --logging="$EXECUTION_LOG_LEVEL"
-    --bootnodes="$EXECUTION_BOOTNODE"
-    --data-path="$EXECUTION_DATA_DIR"
+    # --bootnodes="$EXECUTION_BOOTNODE"
+    --data-path="$EXECUTION_NODE_DIR"
     --genesis-file="$EXECUTION_GENESIS_FILE"
-    --network-id="$NETWORK_ID"
+    --network-id="$CHAIN_ID"
     --rpc-http-enabled=true --rpc-http-api="$EXECUTION_HTTP_APIS"
     --rpc-http-host=0.0.0.0
     --rpc-http-port="$EXECUTION_HTTP_PORT"
@@ -66,10 +66,10 @@ if [ "$IS_DENEB" == 1 ]; then
 else
   besu_args=(
     --logging="$EXECUTION_LOG_LEVEL"
-    --bootnodes="$EXECUTION_BOOTNODE"
-    --data-path="$EXECUTION_DATA_DIR"
+    # --bootnodes="$EXECUTION_BOOTNODE"
+    --data-path="$EXECUTION_NODE_DIR"
     --genesis-file="$EXECUTION_GENESIS_FILE"
-    --network-id="$NETWORK_ID"
+    --network-id="$CHAIN_ID"
     --rpc-http-enabled=true --rpc-http-api="$EXECUTION_HTTP_APIS"
     --rpc-http-host=0.0.0.0
     --rpc-http-port="$EXECUTION_HTTP_PORT"

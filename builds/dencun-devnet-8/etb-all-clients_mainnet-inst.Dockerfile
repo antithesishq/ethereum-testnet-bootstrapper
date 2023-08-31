@@ -3,36 +3,36 @@
 ###############################################################################
 # Consensus Clients
 ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
-ARG LIGHTHOUSE_BRANCH="f031a570ce351a6fc852997c086f5b1822b2ca01" 
+ARG LIGHTHOUSE_BRANCH="ce824e00a3566e7e94e77600d97aab5be3b9a99c" 
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
-ARG PRYSM_BRANCH="fc45d3be11ba1bfd99f3d718be5b5dee71064162"
+ARG PRYSM_BRANCH="d10163fd197bd2d06a2cc13048869b21295c7c66"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
-ARG LODESTAR_BRANCH="f1a22910374e2f955641c9886b74eed189b27b97"
+ARG LODESTAR_BRANCH="b34bbe355a9bd673044b63b9054b5436c9d4bade"
 #
 ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
-ARG NIMBUS_ETH2_BRANCH="a150bc93a6bfa30505fef0f995402082b3183eb0"
+ARG NIMBUS_ETH2_BRANCH="f2d3859d8055dc29e146b5e27ccfb2df9fa55eb7"
 
 ARG TEKU_REPO="https://github.com/ConsenSys/teku.git"
-ARG TEKU_BRANCH="7e5e6bcbc19e5dda6940a8c3cd98f3f71ab86496"
+ARG TEKU_BRANCH="b49165a76c6aaa56fad01eaa2a80c18b4084c81f"
 
 # Execution Clients
 ARG BESU_REPO="https://github.com/hyperledger/besu.git"
-ARG BESU_BRANCH="059a94c6751b2002b13fcf204598160edf859344"
+ARG BESU_BRANCH="c16a3274b30a96678388dd616006d5919085200e"
 
 ARG GETH_REPO="https://github.com/lightclient/go-ethereum.git"
-ARG GETH_BRANCH="bc8c22ed88cee78eddcec5e1ce8bda7a85ca7b17"
+ARG GETH_BRANCH="79f3c2d9c96bd82320d44851074da76587e41887"
 
 ARG NETHERMIND_REPO="https://github.com/NethermindEth/nethermind.git"
-ARG NETHERMIND_BRANCH="27f44c591219facf52d61699024faded1392464c"
+ARG NETHERMIND_BRANCH="b65ef6a9e36da598f850b977f15eb90ad34382c7"
 
 ARG ETHEREUMJS_REPO="https://github.com/ethereumjs/ethereumjs-monorepo.git"
 ARG ETHEREUMJS_BRANCH="c47d2c7351f04f35744de0f2082c37d5f2d2afd0"
 
 # All of the fuzzers we will be using
-ARG TX_FUZZ_REPO="https://github.com/MariusVanDerWijden/tx-fuzz.git"
-ARG TX_FUZZ_BRANCH="536d4aa79b09f83a2c58f7278536fd875ba390c5"
+ARG TX_FUZZ_REPO="https://github.com/qu0b/tx-fuzz.git"
+ARG TX_FUZZ_BRANCH="4e2e7713aa44eb0200cd56d5079edc9cecfa3798"
 
 # Metrics gathering
 ARG BEACON_METRICS_GAZER_REPO="https://github.com/qu0b/beacon-metrics-gazer.git"
@@ -266,7 +266,7 @@ ARG BEACON_METRICS_GAZER_REPO
 ARG BEACON_METRICS_GAZER_BRANCH
 
 RUN go install github.com/wealdtech/ethereal/v2@latest \
-    && go install github.com/wealdtech/ethdo@latest \
+    &&  go install github.com/wealdtech/ethdo@latest \
     && go install github.com/protolambda/eth2-val-tools@latest
 
 RUN git clone "${TX_FUZZ_REPO}" && \

@@ -51,7 +51,7 @@ beacon_args=(
   --data-dir="$CONSENSUS_NODE_DIR"
   --log-file="$CONSENSUS_NODE_DIR/beacon-log.txt"
   --log-level="$CONSENSUS_LOG_LEVEL"
-  --network="$TESTNET_DIR/"
+  --network="$CONSENSUS_NODE_DIR/../"
   --secrets-dir="$CONSENSUS_NODE_DIR/secrets"
   --validators-dir="$CONSENSUS_NODE_DIR/keys"
   --rest
