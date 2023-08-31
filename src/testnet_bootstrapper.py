@@ -94,7 +94,7 @@ def make_prometheus_config(etb_config: dict[str, Any]) -> dict[str, Any]:
     jobs.append(
         {
             "job_name": "prometheus",
-            "static_configs": [{"targets": "localhost:9090"}],
+            "static_configs": [{"targets": ["localhost:9090"]}],
             "metrics_path": "/metrics",
         }
     )
