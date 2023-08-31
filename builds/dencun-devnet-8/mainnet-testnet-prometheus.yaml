@@ -1,0 +1,408 @@
+# Running a mainnet spec local testnet with the current network conditions.
+# parameters for building the docker network
+docker:
+    network-name: "ethereum-testnet"
+    ip-subnet: "10.0.20.0/24"
+    volumes: ['./data:/data/', './:/source/']
+
+# add optional custom files here. They are propagated to all container env.
+# NOTE: default values are not overwritten!
+#files:
+
+# testnet-configuration parameters
+testnet-config:
+  deposit-contract-address: "0x8c594691c0e592ffa21f153a16ae41db5befcaaa"
+
+  # execution layer parameters
+  execution-layer:
+    seconds-per-eth1-block: 14
+    chain-id: 1337
+    network-id: 1337
+
+    # account information
+    account-mnemonic: "cat swing flag economy stadium alone churn speed unique patch report train"
+    keystore-passphrase: "testnet-password"  # passphrase for any keystore files.
+
+    # premine-eth account values in ETH
+    premines:
+      "m/44'/60'/0'/0/0": 100000000
+      "m/44'/60'/0'/0/1": 100000000
+      "m/44'/60'/0'/0/2": 100000000
+      "m/44'/60'/0'/0/3": 100000000
+
+  # used for generating the consensus config placed in /data/eth2-config.yaml
+  consensus-layer:
+    preset-base: 'mainnet'
+    config-name: "local-mainnet-testnet"
+
+    min-genesis-active-validator-count: 60 # custom pre-seeded into genesis state.
+
+    # the validator mnemonic to use for all validators
+    validator-mnemonic: "ocean style run case glory clip into nature guess jacket document firm fiscal hello kite disagree symptom tide net coral envelope wink render festival"
+
+    # forks
+    #   omitted fork-epochs are assumed to be far-future
+    #   omitted fork-versions are assumed to be 1 + the previous fork-version
+
+    phase0-fork-version: 0x01000666
+    phase0-fork-epoch: 0
+
+    altair-fork-version: 0x02000666
+    altair-fork-epoch: 0
+
+    bellatrix-fork-version: 0x03000666
+    bellatrix-fork-epoch: 0
+
+    capella-fork-version: 0x04000666
+    capella-fork-epoch: 1
+
+    deneb-fork-version: 0x05000666
+    deneb-fork-epoch: 2
+
+    # sharding-fork-version: 0x06000666
+#    sharding-fork-epoch: 18446744073709551615 # far future
+
+# configuration options used for execution clients
+execution-configs:
+  geth-execution-config:
+    client: "geth"
+    launcher: "/source/deps/launchers/el/launch-geth.sh"
+
+    log-level: "4" # detail
+    http-apis: "debug,txpool,admin,net,eth,web3,personal,engine,miner"
+    ws-apis: "admin,net,eth,engine"
+    http-port: 8645
+    ws-port: 8646
+    p2p-port: 666
+    engine-http-port: 8551   # http/ws same port.
+    engine-ws-port: 8551   # include for nimbus
+    metric-port: 9001
+    metrics-path: "/debug/metrics/prometheus"
+
+  besu-execution-config:
+    client: "besu"
+    launcher: "/source/deps/launchers/el/launch-besu.sh"
+    log-level: "info"
+    http-apis: "ADMIN,ETH,NET,TXPOOL,WEB3,ENGINE"
+    ws-apis: "ADMIN,ETH,NET,TXPOOL,WEB3,ENGINE"
+    http-port: 8645
+    ws-port: 8646
+    p2p-port: 666
+    engine-http-port: 8551
+    engine-ws-port: 8551
+    metric-port: 9001
+    metrics-path: "/metrics"
+
+  nethermind-execution-config:
+    client: "nethermind"
+    log-level: "info"
+    launcher: "/source/deps/launchers/el/launch-nethermind.sh"
+    http-apis: "net,eth,consensus,subscribe,web3,admin"
+    ws-apis: "net,eth,consensus,subscribe,web3,admin"
+    http-port: 8645
+    ws-port: 8646
+    engine-http-port: 8551 # doesn't do http/ws the same.
+    engine-ws-port: 8552
+    p2p-port: 666
+    metric-port: 9001
+    metrics-path: "/metrics"
+
+# configuration options used for consensus clients
+consensus-configs:
+  prysm-consensus-client:
+    client: "prysm"
+    launcher: "/source/deps/launchers/cl/launch-prysm.sh"
+    num-validators: 10     # number of validators for every client node
+
+    log-level: "debug"
+
+    p2p-port: 4000    # start port used for discovery
+    beacon-api-port: 5000   # start port used for the beacon rest API
+    beacon-rpc-port: 5500
+    validator-rpc-port: 6500
+    beacon-metric-port: 5054 # start port used for beacon node metrics.
+    validator-metric-port: 5064 # start port used for validator client metrics.
+    metrics-path: "/metrics"
+
+  teku-consensus-client:
+    client: "teku"
+    launcher: "/source/deps/launchers/cl/launch-teku.sh"
+    log-level: "INFO"
+
+    num-validators: 10       # number of validators for every client node
+
+    p2p-port: 4000    # start port used for discovery
+    beacon-api-port: 5000   # start port used for the beacon rest API
+    beacon-rpc-port: 5500
+    validator-rpc-port: 6500
+    beacon-metric-port: 5054 # start port used for beacon node metrics.
+    validator-metric-port: 5064 # start port used for validator client metrics.
+    metrics-path: "/metrics"
+
+  lighthouse-consensus-client:
+    client: "lighthouse"
+    launcher: "/source/deps/launchers/cl/launch-lighthouse.sh"
+    num-validators: 10       # number of validators for every client node
+    # start ports increment each time we have a node.
+    log-level: "debug"
+    p2p-port: 4000    # start port used for discovery
+    beacon-api-port: 5000   # start port used for the beacon rest API
+    beacon-rpc-port: 5500
+    validator-rpc-port: 6500
+    beacon-metric-port: 5054 # start port used for beacon node metrics.
+    validator-metric-port: 5064 # start port used for validator client metrics.
+    metrics-path: "/metrics"
+
+  lodestar-consensus-client:
+    client: "lodestar"
+    launcher: "/source/deps/launchers/cl/launch-lodestar.sh"
+    num-validators: 10       # number of validators for every client node
+    # start ports increment each time we have a node.
+    log-level: "debug"
+    p2p-port: 4000    # start port used for discovery
+    beacon-api-port: 5000   # start port used for the beacon rest API
+    beacon-rpc-port: 5500
+    validator-rpc-port: 6500
+    beacon-metric-port: 5054 # start port used for beacon node metrics.
+    validator-metric-port: 5064 # start port used for validator client metrics.
+    metrics-path: "/metrics"
+
+  nimbus-consensus-client:
+    client: "nimbus"
+    launcher: "/source/deps/launchers/cl/launch-nimbus.sh"
+    num-validators: 10       # number of validators for every client node
+    # start ports increment each time we have a node.
+    log-level: "debug"
+
+    p2p-port: 4000    # start port used for discovery
+    beacon-api-port: 5000   # start port used for the beacon rest API
+    beacon-rpc-port: 5500
+    validator-rpc-port: 6500
+    beacon-metric-port: 5054 # start port used for beacon node metrics.
+    validator-metric-port: 5064 # start port used for validator client metrics.
+    metrics-path: "/metrics"
+
+client-instances:
+   # Geth clients
+  prysm-geth:
+    # docker-compose
+    image: "etb-all-clients"
+    tag: "dencun-devnet-8"
+    start-ip-address: "10.0.20.10"
+    num-nodes: 1
+
+    # consensus-info
+    consensus-config: "prysm-consensus-client"
+    execution-config: "geth-execution-config"
+    validator-offset-start: 0
+    additional-env:
+      validator-password: "testnet-password"
+
+  teku-geth:
+    # docker-compose
+    image: "etb-all-clients"
+    tag: "dencun-devnet-8"
+    start-ip-address: "10.0.20.20"
+    num-nodes: 1
+
+    # consensus-info
+    consensus-config: "teku-consensus-client"
+    execution-config: "geth-execution-config"
+
+    validator-offset-start: 10
+
+  lighthouse-geth:
+    # docker-compose
+    image: "etb-all-clients"
+    tag: "dencun-devnet-8"
+    start-ip-address: "10.0.20.30"
+    num-nodes: 1
+
+    # consensus-info
+    consensus-config: "lighthouse-consensus-client"
+    execution-config: "geth-execution-config"
+
+    validator-offset-start: 20
+
+  lodestar-geth:
+    # docker-compose
+    image: "etb-all-clients"
+    tag: "dencun-devnet-8"
+    start-ip-address: "10.0.20.40"
+    num-nodes: 1
+
+    # consensus-info
+    consensus-config: "lodestar-consensus-client"
+    execution-config: "geth-execution-config"
+
+    validator-offset-start: 30
+
+  nimbus-geth:
+    # docker-compose
+    image: "etb-all-clients"
+    tag: "dencun-devnet-8"
+    start-ip-address: "10.0.20.50"
+    num-nodes: 1
+
+    # consensus-info
+    consensus-config: "nimbus-consensus-client"
+    execution-config: "geth-execution-config"
+
+    validator-offset-start: 40
+
+  # teku-besu:
+  #   # docker-compose
+  #   image: "etb-all-clients"
+  #   tag: "dencun-devnet-8"
+  #   start-ip-address: "10.0.20.20"
+  #   num-nodes: 1
+
+  #   # consensus-info
+  #   consensus-config: "teku-consensus-client"
+  #   execution-config: "besu-execution-config"
+
+  #   validator-offset-start: 0
+
+  # lighthouse-besu:
+  #   # docker-compose
+  #   image: "etb-all-clients"
+  #   tag: "dencun-devnet-8"
+  #   start-ip-address: "10.0.20.30"
+  #   num-nodes: 3
+
+  #   # consensus-info
+  #   consensus-config: "lighthouse-consensus-client"
+  #   execution-config: "besu-execution-config"
+
+  #   validator-offset-start: 15
+
+  # Nethermind clients
+
+  prysm-nethermind:
+    # docker-compose
+    image: "etb-all-clients"
+    tag: "dencun-devnet-8"
+    start-ip-address: "10.0.20.110"
+    num-nodes: 1
+
+    # consensus-info
+    consensus-config: "prysm-consensus-client"
+    execution-config: "nethermind-execution-config"
+    validator-offset-start: 50
+    additional-env:
+      validator-password: "testnet-password"
+
+  teku-nethermind:
+    # docker-compose
+    image: "etb-all-clients"
+    tag: "dencun-devnet-8"
+    start-ip-address: "10.0.20.120"
+    num-nodes: 1
+
+    # consensus-info
+    consensus-config: "teku-consensus-client"
+    execution-config: "nethermind-execution-config"
+
+    validator-offset-start: 60
+
+  # lighthouse-nethermind:
+  #   # docker-compose
+  #   image: "etb-all-clients"
+  #   tag: "dencun-devnet-8"
+  #   start-ip-address: "10.0.20.130"
+  #   num-nodes: 1
+
+  #   # consensus-info
+  #   consensus-config: "lighthouse-consensus-client"
+  #   execution-config: "nethermind-execution-config"
+
+  #   validator-offset-start: 45
+
+  lodestar-nethermind:
+    # docker-compose
+    image: "etb-all-clients"
+    tag: "dencun-devnet-8"
+    start-ip-address: "10.0.20.140"
+    num-nodes: 1
+
+    # consensus-info
+    consensus-config: "lodestar-consensus-client"
+    execution-config: "nethermind-execution-config"
+
+    validator-offset-start: 70
+
+  nimbus-nethermind:
+    # docker-compose
+    image: "etb-all-clients"
+    tag: "dencun-devnet-8"
+    start-ip-address: "10.0.20.150"
+    num-nodes: 1
+
+    # consensus-info
+    consensus-config: "nimbus-consensus-client"
+    execution-config: "nethermind-execution-config"
+
+    validator-offset-start: 80
+
+# generic instances that run fuzzers/health checks/etc.
+generic-instances:
+# the bootstrapper that builds the network.
+  ethereum-testnet-bootstrapper:
+    image: "ethereum-testnet-bootstrapper"
+    tag: "dencun-devnet-8"
+    start-ip-address: "10.0.20.201"
+    num-nodes: 1
+    entrypoint: "/source/entrypoint.sh --bootstrap-testnet --log-level debug"
+
+  # required instance, bootnode to connect all CL clients together
+  eth2-bootnode:
+    image: "ethereum-testnet-bootstrapper"
+    tag: "dencun-devnet-8"
+    start-ip-address: "10.0.20.202"
+    entrypoint: "/source/deps/launchers/bootnodes/launch-eth2-bootnode.sh"
+    num-nodes: 1 # this is a special case, we only want one instance of this.
+
+    additional-env:
+      consensus-bootnode-start-ip-addr: "10.0.20.201"
+      consensus-bootnode-private-key: "bc971f814d7bd37f7502cc67408c4f2c5a06e1b3d48dc041e42b5478154df1a8" # private key for the bootnode to use
+      consensus-bootnode-enr-port: 9001 #port in the enr
+      consensus-bootnode-api-port: 6000 # port for web api.
+      consensus-bootnode-enr-file: "/data/consensus-bootnodes.txt" # file to write the enr to.
+
+  # not required, but useful for debugging. This watches the network and shows the head & checkpoints of the CLs.
+  node-watch:
+    image: "ethereum-testnet-bootstrapper"
+    tag: "dencun-devnet-8"
+    start-ip-address: "10.0.20.203"
+    num-nodes: 1
+    entrypoint: "python3 /source/src/node_watch.py --log-level info --monitor execution_availability:epoch --monitor consensus_availability:epoch --monitor heads:slot --monitor checkpoints:slot --monitor peers:epoch --max-retries 3"
+
+  tx-spammer:
+    image: "etb-all-clients"
+    tag: "dencun-devnet-8"
+    start-ip-address: "10.0.20.204"
+    num-nodes: 1
+    # runs on the first prysm geth node.
+    entrypoint: "python3 /source/src/tx_spammer.py --run-indefinitely --log-level debug --target-ip 10.0.20.30 --target-port 8645 --epoch-delay 2 --fuzz-mode spam --no-al --tx-count 20 --tx-fuzz-path /usr/local/bin/livefuzzer"
+
+  antithesis-checker:
+    image: "ethereum-testnet-bootstrapper"
+    tag: "dencun-devnet-8"
+    start-ip-address: "10.0.20.205"
+    num-nodes: 1
+    entrypoint: "python3 /source/src/antithesis_checker.py --config /data/etb-config.yaml
+      --phase0-slot 96 --phase1-slot 104 --phase2-slot 120 --phase3-slot 128"
+
+  prometheus:
+    image: "docker.io/bitnami/prometheus"
+    tag: "latest"
+    start-ip-address: "10.0.20.210"
+    num-nodes: 1
+    entrypoint: [
+      "/opt/bitnami/prometheus/bin/prometheus",
+      "--config.file=/opt/bitnami/prometheus/conf/prometheus.yml",
+      "--storage.tsdb.path=/opt/bitnami/prometheus/data",
+      "--web.console.libraries=/opt/bitnami/prometheus/conf/console_libraries",
+      "--web.console.templates=/opt/bitnami/prometheus/conf/consoles",
+    ]
+    additional-volumes: ["./data/prometheus/conf:/opt/bitnami/prometheus/conf"]
