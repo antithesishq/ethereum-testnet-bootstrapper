@@ -66,8 +66,9 @@ if [ "$IS_DENEB" == 1 ]; then
     --subscribe-all-subnets
     --suggested-fee-recipient=0x00000000219ab540356cbb839cbe05303d7705fa
     --port="$CONSENSUS_P2P_PORT"
-    --logfile="$CONSENSUS_NODE_DIR/beacon_node.log"
-    --logfile-debug-level="$CONSENSUS_LOG_LEVEL"
+    --debug-level="$CONSENSUS_LOG_LEVEL"
+    --logfile="/data/log_files/service_$CONTAINER_NAME--lighthouse-bn.log"
+    --logfile-debug-level="$CONSENSUS_LOG_LEVEL_FILE"
   )
 
   validator_args=(
@@ -82,8 +83,9 @@ if [ "$IS_DENEB" == 1 ]; then
     --http
     --http-port="$CONSENSUS_VALIDATOR_RPC_PORT"
     --suggested-fee-recipient=0x00000000219ab540356cbb839cbe05303d7705fa
-    --logfile="$CONSENSUS_NODE_DIR/validator.log"
-    --logfile-debug-level="$CONSENSUS_LOG_LEVEL"
+    --debug-level="$CONSENSUS_LOG_LEVEL"
+    --logfile="/data/log_files/service_$CONTAINER_NAME--lighthouse-vc.log"
+    --logfile-debug-level="$CONSENSUS_LOG_LEVEL_FILE"
   )
 else
   beacon_args=(
@@ -109,6 +111,8 @@ else
     --target-peers="$NUM_CLIENT_NODES"
     --subscribe-all-subnets
     --debug-level="$CONSENSUS_LOG_LEVEL"
+    --logfile="/data/log_files/service_$CONTAINER_NAME--lighthouse-bn.log"
+    --logfile-debug-level="$CONSENSUS_LOG_LEVEL_FILE"
   )
 
   validator_args=(
@@ -124,11 +128,12 @@ else
     --http-port="$CONSENSUS_VALIDATOR_RPC_PORT"
     --suggested-fee-recipient=0x00000000219ab540356cbb839cbe05303d7705fa
     --debug-level="$CONSENSUS_LOG_LEVEL"
+    --logfile="/data/log_files/service_$CONTAINER_NAME--lighthouse-vc.log"
+    --logfile-debug-level="$CONSENSUS_LOG_LEVEL_FILE"
   )
 fi
 
 echo "Launching Lighthouse beacon node in ${CONTAINER_NAME}"
-
 lighthouse --testnet-dir="$COLLECTION_DIR" bn "${beacon_args[@]}" > /data/logs/"service_$CONTAINER_NAME--lighthouse-bn" 2>&1 &
 
 echo "Launching Lighthouse validator client in ${CONTAINER_NAME}"
