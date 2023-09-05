@@ -100,7 +100,7 @@ def make_prometheus_config(etb_config: dict[str, Any]) -> dict[str, Any]:
     )
 
     prometheus_config = {
-        "global": {"scrape_interval": "10s", "evaluation_interval": "15s"},
+        "global": {"scrape_interval": "3s", "evaluation_interval": "3s"},
         "scrape_configs": jobs
     }
 
@@ -535,7 +535,7 @@ class EthereumTestnetBootstrapper:
         return block_hash, int(block_number, 16)
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
@@ -565,7 +565,15 @@ if __name__ == "__main__":
         "--log-level",
         dest="log_level",
         default="debug",
-        help="logging level to use.",
+        help="Logging level to use.",
+    )
+
+    parser.add_argument(
+        "--clean",
+        dest="clean",
+        action="store_true",
+        default=False,
+        help="Remove last run",
     )
 
     args = parser.parse_args()
@@ -573,8 +581,22 @@ if __name__ == "__main__":
     create_logger(
         log_level=args.log_level, name="testnet_bootstrapper", log_to_file=True
     )
-    logging.info("testnet_bootstrapper has started.")
 
+    if args.clean:
+        logging.info("cleaning up last run")
+
+        with os.scandir("/data") as entries:
+            for entry in entries:
+                if entry.is_dir() and not entry.is_symlink():
+                    shutil.rmtree(entry.path)
+                else:
+                    os.remove(entry.path)
+
+        pathlib.Path("/source/docker-compose.yaml").unlink(missing_ok=True)
+        pathlib.Path("/data/logs").mkdir(parents=True)
+        return
+
+    logging.info("testnet_bootstrapper has started.")
     etb = EthereumTestnetBootstrapper()
 
     if args.init_testnet:
@@ -587,3 +609,7 @@ if __name__ == "__main__":
         path_to_config = pathlib.Path("/source/data/etb-config.yaml")
         etb.bootstrap_testnet(path_to_config)
         logging.debug("testnet_bootstrapper has finished bootstrapping the testnet.")
+
+
+if __name__ == "__main__":
+    main()

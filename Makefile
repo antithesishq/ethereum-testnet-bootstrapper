@@ -33,9 +33,9 @@ build-all-images: build-bootstrapper build-client-images build-config
 rebuild-all-images: rebuild-bootstrapper rebuild-client-images rebuild-config
 
 # remove last run.
+# this has to be done through docker because of filesystem permissions
 clean:
-	rm -rf docker-compose.yaml data/
-	mkdir -p data
+	docker run -v $(REPO_DIR)/:/source/ -v $(REPO_DIR)/data/:/data ethereum-testnet-bootstrapper --clean
 
 # init the testnet dirs and all files needed to later bootstrap the testnet.
 init-testnet: clean
@@ -48,4 +48,3 @@ shell:
 # after an init this runs the bootstrapper and start up the testnet.
 run-bootstrapper:
 	docker run -it -v $(REPO_DIR)/:/source/ -v $(REPO_DIR)/data/:/data ethereum-testnet-bootstrapper --config $(config) --bootstrap-testnet --log-level $(log_level)
-
