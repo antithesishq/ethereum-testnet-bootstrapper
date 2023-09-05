@@ -406,3 +406,4 @@ generic-instances:
       "--web.console.templates=/opt/bitnami/prometheus/conf/consoles",
     ]
     additional-volumes: ["./data/prometheus/conf:/opt/bitnami/prometheus/conf"]
+    ports: "9090:9090"

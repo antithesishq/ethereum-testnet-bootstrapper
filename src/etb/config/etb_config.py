@@ -511,6 +511,9 @@ class InstanceCollectionConfig(Config):
             # for prometheus
             self.docker_command: list[str] = config["command"]
 
+        if "ports" in config:
+            self.ports: list[str] = config["ports"]
+
         # special case for additional env
         if "additional-env" in config:
             for key, value in config["additional-env"].items():
@@ -665,6 +668,9 @@ class Instance:
             entry["command"] = self.collection_config.docker_command
         elif hasattr(self, "docker_command"):
             entry["command"] = self.docker_command
+
+        if hasattr(self.collection_config, "ports"):
+            entry["ports"] = self.collection_config.ports
 
         # don't modify the global env vars
         env_vars = global_env_vars.copy()
