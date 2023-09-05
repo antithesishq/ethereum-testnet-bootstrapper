@@ -78,7 +78,7 @@ class TestnetMonitor:
         """Get the current slot wrt to genesis time @return: slot numbuer."""
         if self.consensus_genesis_time is None:
             return 0
-        
+
         return (int(time.time()) - self.consensus_genesis_time) // self.seconds_per_slot
 
     def get_epoch(self) -> int:
@@ -88,7 +88,7 @@ class TestnetMonitor:
     def wait_for_slot(self, target_slot: int):
         """Wait until target slot.
         @param target_slot: slot to wait for @return:
-        """        
+        """
         t_delta: int = (target_slot - self.get_slot()) * self.seconds_per_slot
         while t_delta > 0:
             logging.debug(f"Waiting for slot {target_slot}")
@@ -98,7 +98,7 @@ class TestnetMonitor:
             )
             time.sleep(sleep_time)
             t_delta = (target_slot - self.get_slot()) * self.seconds_per_slot
-    
+
     def wait_for_next_slot(self):
         self.wait_for_slot(self.get_slot() + 1)
 
