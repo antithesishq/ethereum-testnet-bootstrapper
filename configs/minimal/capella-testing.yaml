@@ -24,7 +24,7 @@ files:
 
   etb-config-file: "/data/etb-config.yaml"
   testnet-dir: "/data/local_testnet" # where client setups occur
-  validators-to-client-mapping: "/data/validators-to-client-mapping"
+  validators-checkpoint-file: "/data/validators-to-client-mapping"
   docker-compose-file:  "/source/docker-compose.yaml" #wrt to docker config
 
   # this file is created when all testnet directories have been written.
@@ -525,3 +525,14 @@ generic-instances:
       consensus-bootnode-enr-port: 9001 #port in the enr
       consensus-bootnode-api-port: 6000 # port for web api.
       consensus-bootnode-enr-file: "/data/eth2-bootnode-enr.dat" # this must match the file at the top.
+
+gazer-instances:
+    beacon-chain-gazer1:
+      image: "beacon-chain-gazer"
+      tag: "latest"
+      start-ip-address: "10.0.20.200"
+      consensus-beacon-api-ip-and-port: "http://10.0.20.10:5000"
+      num-nodes: 1
+      entrypoint: "/bin/bash /beacon_gazer_setup.sh"
+
+      
