@@ -250,31 +250,31 @@ client-instances:
 
     validator-offset-start: 40
 
-  # teku-besu:
-  #   # docker-compose
-  #   image: "etb-all-clients"
-  #   tag: "dencun-devnet-8"
-  #   start-ip-address: "10.0.20.20"
-  #   num-nodes: 1
+  teku-besu:
+    # docker-compose
+    image: "etb-all-clients"
+    tag: "dencun-devnet-8"
+    start-ip-address: "10.0.20.20"
+    num-nodes: 1
 
-  #   # consensus-info
-  #   consensus-config: "teku-consensus-client"
-  #   execution-config: "besu-execution-config"
+    # consensus-info
+    consensus-config: "teku-consensus-client"
+    execution-config: "besu-execution-config"
 
-  #   validator-offset-start: 0
+    validator-offset-start: 0
 
-  # lighthouse-besu:
-  #   # docker-compose
-  #   image: "etb-all-clients"
-  #   tag: "dencun-devnet-8"
-  #   start-ip-address: "10.0.20.30"
-  #   num-nodes: 3
+  lighthouse-besu:
+    # docker-compose
+    image: "etb-all-clients"
+    tag: "dencun-devnet-8"
+    start-ip-address: "10.0.20.30"
+    num-nodes: 3
 
-  #   # consensus-info
-  #   consensus-config: "lighthouse-consensus-client"
-  #   execution-config: "besu-execution-config"
+    # consensus-info
+    consensus-config: "lighthouse-consensus-client"
+    execution-config: "besu-execution-config"
 
-  #   validator-offset-start: 15
+    validator-offset-start: 15
 
   # Nethermind clients
 
@@ -305,18 +305,18 @@ client-instances:
 
     validator-offset-start: 60
 
-  # lighthouse-nethermind:
-  #   # docker-compose
-  #   image: "etb-all-clients"
-  #   tag: "dencun-devnet-8"
-  #   start-ip-address: "10.0.20.130"
-  #   num-nodes: 1
+  lighthouse-nethermind:
+    # docker-compose
+    image: "etb-all-clients"
+    tag: "dencun-devnet-8"
+    start-ip-address: "10.0.20.130"
+    num-nodes: 1
 
-  #   # consensus-info
-  #   consensus-config: "lighthouse-consensus-client"
-  #   execution-config: "nethermind-execution-config"
+    # consensus-info
+    consensus-config: "lighthouse-consensus-client"
+    execution-config: "nethermind-execution-config"
 
-  #   validator-offset-start: 45
+    validator-offset-start: 45
 
   lodestar-nethermind:
     # docker-compose
