@@ -6,13 +6,13 @@ ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
 ARG LIGHTHOUSE_BRANCH="ce824e00a3566e7e94e77600d97aab5be3b9a99c" 
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
-ARG PRYSM_BRANCH="d10163fd197bd2d06a2cc13048869b21295c7c66"
+ARG PRYSM_BRANCH="c728e0923fc451c151c7ffe373fad3b57fab018e"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
 ARG LODESTAR_BRANCH="b34bbe355a9bd673044b63b9054b5436c9d4bade"
 #
 ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
-ARG NIMBUS_ETH2_BRANCH="f2d3859d8055dc29e146b5e27ccfb2df9fa55eb7"
+ARG NIMBUS_ETH2_BRANCH="887bdd41ea870c55cd694c8380fcae0d3d47a260"
 
 
 ARG TEKU_REPO="https://github.com/ConsenSys/teku.git"
@@ -27,7 +27,7 @@ ARG GETH_REPO="https://github.com/lightclient/go-ethereum.git"
 ARG GETH_BRANCH="79f3c2d9c96bd82320d44851074da76587e41887"
 
 ARG NETHERMIND_REPO="https://github.com/NethermindEth/nethermind.git"
-ARG NETHERMIND_BRANCH="b65ef6a9e36da598f850b977f15eb90ad34382c7"
+ARG NETHERMIND_BRANCH="84d41bd174fd6c4f8350c5c6f0d4b746acee1c51"
 
 # ARG ETHEREUMJS_REPO="https://github.com/ethereumjs/ethereumjs-monorepo.git"
 # ARG ETHEREUMJS_BRANCH="c47d2c7351f04f35744de0f2082c37d5f2d2afd0"

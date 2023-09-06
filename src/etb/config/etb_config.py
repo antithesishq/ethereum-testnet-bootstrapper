@@ -444,6 +444,7 @@ class ConsensusInstanceConfig(Config):
         self.client: str = config["client"]
         self.launcher: pathlib.Path = pathlib.Path(config["launcher"])
         self.log_level: str = config["log-level"]
+        self.log_level_file:str = config["log-level-file"]
         self.p2p_port: int = config["p2p-port"]
         self.beacon_api_port: int = config["beacon-api-port"]
         self.beacon_rpc_port: int = config["beacon-rpc-port"]
@@ -465,6 +466,7 @@ class ConsensusInstanceConfig(Config):
             "CONSENSUS_CLIENT": self.client,
             "CONSENSUS_LAUNCHER": str(self.launcher),
             "CONSENSUS_LOG_LEVEL": self.log_level,
+            "CONSENSUS_LOG_LEVEL_FILE": self.log_level_file,
             "CONSENSUS_P2P_PORT": self.p2p_port,
             "CONSENSUS_BEACON_API_PORT": self.beacon_api_port,
             "CONSENSUS_BEACON_RPC_PORT": self.beacon_rpc_port,

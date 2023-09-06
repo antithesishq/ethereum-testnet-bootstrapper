@@ -6,13 +6,13 @@ ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
 ARG LIGHTHOUSE_BRANCH="ce824e00a3566e7e94e77600d97aab5be3b9a99c" 
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
-ARG PRYSM_BRANCH="d10163fd197bd2d06a2cc13048869b21295c7c66"
+ARG PRYSM_BRANCH="c728e0923fc451c151c7ffe373fad3b57fab018e"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
 ARG LODESTAR_BRANCH="b34bbe355a9bd673044b63b9054b5436c9d4bade"
 #
 ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
-ARG NIMBUS_ETH2_BRANCH="f2d3859d8055dc29e146b5e27ccfb2df9fa55eb7"
+ARG NIMBUS_ETH2_BRANCH="887bdd41ea870c55cd694c8380fcae0d3d47a260"
 
 ARG TEKU_REPO="https://github.com/ConsenSys/teku.git"
 ARG TEKU_BRANCH="b49165a76c6aaa56fad01eaa2a80c18b4084c81f"
@@ -25,7 +25,7 @@ ARG GETH_REPO="https://github.com/lightclient/go-ethereum.git"
 ARG GETH_BRANCH="79f3c2d9c96bd82320d44851074da76587e41887"
 
 ARG NETHERMIND_REPO="https://github.com/NethermindEth/nethermind.git"
-ARG NETHERMIND_BRANCH="b65ef6a9e36da598f850b977f15eb90ad34382c7"
+ARG NETHERMIND_BRANCH="84d41bd174fd6c4f8350c5c6f0d4b746acee1c51"
 
 ARG ETHEREUMJS_REPO="https://github.com/ethereumjs/ethereumjs-monorepo.git"
 ARG ETHEREUMJS_BRANCH="c47d2c7351f04f35744de0f2082c37d5f2d2afd0"
@@ -165,7 +165,9 @@ RUN git clone "${NIMBUS_ETH2_REPO}" && \
 
 RUN cd nimbus-eth2 && \
     arch=$(arch | sed s/aarch64/arm64/ | sed s/x86_64/amd64/) && \
-    make -j16 nimbus_beacon_node NIMFLAGS="-d:disableMarchNative --cpu:${arch} --cc:clang --clang.exe:clang-15 --clang.linkerexe:clang-15 --passC:-fno-lto --passL:-fno-lto"
+    make -j16 nimbus_beacon_node NIMFLAGS="-d:disableMarchNative --cpu:${arch} --cc:clang --clang.exe:clang-15 --clang.linkerexe:clang-15 --passC:'-fno-lto -fsanitize=thread' --passL:-'fno-lto -fsanitize=thread'"
+# can use either leak sanitizer or thread sanitizer
+#    make -j16 nimbus_beacon_node NIMFLAGS="-d:disableMarchNative --cpu:${arch} --cc:clang --clang.exe:clang-15 --clang.linkerexe:clang-15 --passC:'-fsanitize=leak' --passL:'-fsanitize=leak' -d:useMalloc"
 
 # TEKU
 FROM etb-client-builder AS teku-builder
@@ -190,19 +192,8 @@ RUN git clone "${PRYSM_REPO}" && \
     git log -n 1 --format=format:"%H" > /prysm.version
 
 RUN cd prysm && \
-    bazelisk build --config=release //cmd/beacon-chain:beacon-chain //cmd/validator:validator
-
-# Antithesis instrumented prysm binary
-RUN mkdir prysm_instrumented && \
-    /opt/antithesis/go_instrumentation/bin/goinstrumentor \
-    -logtostderr -stderrthreshold=INFO \
-    -antithesis /opt/antithesis/go_instrumentation/instrumentation/go/wrappers \
-    prysm prysm_instrumented
-
-RUN cd prysm_instrumented/customer && go build -o /validator ./cmd/validator
-RUN cd prysm_instrumented/customer && go build -o /beacon-chain ./cmd/beacon-chain
-RUN cd prysm_instrumented/customer && go build -race -o /validator_race ./cmd/validator
-RUN cd prysm_instrumented/customer && go build -race -o /beacon-chain_race ./cmd/beacon-chain
+   go build -race -tags minimal -o /validator_race ./cmd/validator && \
+   go build -race -tags minimal -o /beacon-chain_race ./cmd/beacon-chain
 
 
 ############################# Execution  Clients  #############################
@@ -216,22 +207,7 @@ RUN git clone "${GETH_REPO}" && \
     git log -n 1 --format=format:"%H" > /geth.version
 
 RUN cd go-ethereum && \
-    go install ./... && \
-    mv /root/go/bin/geth /tmp/geth_uninstrumented
-
-# Antithesis add instrumentation
-RUN mkdir geth_instrumented
-
-RUN /opt/antithesis/go_instrumentation/bin/goinstrumentor \
-    -logtostderr -stderrthreshold=INFO \
-    -antithesis /opt/antithesis/go_instrumentation/instrumentation/go/wrappers \
-    go-ethereum geth_instrumented
-
-RUN cd geth_instrumented/customer && \
-    go install -race ./... && mv /root/go/bin/geth /tmp/geth_race
-
-RUN cd geth_instrumented/customer && \
-    go install ./...
+    go install -race ./...
 
 
 # Besu
@@ -354,13 +330,10 @@ RUN ln -s /opt/teku/bin/teku /usr/local/bin/teku
 
 # COPY --from=prysm-builder /beacon-chain /usr/local/bin/
 # COPY --from=prysm-builder /validator /usr/local/bin/
-COPY --from=prysm-builder /beacon-chain_race /usr/local/bin/beacon-chain
-COPY --from=prysm-builder /validator_race /usr/local/bin/validator
-COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /usr/local/bin/beacon-chain_uninstrumented
-COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/validator/validator_/validator /usr/local/bin/validator_uninstrumented
+COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /usr/local/bin/beacon-chain
+COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/validator/validator_/validator /usr/local/bin/validator
 COPY --from=prysm-builder /prysm.version /prysm.version
-COPY --from=prysm-builder /git/prysm_instrumented/symbols/* /opt/antithesis/symbols/
-COPY --from=prysm-builder /git/prysm_instrumented/customer /prysm_instrumented_code
+
 #
 COPY --from=lodestar-builder /git/lodestar /git/lodestar
 COPY --from=lodestar-builder /lodestar.version /lodestar.version
@@ -368,12 +341,7 @@ RUN ln -s /git/lodestar/node_modules/.bin/lodestar /usr/local/bin/lodestar
 
 # execution clients
 COPY --from=geth-builder /geth.version /geth.version
-# COPY --from=geth-builder /root/go/bin/geth /usr/local/bin/geth
-COPY --from=geth-builder /tmp/geth_uninstrumented /usr/local/bin/geth_uninstrumented
-COPY --from=geth-builder /tmp/geth_race /usr/local/bin/geth
-COPY --from=geth-builder /git/geth_instrumented/symbols/* /opt/antithesis/symbols/
-COPY --from=geth-builder /git/geth_instrumented/customer /geth_instrumented_code
-
+COPY --from=geth-builder /root/go/bin/geth /usr/local/bin/geth
 
 COPY --from=besu-builder /besu.version /besu.version
 COPY --from=besu-builder /git/besu/build/install/besu/. /opt/besu

@@ -18,7 +18,7 @@ env_vars=(
   "$CONSENSUS_P2P_PORT"
   "$CONSENSUS_VALIDATOR_METRIC_PORT"
   "$CONSENSUS_VALIDATOR_RPC_PORT"
-  "$CONSENSUS_LOG_LEVEL"
+  "$CONSENSUS_LOG_LEVEL_FILE"
   "$IP_ADDRESS"
   "$IP_SUBNET"
   "$JWT_SECRET_FILE"
@@ -57,6 +57,8 @@ beacon_args=(
     --http-allow-sync-stalled
     --http-port="$CONSENSUS_BEACON_API_PORT"
     --jwt-secrets="$JWT_SECRET_FILE"
+    --logfile-debug-level="$CONSENSUS_LOG_LEVEL_FILE"
+    --logfile="/data/log_files/service_$CONTAINER_NAME--lighthouse-bn.log"
     --listen-address=0.0.0.0
     --metrics
     --metrics-address=0.0.0.0
@@ -73,6 +75,8 @@ validator_args=(
     --http
     --http-port="$CONSENSUS_VALIDATOR_RPC_PORT"
     --init-slashing-protection
+    --logfile-debug-level="$CONSENSUS_LOG_LEVEL_FILE"
+    --logfile="/data/log_files/service_$CONTAINER_NAME--lighthouse-vc.log"
     --metrics
     --metrics-address=0.0.0.0
     --metrics-allow-origin="*"
@@ -83,21 +87,14 @@ validator_args=(
 
 if [ "$IS_DENEB" == 1 ]; then
   beacon_args+=(
-    --logfile-debug-level="$CONSENSUS_LOG_LEVEL"
-    --logfile="$CONSENSUS_NODE_DIR/beacon_node.log"
     --suggested-fee-recipient=0x00000000219ab540356cbb839cbe05303d7705fa
   )
-
-  validator_args+=(
-    --logfile-debug-level="$CONSENSUS_LOG_LEVEL"
-    --logfile="$CONSENSUS_NODE_DIR/validator.log"
-  )
+  echo "Launching deneb-ready Lighthouse beacon node in ${CONTAINER_NAME}"
+else
+  echo "Launching Lighthouse beacon node in ${CONTAINER_NAME}"
 fi
-
-echo "Launching Lighthouse beacon node in ${CONTAINER_NAME}"
-
 lighthouse --testnet-dir="$COLLECTION_DIR" bn "${beacon_args[@]}" > /data/logs/"service_$CONTAINER_NAME--lighthouse-bn" 2>&1 &
 
-echo "Launching Lighthouse validator client in ${CONTAINER_NAME}"
 sleep 10
+echo "Launching Lighthouse validator client in ${CONTAINER_NAME}"
 lighthouse --testnet-dir="$COLLECTION_DIR" vc "${validator_args[@]}" > /data/logs/"service_$CONTAINER_NAME--lighthouse-vc" 2>&1
