@@ -5,7 +5,6 @@ import argparse
 import json
 import logging
 import os
-import pathlib
 import random
 import re
 import shutil
@@ -36,6 +35,28 @@ from etb.interfaces.external.eth2_val_tools import Eth2ValTools
 from etb.common.consensus import Epoch
 
 
+def rm_rf(*paths):
+    """Recursively delete paths, regardless of if they exist or are files/directories."""
+    for path in paths:
+        path = Path(path)
+        if path.exists():
+            if path.is_dir() and not path.is_symlink():
+                shutil.rmtree(path)
+
+            else:
+                path.unlink()
+
+
+def rm_contents(dir_path):
+    """Delete everything in the directory, but not the directory itself."""
+    with os.scandir(dir_path) as entries:
+        for entry in entries:
+            if entry.is_dir() and not entry.is_symlink():
+                shutil.rmtree(entry.path)
+            else:
+                os.remove(entry.path)
+
+
 def move_trusted_setup_files(etb_config: ETBConfig):
     """Move the trusted setup files to the correct location.
 
@@ -43,8 +64,8 @@ def move_trusted_setup_files(etb_config: ETBConfig):
     @return:
     """
     # we must have the correct trusted setup files in deps.
-    trusted_setup_json = pathlib.Path("/source/deps/misc/trusted_setup.json")
-    trusted_setup_txt = pathlib.Path("/source/deps/misc/trusted_setup.txt")
+    trusted_setup_json = Path("/source/deps/misc/trusted_setup.json")
+    trusted_setup_txt = Path("/source/deps/misc/trusted_setup.txt")
     if not trusted_setup_json.exists():
         raise Exception("The trusted setup json file is missing from /source/deps/misc/")
     if not trusted_setup_txt.exists():
@@ -143,24 +164,22 @@ class EthereumTestnetBootstrapper:
         @return:
         """
         etb_config: ETBConfig = ETBConfig(config_path)
-        # this file holds all the static files for the nodes.
-        local_testnet_dir: pathlib.Path = etb_config.files.local_testnet_dir
 
-        # check to see if we have a testnet already here.
-        if local_testnet_dir.exists():
+        if (init_file := Path("data/init_file")).exists():
             raise Exception(
-                f"non-empty local-testnet-dir:{local_testnet_dir}, please run `make clean` first."
+                f"data/init_file exists, please run `make clean` first to clear last run"
             )
+
+        init_file.touch()
+
+        # this file holds all the static files for the nodes.
+        local_testnet_dir: Path = etb_config.files.local_testnet_dir
         local_testnet_dir.mkdir(parents=True)  # /data/local_testnet
 
         # Antithesis capture logs via a mounted directory.
-        local_logs_dir: pathlib.Path = etb_config.files.local_logs_dir
+        local_logs_dir: Path = etb_config.files.local_logs_dir
+        local_logs_dir.mkdir(parents=True, exist_ok=True)
 
-        if local_logs_dir.exists():
-            raise Exception(
-                f"non-empty local-logs-dir:{local_logs_dir}, please run `make clean` first."
-            )
-        local_logs_dir.mkdir(parents=True)  # /data/local_testnet
         # create the client directories
         # directory structure:
         # /testnet_root/local_testnet/collection_name/node_<node_num>/{cl
@@ -172,7 +191,7 @@ class EthereumTestnetBootstrapper:
 
             # create the jwt-secret file:
             # /testnet_dir/collection_name/node_<node_num>/jwt-secret
-            jwt_secret_file: pathlib.Path = client_instance.jwt_secret_file
+            jwt_secret_file: Path = client_instance.jwt_secret_file
             logging.debug(f"populating jwt-secret-file: {jwt_secret_file}")
             with open(jwt_secret_file, "w", encoding="utf-8") as jwt_file:
                 jwt_file.write(f"0x{random.randbytes(32).hex()}")
@@ -299,10 +318,10 @@ class EthereumTestnetBootstrapper:
         block_hash, block_number = self.get_deposit_contract_deployment_block(
             etb_config, global_timeout=global_timeout
         )
-        etb_block_hash_file: pathlib.Path = (
+        etb_block_hash_file: Path = (
             etb_config.files.deposit_contract_deployment_block_hash_file
         )
-        etb_block_number_file: pathlib.Path = (
+        etb_block_number_file: Path = (
             etb_config.files.deposit_contract_deployment_block_number_file
         )
         with open(etb_block_hash_file, "w", encoding="utf-8") as block_hash_file:
@@ -433,8 +452,8 @@ class EthereumTestnetBootstrapper:
             cl_client = client_instance.consensus_config.client
             if cl_client not in ["prysm", "lighthouse", "teku", "nimbus", "lodestar"]:
                 raise Exception(f"client: {cl_client} not supported for keystores")
-            consensus_node_dir: pathlib.Path = client_instance.node_dir
-            keystore_dir: pathlib.Path = consensus_node_dir / pathlib.Path("keystores/")
+            consensus_node_dir: Path = client_instance.node_dir
+            keystore_dir: Path = consensus_node_dir / Path("keystores/")
             vpn = client_instance.consensus_config.num_validators  # validators per node
             offset = client_instance.ndx * vpn
             min_ndx = client_instance.collection_config.validator_offset_start + offset
@@ -451,13 +470,13 @@ class EthereumTestnetBootstrapper:
                     prysm_password=client_instance.validator_password,
                 )
 
-                for item in pathlib.Path(keystore_dir).glob("prysm/*"):
+                for item in Path(keystore_dir).glob("prysm/*"):
                     if item.is_dir():
                         shutil.copytree(item, consensus_node_dir / item.name)
                     else:
                         shutil.copy(item, consensus_node_dir / item.name)
                 # prysm requires a wallet-password.txt to launch.
-                wallet_password_path: pathlib.Path = (
+                wallet_password_path: Path = (
                     consensus_node_dir / "wallet-password.txt"
                 )
                 with open(wallet_password_path, "w") as wallet_password_file:
@@ -471,16 +490,16 @@ class EthereumTestnetBootstrapper:
                     mnemonic=mnemonic,
                 )
                 # these are the defaults shared by most of the clients
-                keystore_src: pathlib.Path = (
+                keystore_src: Path = (
                     keystore_dir / "keys"
                 )  # where the generated keystores are
-                keystore_dst: pathlib.Path = (
+                keystore_dst: Path = (
                     consensus_node_dir / "keys"
                 )  # where the keystores will be moved to
-                secret_src: pathlib.Path = (
+                secret_src: Path = (
                     keystore_dir / "secrets"
                 )  # where the generated secrets are
-                secret_dst: pathlib.Path = (
+                secret_dst: Path = (
                     consensus_node_dir / "secrets"
                 )  # where the secrets will be moved to
                 if cl_client == "teku":
@@ -491,7 +510,7 @@ class EthereumTestnetBootstrapper:
                 elif cl_client == "lodestar":
                     secret_src = keystore_dir / "lodestar-secrets"
                     # go ahead and create the validatordb dir for lodestar
-                    pathlib.Path(consensus_node_dir / "validatordb").mkdir()
+                    Path(consensus_node_dir / "validatordb").mkdir()
                 # copy everything over
                 shutil.copytree(keystore_src, keystore_dst)
                 shutil.copytree(secret_src, secret_dst)
@@ -585,28 +604,26 @@ def main():
     if args.clean:
         logging.info("cleaning up last run")
 
-        with os.scandir("/data") as entries:
-            for entry in entries:
-                if entry.is_dir() and not entry.is_symlink():
-                    shutil.rmtree(entry.path)
-                else:
-                    os.remove(entry.path)
+        rm_rf(
+            "/source/docker-compose.yaml",
+            "/source/tranches",
+        )
+        rm_contents("/data")
+        Path("/data/logs").mkdir(parents=True)
 
-        pathlib.Path("/source/docker-compose.yaml").unlink(missing_ok=True)
-        pathlib.Path("/data/logs").mkdir(parents=True)
         return
 
     logging.info("testnet_bootstrapper has started.")
     etb = EthereumTestnetBootstrapper()
 
     if args.init_testnet:
-        path_to_config = pathlib.Path(args.config)
+        path_to_config = Path(args.config)
         etb.init_testnet(path_to_config)
         logging.debug("testnet_bootstrapper has finished init-ing the testnet.")
 
     if args.bootstrap_testnet:
         # the config path lies in /source/data/etb-config.yaml
-        path_to_config = pathlib.Path("/source/data/etb-config.yaml")
+        path_to_config = Path("/source/data/etb-config.yaml")
         etb.bootstrap_testnet(path_to_config)
         logging.debug("testnet_bootstrapper has finished bootstrapping the testnet.")
 
