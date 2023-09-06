@@ -268,6 +268,34 @@ class InstanceCollection(ConfigEntry):
             yield Instance(self.name, x, self.config_entry)
 
 
+class GazerInstanceCollection(ConfigEntry):
+    """
+    Describes a collection of instances.
+    """
+
+    def __init__(self, name: str, entry: dict):
+        # config entry code
+
+        self.required_keys = [
+            "image",
+            "tag",
+            "start-ip-address",
+            "num-nodes",
+        ]
+        self.ignored_keys = [
+            # 'entrypoint',  # handled in inherited classes
+        ]
+        self.invalid_keys = []
+        self.config_entry = super()._validate_and_parse(entry)
+        # instance code
+        self.name = name
+        self.num_nodes: int = self.config_entry.get("num-nodes")
+        self.consensus_beacon_api_ip_and_port = self.config_entry.get("consensus-beacon-api-ip-and-port")
+    def __iter__(self):
+        for x in range(self.get("num-nodes")):
+            yield Instance(self.name, x, self.config_entry)
+
+
 class ClientInstance(Instance, ConfigEntry):
     """
     Represents a single instance with a CL and EL node.
@@ -558,6 +586,11 @@ class ETBConfig(object):
         for gi, entry in self.global_config["generic-instances"].items():
             self.generic_instance_collections[gi] = InstanceCollection(gi, entry)
 
+        self.gazer_instance_collections: dict[str, GazerInstanceCollection] = {}
+        for gi, entry in self.global_config["gazer-instances"].items():
+            self.gazer_instance_collections[gi] = GazerInstanceCollection(gi, entry)
+        print(self.gazer_instance_collections)
+
         # set useful members that describe the testnet.
         self.preset_base: Type[
             Union[MainnetPreset, MinimalPreset]
@@ -590,6 +623,7 @@ class ETBConfig(object):
         if hasattr(self, f"get_{key.replace('-', '_')}"):
             return getattr(self, f'get_{key.replace("-", "_")}')()
 
+        # this will look for the beacon-gazer related things inside files object
         if self.files.has(key):
             return self.files.get(key)
 
@@ -601,7 +635,7 @@ class ETBConfig(object):
 
         if self.accounts.has(key):
             return self.accounts.get(key)
-
+        
         raise Exception("Should not occur.")
 
     # get data structures describing instances running on the network
@@ -640,6 +674,13 @@ class ETBConfig(object):
                 all_generic_instances.append(instances)
         return all_generic_instances
 
+    def get_gazer_instances(self) -> List[Instance]:
+        all_gazer_instances = []
+        for collections in self.gazer_instance_collections.values():
+            for instances in collections:
+                all_gazer_instances.append(instances)
+        return all_gazer_instances
+
     def get_docker_compose_repr(self) -> dict:
         """
         Takes all the information contained in the config file and flattens
@@ -674,12 +715,29 @@ class ETBConfig(object):
             for k, v in global_env_vars.items():
                 services[generic_instances.name]["environment"][k] = v
 
+
         for client_instances in self.get_client_instances():
             services[client_instances.name] = client_instances.get_docker_repr(
                 self.docker
             )
             for k, v in global_env_vars.items():
                 services[client_instances.name]["environment"][k] = v
+
+        env_vars_to_get_for_beacon_gazer = [
+            "validators-checkpoint-file",
+        ]
+
+        beacon_gazer_env_vars = {}
+        for var in env_vars_to_get_for_beacon_gazer:
+            beacon_gazer_env_vars[var.replace("-", "_").upper()] = self.get(var)
+
+        for gazer_instances in self.get_gazer_instances():
+            services[gazer_instances.name] = gazer_instances.get_docker_repr(
+                self.docker
+            )
+            for k, v in beacon_gazer_env_vars.items():
+                print(services[gazer_instances.name])
+                services[gazer_instances.name]["environment"][k] = v
 
         return {
             "services": services,
