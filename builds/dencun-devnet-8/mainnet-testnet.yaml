@@ -77,6 +77,7 @@ execution-configs:
     engine-http-port: 8551   # http/ws same port.
     engine-ws-port: 8551   # include for nimbus
     metric-port: 9001
+    metrics-path: "/debug/metrics/prometheus"
 
   besu-execution-config:
     client: "besu"
@@ -90,6 +91,7 @@ execution-configs:
     engine-http-port: 8551
     engine-ws-port: 8551
     metric-port: 9001
+    metrics-path: "/metrics"
 
   nethermind-execution-config:
     client: "nethermind"
@@ -103,6 +105,7 @@ execution-configs:
     engine-ws-port: 8552
     p2p-port: 666
     metric-port: 9001
+    metrics-path: "/metrics"
 
 # configuration options used for consensus clients
 consensus-configs:
@@ -120,6 +123,7 @@ consensus-configs:
     validator-rpc-port: 6500
     beacon-metric-port: 5054 # start port used for beacon node metrics.
     validator-metric-port: 5064 # start port used for validator client metrics.
+    metrics-path: "/metrics"
 
   teku-consensus-client:
     client: "teku"
@@ -135,6 +139,7 @@ consensus-configs:
     validator-rpc-port: 6500
     beacon-metric-port: 5054 # start port used for beacon node metrics.
     validator-metric-port: 5064 # start port used for validator client metrics.
+    metrics-path: "/metrics"
 
   lighthouse-consensus-client:
     client: "lighthouse"
@@ -149,6 +154,7 @@ consensus-configs:
     validator-rpc-port: 6500
     beacon-metric-port: 5054 # start port used for beacon node metrics.
     validator-metric-port: 5064 # start port used for validator client metrics.
+    metrics-path: "/metrics"
 
   lodestar-consensus-client:
     client: "lodestar"
@@ -163,6 +169,7 @@ consensus-configs:
     validator-rpc-port: 6500
     beacon-metric-port: 5054 # start port used for beacon node metrics.
     validator-metric-port: 5064 # start port used for validator client metrics.
+    metrics-path: "/metrics"
 
   nimbus-consensus-client:
     client: "nimbus"
@@ -178,6 +185,7 @@ consensus-configs:
     validator-rpc-port: 6500
     beacon-metric-port: 5054 # start port used for beacon node metrics.
     validator-metric-port: 5064 # start port used for validator client metrics.
+    metrics-path: "/metrics"
 
 client-instances:
    # Geth clients
@@ -426,3 +434,18 @@ generic-instances:
     num-nodes: 1
     entrypoint: "python3 /source/src/antithesis_checker.py --config /data/etb-config.yaml
       --phase0-slot 96 --phase1-slot 104 --phase2-slot 120 --phase3-slot 128"
+
+  prometheus:
+    image: "docker.io/bitnami/prometheus"
+    tag: "latest"
+    start-ip-address: "10.0.20.210"
+    num-nodes: 1
+    entrypoint: "/opt/bitnami/prometheus/bin/prometheus"
+    command: [
+      "--config.file=/opt/bitnami/prometheus/conf/prometheus.yml",
+      "--storage.tsdb.path=/opt/bitnami/prometheus/data",
+      "--web.console.libraries=/opt/bitnami/prometheus/conf/console_libraries",
+      "--web.console.templates=/opt/bitnami/prometheus/conf/consoles",
+    ]
+    additional-volumes: ["./data/prometheus/conf:/opt/bitnami/prometheus/conf"]
+    ports: "9090:9090"

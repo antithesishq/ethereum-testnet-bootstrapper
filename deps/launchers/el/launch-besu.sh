@@ -31,64 +31,44 @@ while [ ! -f "$EXECUTION_CHECKPOINT_FILE" ]; do
   sleep 1
 done
 
+besu_args=(
+  # --bootnodes="$EXECUTION_BOOTNODE"
+  --data-path="$EXECUTION_NODE_DIR"
+  --data-storage-format="BONSAI"
+  --engine-host-allowlist="*"
+  --engine-jwt-enabled
+  --engine-jwt-secret="$JWT_SECRET_FILE"
+  --engine-rpc-enabled=true
+  --engine-rpc-port="$EXECUTION_ENGINE_HTTP_PORT"
+  --genesis-file="$EXECUTION_GENESIS_FILE"
+  --host-allowlist="*"
+  --logging="$EXECUTION_LOG_LEVEL"
+  --metrics-enabled
+  --metrics-host="$IP_ADDRESS"
+  --metrics-port="$EXECUTION_METRIC_PORT"
+  --nat-method=DOCKER
+  --network-id="$CHAIN_ID"
+  --p2p-enabled=true
+  --p2p-host="$IP_ADDRESS"
+  --p2p-port="$EXECUTION_P2P_PORT"
+  --rpc-http-cors-origins="*"
+  --rpc-http-enabled=true
+  --rpc-http-api="$EXECUTION_HTTP_APIS"
+  --rpc-http-host=0.0.0.0
+  --rpc-http-port="$EXECUTION_HTTP_PORT"
+  --rpc-ws-enabled=true
+  --rpc-ws-api="$EXECUTION_WS_APIS"
+  --rpc-ws-host=0.0.0.0
+  --rpc-ws-port="$EXECUTION_WS_PORT"
+  --sync-mode=FULL
+)
 if [ "$IS_DENEB" == 1 ]; then
-  echo "Launching deneb ready besu."
-  besu_args=(
-    --metrics-enabled
-    --metrics-host="$IP_ADDRESS"
-    --metrics-port="$EXECUTION_METRIC_PORT"
-    --logging="$EXECUTION_LOG_LEVEL"
-    # --bootnodes="$EXECUTION_BOOTNODE"
-    --data-path="$EXECUTION_NODE_DIR"
-    --genesis-file="$EXECUTION_GENESIS_FILE"
-    --network-id="$CHAIN_ID"
-    --rpc-http-enabled=true --rpc-http-api="$EXECUTION_HTTP_APIS"
-    --rpc-http-host=0.0.0.0
-    --rpc-http-port="$EXECUTION_HTTP_PORT"
-    --rpc-http-cors-origins="*"
-    --rpc-ws-enabled=true --rpc-ws-api="$EXECUTION_WS_APIS"
-    --rpc-ws-host=0.0.0.0
-    --rpc-ws-port="$EXECUTION_WS_PORT"
-    --host-allowlist="*"
-    --p2p-enabled=true
-    --p2p-host="$IP_ADDRESS"
-    --nat-method=DOCKER
-    --sync-mode=FULL
-    --p2p-port="$EXECUTION_P2P_PORT"
-    --engine-rpc-enabled=true
-    --engine-jwt-enabled
-    --engine-jwt-secret="$JWT_SECRET_FILE"
-    --engine-host-allowlist="*"
-    --data-storage-format="BONSAI"
+  besu_args+=(
     --kzg-trusted-setup="$TRUSTED_SETUP_TXT_FILE"
     --engine-rpc-port="$EXECUTION_ENGINE_HTTP_PORT"
   )
+  echo "Launching deneb ready besu"
 else
-  besu_args=(
-    --logging="$EXECUTION_LOG_LEVEL"
-    # --bootnodes="$EXECUTION_BOOTNODE"
-    --data-path="$EXECUTION_NODE_DIR"
-    --genesis-file="$EXECUTION_GENESIS_FILE"
-    --network-id="$CHAIN_ID"
-    --rpc-http-enabled=true --rpc-http-api="$EXECUTION_HTTP_APIS"
-    --rpc-http-host=0.0.0.0
-    --rpc-http-port="$EXECUTION_HTTP_PORT"
-    --rpc-http-cors-origins="*"
-    --rpc-ws-enabled=true --rpc-ws-api="$EXECUTION_WS_APIS"
-    --rpc-ws-host=0.0.0.0
-    --rpc-ws-port="$EXECUTION_WS_PORT"
-    --host-allowlist="*"
-    --p2p-enabled=true
-    --p2p-host="$IP_ADDRESS"
-    --nat-method=DOCKER
-    --sync-mode=FULL
-    --p2p-port="$EXECUTION_P2P_PORT"
-    --engine-rpc-enabled=true
-    --engine-jwt-enabled
-    --engine-jwt-secret="$JWT_SECRET_FILE"
-    --engine-host-allowlist="*"
-    --data-storage-format="BONSAI"
-    --engine-rpc-port="$EXECUTION_ENGINE_HTTP_PORT"
-  )
+  echo "Launching besu"
 fi
 besu "${besu_args[@]}" > /data/logs/"service_$CONTAINER_NAME--besu" 2>&1

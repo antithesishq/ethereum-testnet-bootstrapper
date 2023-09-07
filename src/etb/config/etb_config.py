@@ -509,12 +509,21 @@ class InstanceCollectionConfig(Config):
         if "entrypoint" in config:
             self.entrypoint: pathlib.Path = pathlib.Path(config["entrypoint"])
 
+        if "command" in config:
+            # for prometheus
+            self.docker_command: list[str] = config["command"]
+
+        if "ports" in config:
+            self.ports: list[str] = config["ports"]
+
         # special case for additional env
         if "additional-env" in config:
             for key, value in config["additional-env"].items():
                 if key in self.additional_env:
                     raise Exception(f"Duplicate key {key} in additional-env for {name}")
                 self.additional_env[key] = value
+
+        self.additional_volumes = config.get("additional-volumes", [])
 
     def get_env_vars(self) -> dict[str, str]:
         """Returns the environment variables used by the instance that can be
@@ -649,7 +658,7 @@ class Instance:
             "container_name": self.name,
             "hostname": self.name,
             "image": f"{self.collection_config.image}:{self.collection_config.tag}",
-            "volumes": docker_config.volumes,
+            "volumes": docker_config.volumes + self.collection_config.additional_volumes,
             "networks": {docker_config.network_name: {"ipv4_address": self.ip_address}},
         }
         if self.collection_config.entrypoint is not None:
@@ -657,8 +666,13 @@ class Instance:
         else:
             entry["entrypoint"] = ["/bin/sh", "-c"]
 
-        if hasattr(self, "docker-command"):
-            entry["command"] = self["docker-command"]
+        if hasattr(self.collection_config, "docker_command"):
+            entry["command"] = self.collection_config.docker_command
+        elif hasattr(self, "docker_command"):
+            entry["command"] = self.docker_command
+
+        if hasattr(self.collection_config, "ports"):
+            entry["ports"] = self.collection_config.ports
 
         # don't modify the global env vars
         env_vars = global_env_vars.copy()
