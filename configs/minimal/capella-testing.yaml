@@ -528,7 +528,7 @@ generic-instances:
 
 gazer-instances:
     beacon-chain-gazer1:
-      image: "beacon-chain-gazer"
+      image: "beacon-gazer"
       tag: "latest"
       start-ip-address: "10.0.20.200"
       consensus-beacon-api-ip-and-port: "http://10.0.20.10:5000"
