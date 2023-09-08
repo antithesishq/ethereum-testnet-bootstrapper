@@ -21,8 +21,6 @@ FROM debian:bullseye-slim
 
 WORKDIR /
 
-VOLUME ["/data"]
-
 EXPOSE 8000/tcp
 
 RUN apt-get update && \

@@ -165,9 +165,9 @@ class EthereumTestnetBootstrapper:
         """
         etb_config: ETBConfig = ETBConfig(config_path)
 
-        if (init_file := Path("data/init_file")).exists():
+        if (init_file := Path(etb_config.files.testnet_root / "init_file")).exists():
             raise Exception(
-                f"data/init_file exists, please run `make clean` first to clear last run"
+                f"{init_file} exists, please run `make clean` first to clear last run"
             )
 
         init_file.touch()
@@ -236,9 +236,11 @@ class EthereumTestnetBootstrapper:
 
         prometheus_conf_dir = etb_config.files.testnet_root / "prometheus" / "conf"
         prometheus_conf_dir.mkdir(exist_ok=True, parents=True)
-        with open(prometheus_conf_dir / "prometheus.yml", "w") as f:
-            yaml.dump(prometheus_config, f, default_flow_style=False, indent=2)
 
+        prometheus_path = prometheus_conf_dir / "prometheus.yml"
+        logging.info(f"writing {prometheus_path}")
+        with open(prometheus_path, "w") as f:
+            yaml.dump(prometheus_config, f, default_flow_style=False, indent=2)
 
 
     def bootstrap_testnet(self, config_path: Path, global_timeout: int = 60):
