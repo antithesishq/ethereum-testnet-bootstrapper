@@ -153,7 +153,7 @@ consensus-configs:
   lodestar-consensus-client:
     client: "lodestar"
     launcher: "/source/deps/launchers/cl/launch-lodestar.sh"
-    num-validators: 5       # number of validators for every client node
+    num-validators: 10       # number of validators for every client node
     # start ports increment each time we have a node.
     log-level-file: "debug"
     log-level: "debug"
@@ -244,7 +244,7 @@ client-instances:
     consensus-config: "nimbus-consensus-client"
     execution-config: "geth-execution-config"
 
-    validator-offset-start: 35
+    validator-offset-start: 40
 
   prysm-besu:
     # docker-compose
@@ -257,7 +257,7 @@ client-instances:
     consensus-config: "prysm-consensus-client"
     execution-config: "besu-execution-config"
 
-    validator-offset-start: 45
+    validator-offset-start: 50
 
     additional-env:
       validator-password: "testnet-password"
@@ -286,7 +286,7 @@ client-instances:
     consensus-config: "lighthouse-consensus-client"
     execution-config: "besu-execution-config"
 
-    validator-offset-start: 65
+    validator-offset-start: 60
 
   # lodestar-besu:
   #   # docker-compose
@@ -313,7 +313,7 @@ client-instances:
     # consensus-info
     consensus-config: "prysm-consensus-client"
     execution-config: "nethermind-execution-config"
-    validator-offset-start: 80
+    validator-offset-start: 70
     additional-env:
       validator-password: "testnet-password"
 
@@ -328,7 +328,7 @@ client-instances:
     consensus-config: "teku-consensus-client"
     execution-config: "nethermind-execution-config"
 
-    validator-offset-start: 90
+    validator-offset-start: 80
 
   lighthouse-nethermind:
     # docker-compose
@@ -341,7 +341,7 @@ client-instances:
     consensus-config: "lighthouse-consensus-client"
     execution-config: "nethermind-execution-config"
 
-    validator-offset-start: 100
+    validator-offset-start: 90
 
   # lodestar-nethermind:
   #   # docker-compose
@@ -366,7 +366,7 @@ client-instances:
     # consensus-info
     consensus-config: "nimbus-consensus-client"
     execution-config: "nethermind-execution-config"
-    validator-offset-start: 115
+    validator-offset-start: 100
 
 # generic instances that run fuzzers/health checks/etc.
 generic-instances:
