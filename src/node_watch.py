@@ -243,9 +243,9 @@ class PrometheusAction(TestnetMonitorAction):
         with ThreadPoolExecutor(max_workers=8) as exc:
             results = dict(exc.map(lambda item: _one_request(*item), queries.items()))
 
-        logging(
-            json.dumps({"prometheus_metrics": results})
-        )
+            logging(
+                json.dumps({"prometheus_metrics": results})
+            )
 
 
 class NodeWatch:
