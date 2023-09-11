@@ -74,6 +74,26 @@ class EthereumTestnetBootstrapper:
     def __init__(self):
         pass
 
+    def clean(self):
+        """Cleans up the testnet root directory and docker-compose file.
+
+        @return:
+        """
+        files_config = FilesConfig()
+        logging.info(
+            f"Cleaning up the testnet directories: {files_config.testnet_root}"
+        )
+        docker_compose_file = files_config.docker_compose_file
+        if files_config.testnet_root.exists():
+            for root, dirs, files in os.walk(files_config.testnet_root):
+                for file in files:
+                    pathlib.Path(f"{root}/{file}").unlink()
+                for directory in dirs:
+                    shutil.rmtree(f"{root}/{directory}")
+
+        if docker_compose_file.exists():
+            docker_compose_file.unlink()
+
     def init_testnet(self, config_path: Path):
         """Initializes the testnet directory, 3 phases.
 
