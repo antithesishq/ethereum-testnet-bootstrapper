@@ -10,6 +10,7 @@ import logging
 import json
 import pathlib
 import random
+import re
 import time
 from abc import abstractmethod
 from typing import Union, Any, Type
@@ -176,15 +177,33 @@ class EpochPerformanceAction(TestnetMonitorAction):
         max_retries_for_consensus: int,  # not used.
         interval: TestnetMonitorActionInterval,
     ):
-        super().__init__(name="prometheus", interval=interval)
+        super().__init__(name="epoch_performance", interval=interval)
         self.instances_to_monitor = client_instances
         self.ethdo = Ethdo()
+        self.max_retries = max_retries
 
     def perform_action(self):
-        random_instance = self.instances_to_monitor[random.randint(0, len(self.instances_to_monitor) - 1)]
-        logging.debug(f"Getting epoch summary from {random_instance.name} {random_instance.name}")
-        self.ethdo.epoch_summary(f"http://{random_instance.ip_address}:{random_instance.consensus_config.beacon_api_port}", None)
+        summary = None
+        random_instance = None
+        for i in range(0, self.max_retries):
+            random_instance = self.instances_to_monitor[random.randint(0, len(self.instances_to_monitor) - 1)]
+            summary = self.ethdo.epoch_summary(f"http://{random_instance.ip_address}:{random_instance.consensus_config.beacon_api_port}", None)
+            try:
+                epoch_pattern = r'^Epoch\s*(\d+):'
+                data_pattern = r'^([\w\s]+):\s*(\d+/\d+)'
 
+                epoch_match = re.search(epoch_pattern, summary)
+                data_matches = re.findall(data_pattern, summary, re.MULTILINE)
+
+                data = {"Epoch": epoch_match.group(1)}
+                data.update({match[0].strip().replace(' ', '_'): match[1] for match in data_matches})
+
+                json_data = json.dumps(data)
+                logging.info(f"epoch_summary:\n{json_data}")
+                return
+
+            except:
+                logging.error(f"error getting epoch summary {summary} from {random_instance.name} {random_instance.ip_address}")
 
 class PrometheusAction(TestnetMonitorAction):
     def __init__(

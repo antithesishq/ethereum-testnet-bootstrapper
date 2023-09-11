@@ -3,6 +3,7 @@ ethdo interface
 """
 import logging
 import pathlib
+import re
 import subprocess
 from typing import Union
 
@@ -38,22 +39,25 @@ class Ethdo:
             # Get the current epoch
             current_epoch = 0
             try:
-                result = subprocess.run(
-                    ["ethdo", "--connection=" + client, "epoch", "summary"], 
+                cmd = ["ethdo", "--connection=" + client, "epoch", "summary"]
+                logging.debug(f"Running command: {cmd}")
+                out = subprocess.run(
+                    cmd, 
                     capture_output=True, text=True
                 )
                 if len(out.stderr) > 0:
                  return Exception(out.stderr)
-                logging.debug(f"Result: {result.stdout}")
-                current_epoch_line = next(line for line in result.stdout.split('\n') if 'Epoch' in line)
-                logging.debug(f"Current epoch line: {current_epoch_line}")
-                current_epoch = int(current_epoch_line.split(':')[1].strip())
+                current_epoch_line = next(line for line in out.stdout.split('\n') if 'Epoch' in line)
+                match = re.search(r'Epoch (\d+):', current_epoch_line)
+                current_epoch = int(match.group(1))
             except subprocess.CalledProcessError as e:
                 return Exception(e.stderr)
             
             
             # Calculate the last epoch
-            last_epoch = current_epoch - 1
+            last_epoch = 0
+            if current_epoch > 0:
+                last_epoch = current_epoch - 1
             logging.debug(f"Last epoch: {last_epoch}")
             
 
@@ -66,7 +70,7 @@ class Ethdo:
                     capture_output=True, check=True
                 )
                 if len(out.stderr) > 0:
-                 return Exception(out.stderr)
+                    return Exception(out.stderr)
                 return out.stdout.decode("utf-8")
             except subprocess.CalledProcessError as e:
                 return Exception(e.stderr)
