@@ -97,9 +97,9 @@ def make_prometheus_config(etb_config: dict[str, Any]) -> dict[str, Any]:
             "metrics_path": "/metrics",
         }
     )
-
+    # Scrape at the rate of slot production. There is no reason to scrape more often.
     prometheus_config = {
-        "global": {"scrape_interval": "3s", "evaluation_interval": "3s"},
+        "global": {"scrape_interval": f"{etb_config.testnet_config.consensus_layer.preset_base.SECONDS_PER_SLOT.value}s", "evaluation_interval": f"{etb_config.testnet_config.consensus_layer.preset_base.SECONDS_PER_SLOT.value}s"},
         "scrape_configs": jobs
     }
 
