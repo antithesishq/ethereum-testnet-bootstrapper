@@ -5,13 +5,13 @@ import argparse
 import json
 import logging
 import os
-import pathlib
 import random
 import re
 import shutil
 import time
 from pathlib import Path
 from typing import Union, Any
+from collections import defaultdict
 
 import requests
 from ruamel import yaml
@@ -42,8 +42,8 @@ def move_trusted_setup_files(etb_config: ETBConfig):
     @return:
     """
     # we must have the correct trusted setup files in deps.
-    trusted_setup_json = pathlib.Path("/source/deps/misc/trusted_setup.json")
-    trusted_setup_txt = pathlib.Path("/source/deps/misc/trusted_setup.txt")
+    trusted_setup_json = Path("/source/deps/misc/trusted_setup.json")
+    trusted_setup_txt = Path("/source/deps/misc/trusted_setup.txt")
     if not trusted_setup_json.exists():
         raise Exception("The trusted setup json file is missing from /source/deps/misc/")
     if not trusted_setup_txt.exists():
@@ -51,6 +51,60 @@ def move_trusted_setup_files(etb_config: ETBConfig):
     # move the trusted setup files to the correct location.
     shutil.copy(trusted_setup_txt, etb_config.files.trusted_setup_txt_file)
     shutil.copy(trusted_setup_json, etb_config.files.trusted_setup_json_file)
+
+
+def make_prometheus_config(etb_config: dict[str, Any]) -> dict[str, Any]:
+    client_instances = etb_config["client-instances"]
+    consensus_configs = etb_config["consensus-configs"]
+    execution_configs = etb_config["execution-configs"]
+
+    metrics_paths: dict[str, str] = dict()
+    for config in consensus_configs.values():
+        metrics_paths[config["client"]] = config["metrics-path"]
+    for config in execution_configs.values():
+        metrics_paths[config["client"]] = config["metrics-path"]
+
+    targets = defaultdict(list)
+    for k, v in client_instances.items():
+        consensus_client = consensus_configs[v["consensus-config"]]
+        consensus_client_name = consensus_client["client"]
+        beacon_metric_port = consensus_client["beacon-metric-port"]
+        validator_metric_port = consensus_client["validator-metric-port"]
+
+        execution_client = execution_configs[v["execution-config"]]
+        execution_client_name = execution_client["client"]
+        execution_metric_port = execution_client["metric-port"]
+
+        nodes = [f"{k}-{n}" for n in range(v["num-nodes"])]
+        for n in nodes:
+            targets[consensus_client_name].append(f"{n}:{beacon_metric_port}")
+            targets[consensus_client_name].append(f"{n}:{validator_metric_port}")
+            targets[execution_client_name].append(f"{n}:{execution_metric_port}")
+
+    jobs = [
+        {
+            "job_name": k,
+            "static_configs": [{"targets": v}],
+            "metrics_path": metrics_paths[k],
+        }
+        for k, v in targets.items()
+    ]
+
+    jobs.append(
+        {
+            "job_name": "prometheus",
+            "static_configs": [{"targets": ["localhost:9090"]}],
+            "metrics_path": "/metrics",
+        }
+    )
+
+    prometheus_config = {
+        "global": {"scrape_interval": "3s", "evaluation_interval": "3s"},
+        "scrape_configs": jobs
+    }
+
+    return prometheus_config
+
 
 class EthereumTestnetBootstrapper:
     """The Testnet Bootstrapper wraps all the consensus and execution
@@ -87,7 +141,7 @@ class EthereumTestnetBootstrapper:
         if files_config.testnet_root.exists():
             for root, dirs, files in os.walk(files_config.testnet_root):
                 for file in files:
-                    pathlib.Path(f"{root}/{file}").unlink()
+                    Path(f"{root}/{file}").unlink()
                 for directory in dirs:
                     shutil.rmtree(f"{root}/{directory}")
 
@@ -95,7 +149,7 @@ class EthereumTestnetBootstrapper:
             docker_compose_file.unlink()
 
     def init_testnet(self, config_path: Path):
-        """Initializes the testnet directory, 3 phases.
+        """Initializes the testnet directory, 4 phases.
 
         1. populate client-specific static files:
             - client-directories
@@ -103,28 +157,27 @@ class EthereumTestnetBootstrapper:
             - validator keystores
         2. Write the etb-config file into the testnet-dir.
         3. Write the docker-compose file to use for bootstrapping later.
+        4. Write the prometheus.yaml file to the config directory.
         @param config_path: path to the etb-config file.
         @return:
         """
         etb_config: ETBConfig = ETBConfig(config_path)
-        # this file holds all the static files for the nodes.
-        local_testnet_dir: pathlib.Path = etb_config.files.local_testnet_dir
 
-        # check to see if we have a testnet already here.
-        if local_testnet_dir.exists():
+        if (init_file := Path(etb_config.files.testnet_root / "init_file")).exists():
             raise Exception(
-                f"non-empty local-testnet-dir:{local_testnet_dir}, please run `make clean` first."
+                f"{init_file} exists, please run `make clean` first to clear last run"
             )
+
+        init_file.touch()
+
+        # this file holds all the static files for the nodes.
+        local_testnet_dir: Path = etb_config.files.local_testnet_dir
         local_testnet_dir.mkdir(parents=True)  # /data/local_testnet
 
         # Antithesis capture logs via a mounted directory.
-        local_logs_dir: pathlib.Path = etb_config.files.local_logs_dir
+        local_logs_dir: Path = etb_config.files.local_logs_dir
+        local_logs_dir.mkdir(parents=True, exist_ok=True)
 
-        if local_logs_dir.exists():
-            raise Exception(
-                f"non-empty local-logs-dir:{local_logs_dir}, please run `make clean` first."
-            )
-        local_logs_dir.mkdir(parents=True)  # /data/local_testnet
         # create the client directories
         # directory structure:
         # /testnet_root/local_testnet/collection_name/node_<node_num>/{cl
@@ -136,7 +189,7 @@ class EthereumTestnetBootstrapper:
 
             # create the jwt-secret file:
             # /testnet_dir/collection_name/node_<node_num>/jwt-secret
-            jwt_secret_file: pathlib.Path = client_instance.jwt_secret_file
+            jwt_secret_file: Path = client_instance.jwt_secret_file
             logging.debug(f"populating jwt-secret-file: {jwt_secret_file}")
             with open(jwt_secret_file, "w", encoding="utf-8") as jwt_file:
                 jwt_file.write(f"0x{random.randbytes(32).hex()}")
@@ -147,13 +200,14 @@ class EthereumTestnetBootstrapper:
 
         # write the etb-config file into the testnet-dir.
         logging.info("writing etb-config file..")
-        etb_config.write_config(etb_config.files.testnet_root / "etb-config.yaml")
+        etb_config_path = etb_config.files.testnet_root / "etb-config.yaml"
+        etb_config.write_config(etb_config_path)
 
         # if running a deneb experiment copy over the trusted_setup files.
         if etb_config.is_deneb:
             move_trusted_setup_files(etb_config)
 
-        # lastly write the docker-compose file to use for bootstrapping later.
+        # write the docker-compose file to use for bootstrapping later.
         logging.info("writing docker-compose file..")
         with open(
             etb_config.files.docker_compose_file, "w", encoding="utf-8"
@@ -171,6 +225,21 @@ class EthereumTestnetBootstrapper:
             docker_file.write(
                 yaml.dump(etb_config.get_docker_compose_repr(), Dumper=NoAliasDumper)
             )
+
+        # generate prometheus.yaml from the etb-config
+        # (just read the etb-config file back in and parse what's needed, it's
+        # less hassle)
+        with open(etb_config_path) as f:
+            prometheus_config = make_prometheus_config(yaml.safe_load(f))
+
+        prometheus_conf_dir = etb_config.files.testnet_root / "prometheus" / "conf"
+        prometheus_conf_dir.mkdir(exist_ok=True, parents=True)
+
+        prometheus_path = prometheus_conf_dir / "prometheus.yml"
+        logging.info(f"writing {prometheus_path}")
+        with open(prometheus_path, "w") as f:
+            yaml.dump(prometheus_config, f, default_flow_style=False, indent=2)
+
 
     def bootstrap_testnet(self, config_path: Path, global_timeout: int = 60):
         """Bootstraps the testnet. This happens in several phases, each
@@ -249,10 +318,10 @@ class EthereumTestnetBootstrapper:
         block_hash, block_number = self.get_deposit_contract_deployment_block(
             etb_config, global_timeout=global_timeout
         )
-        etb_block_hash_file: pathlib.Path = (
+        etb_block_hash_file: Path = (
             etb_config.files.deposit_contract_deployment_block_hash_file
         )
-        etb_block_number_file: pathlib.Path = (
+        etb_block_number_file: Path = (
             etb_config.files.deposit_contract_deployment_block_number_file
         )
         with open(etb_block_hash_file, "w", encoding="utf-8") as block_hash_file:
@@ -383,8 +452,8 @@ class EthereumTestnetBootstrapper:
             cl_client = client_instance.consensus_config.client
             if cl_client not in ["prysm", "lighthouse", "teku", "nimbus", "lodestar"]:
                 raise Exception(f"client: {cl_client} not supported for keystores")
-            consensus_node_dir: pathlib.Path = client_instance.node_dir
-            keystore_dir: pathlib.Path = consensus_node_dir / pathlib.Path("keystores/")
+            consensus_node_dir: Path = client_instance.node_dir
+            keystore_dir: Path = consensus_node_dir / Path("keystores/")
             vpn = client_instance.consensus_config.num_validators  # validators per node
             offset = client_instance.ndx * vpn
             min_ndx = client_instance.collection_config.validator_offset_start + offset
@@ -401,13 +470,13 @@ class EthereumTestnetBootstrapper:
                     prysm_password=client_instance.validator_password,
                 )
 
-                for item in pathlib.Path(keystore_dir).glob("prysm/*"):
+                for item in Path(keystore_dir).glob("prysm/*"):
                     if item.is_dir():
                         shutil.copytree(item, consensus_node_dir / item.name)
                     else:
                         shutil.copy(item, consensus_node_dir / item.name)
                 # prysm requires a wallet-password.txt to launch.
-                wallet_password_path: pathlib.Path = (
+                wallet_password_path: Path = (
                     consensus_node_dir / "wallet-password.txt"
                 )
                 with open(wallet_password_path, "w") as wallet_password_file:
@@ -421,16 +490,16 @@ class EthereumTestnetBootstrapper:
                     mnemonic=mnemonic,
                 )
                 # these are the defaults shared by most of the clients
-                keystore_src: pathlib.Path = (
+                keystore_src: Path = (
                     keystore_dir / "keys"
                 )  # where the generated keystores are
-                keystore_dst: pathlib.Path = (
+                keystore_dst: Path = (
                     consensus_node_dir / "keys"
                 )  # where the keystores will be moved to
-                secret_src: pathlib.Path = (
+                secret_src: Path = (
                     keystore_dir / "secrets"
                 )  # where the generated secrets are
-                secret_dst: pathlib.Path = (
+                secret_dst: Path = (
                     consensus_node_dir / "secrets"
                 )  # where the secrets will be moved to
                 if cl_client == "teku":
@@ -441,7 +510,7 @@ class EthereumTestnetBootstrapper:
                 elif cl_client == "lodestar":
                     secret_src = keystore_dir / "lodestar-secrets"
                     # go ahead and create the validatordb dir for lodestar
-                    pathlib.Path(consensus_node_dir / "validatordb").mkdir()
+                    Path(consensus_node_dir / "validatordb").mkdir()
                 # copy everything over
                 shutil.copytree(keystore_src, keystore_dst)
                 shutil.copytree(secret_src, secret_dst)
@@ -485,7 +554,7 @@ class EthereumTestnetBootstrapper:
         return block_hash, int(block_number, 16)
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
@@ -515,7 +584,15 @@ if __name__ == "__main__":
         "--log-level",
         dest="log_level",
         default="debug",
-        help="logging level to use.",
+        help="Logging level to use.",
+    )
+
+    parser.add_argument(
+        "--clean",
+        dest="clean",
+        action="store_true",
+        default=False,
+        help="Remove last run",
     )
 
     args = parser.parse_args()
@@ -523,17 +600,26 @@ if __name__ == "__main__":
     create_logger(
         log_level=args.log_level, name="testnet_bootstrapper", log_to_file=True
     )
-    logging.info("testnet_bootstrapper has started.")
 
+
+    logging.info("testnet_bootstrapper has started.")
     etb = EthereumTestnetBootstrapper()
 
+    if args.clean:
+        etb.clean()
+        logging.debug("testnet_bootstrapper has finished cleaning the testnet.")
+
     if args.init_testnet:
-        path_to_config = pathlib.Path(args.config)
+        path_to_config = Path(args.config)
         etb.init_testnet(path_to_config)
         logging.debug("testnet_bootstrapper has finished init-ing the testnet.")
 
     if args.bootstrap_testnet:
         # the config path lies in /source/data/etb-config.yaml
-        path_to_config = pathlib.Path("/source/data/etb-config.yaml")
+        path_to_config = Path("/source/data/etb-config.yaml")
         etb.bootstrap_testnet(path_to_config)
         logging.debug("testnet_bootstrapper has finished bootstrapping the testnet.")
+
+
+if __name__ == "__main__":
+    main()

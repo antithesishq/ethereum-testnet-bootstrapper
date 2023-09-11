@@ -7,12 +7,14 @@
     the last 6 characters of the root.
 """
 import logging
+import json
 import pathlib
 import time
 from abc import abstractmethod
 from typing import Union, Any, Type
 
 import requests
+from concurrent.futures import ThreadPoolExecutor
 
 from etb.common.consensus import ConsensusFork, Epoch
 from etb.common.utils import create_logger
@@ -114,7 +116,7 @@ class HeadsMonitorExecutionAvailabilityCheckAction(TestnetMonitorAction):
             max_retries_for_consensus=max_retries_for_consensus,
         )
         self.instances_to_monitor = client_instances
-    
+
     def perform_action(self):
         # logging.info("heads:")
         logging.info(f"{self.get_heads_monitor_execution_availability_check.run(self.instances_to_monitor)}\n")
@@ -135,7 +137,7 @@ class HeadsMonitorConsensusAvailabilityCheckAction(TestnetMonitorAction):
             max_retries_for_consensus=max_retries_for_consensus,
         )
         self.instances_to_monitor = client_instances
-    
+
     def perform_action(self):
         # logging.info("heads:")
         logging.info(f"{self.get_heads_monitor_consensus_availability_check.run(self.instances_to_monitor)}\n")
@@ -160,6 +162,42 @@ class BlobMonitorAction(TestnetMonitorAction):
         logging.info("blob-info:")
         logging.info(
             f"{self.get_blob_monitor.run(self.instances_to_monitor)}\n"
+        )
+
+
+class PrometheusAction(TestnetMonitorAction):
+    def __init__(self):
+        super().__init__(name="prometheus", interval=TestnetMonitorActionInterval.EVERY_SLOT)
+
+    def perform_action(self) -> None:
+        queries = {
+            "cpu_usage": "rate(process_cpu_seconds_total[2m])",
+            "libp2p_peers": "libp2p_peers",
+            "beacon_head_slot": "beacon_head_slot",
+            "beacon_current_justified_epoch": "beacon_current_justified_epoch",
+        }
+
+        def _one_request(key, query):
+            resp = requests.get(
+                "http://prometheus-0:9090/api/v1/query",
+                params=dict(query=query)
+            )
+            if resp.status_code != 200:
+                logging.info(f"prometheus query {query} responded with status code {resp.status_code}, skipping")
+                return
+
+            result_all = resp.json()
+            if (result_status := result_all["status"]) != "success":
+                logging.info(f"prometheus query {query} has result status {result_status!r}, skipping")
+                return
+
+            return key, result_all["data"]
+
+        with ThreadPoolExecutor(max_workers=8) as exc:
+            results = dict(exc.map(lambda item: _one_request(*item), queries.items()))
+
+        logging.info(
+            json.dumps({"prometheus_metrics": results})
         )
 
 
@@ -229,6 +267,9 @@ class NodeWatch:
                     interval=_interval,
                 )
             )
+
+        testnet_monitor.add_action(PrometheusAction())
+
         return testnet_monitor
 
     def get_testnet_info_str(self) -> str:

@@ -165,7 +165,9 @@ RUN git clone "${NIMBUS_ETH2_REPO}" && \
 
 RUN cd nimbus-eth2 && \
     arch=$(arch | sed s/aarch64/arm64/ | sed s/x86_64/amd64/) && \
-    make -j16 nimbus_beacon_node NIMFLAGS="-d:disableMarchNative --cpu:${arch} --cc:clang --clang.exe:clang-15 --clang.linkerexe:clang-15 --passC:-fno-lto --passL:-fno-lto"
+    make -j16 nimbus_beacon_node NIMFLAGS="-d:disableMarchNative --cpu:${arch} --cc:clang --clang.exe:clang-15 --clang.linkerexe:clang-15 --passC:'-fno-lto -fsanitize=thread' --passL:-'fno-lto -fsanitize=thread'"
+# can use either leak sanitizer or thread sanitizer
+#    make -j16 nimbus_beacon_node NIMFLAGS="-d:disableMarchNative --cpu:${arch} --cc:clang --clang.exe:clang-15 --clang.linkerexe:clang-15 --passC:'-fsanitize=leak' --passL:'-fsanitize=leak' -d:useMalloc"
 
 # TEKU
 FROM etb-client-builder AS teku-builder
@@ -190,19 +192,8 @@ RUN git clone "${PRYSM_REPO}" && \
     git log -n 1 --format=format:"%H" > /prysm.version
 
 RUN cd prysm && \
-    bazelisk build --config=release //cmd/beacon-chain:beacon-chain //cmd/validator:validator
-
-# Antithesis instrumented prysm binary
-RUN mkdir prysm_instrumented && \
-    /opt/antithesis/go_instrumentation/bin/goinstrumentor \
-    -logtostderr -stderrthreshold=INFO \
-    -antithesis /opt/antithesis/go_instrumentation/instrumentation/go/wrappers \
-    prysm prysm_instrumented
-
-RUN cd prysm_instrumented/customer && go build -o /validator ./cmd/validator
-RUN cd prysm_instrumented/customer && go build -o /beacon-chain ./cmd/beacon-chain
-RUN cd prysm_instrumented/customer && go build -race -o /validator_race ./cmd/validator
-RUN cd prysm_instrumented/customer && go build -race -o /beacon-chain_race ./cmd/beacon-chain
+   go build -race -tags minimal -o /validator_race ./cmd/validator && \
+   go build -race -tags minimal -o /beacon-chain_race ./cmd/beacon-chain
 
 
 ############################# Execution  Clients  #############################
@@ -216,22 +207,7 @@ RUN git clone "${GETH_REPO}" && \
     git log -n 1 --format=format:"%H" > /geth.version
 
 RUN cd go-ethereum && \
-    go install ./... && \
-    mv /root/go/bin/geth /tmp/geth_uninstrumented
-
-# Antithesis add instrumentation
-RUN mkdir geth_instrumented
-
-RUN /opt/antithesis/go_instrumentation/bin/goinstrumentor \
-    -logtostderr -stderrthreshold=INFO \
-    -antithesis /opt/antithesis/go_instrumentation/instrumentation/go/wrappers \
-    go-ethereum geth_instrumented
-
-RUN cd geth_instrumented/customer && \
-    go install -race ./... && mv /root/go/bin/geth /tmp/geth_race
-
-RUN cd geth_instrumented/customer && \
-    go install ./...
+    go install -race ./...
 
 
 # Besu
@@ -354,13 +330,10 @@ RUN ln -s /opt/teku/bin/teku /usr/local/bin/teku
 
 # COPY --from=prysm-builder /beacon-chain /usr/local/bin/
 # COPY --from=prysm-builder /validator /usr/local/bin/
-COPY --from=prysm-builder /beacon-chain_race /usr/local/bin/beacon-chain
-COPY --from=prysm-builder /validator_race /usr/local/bin/validator
-COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /usr/local/bin/beacon-chain_uninstrumented
-COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/validator/validator_/validator /usr/local/bin/validator_uninstrumented
+COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /usr/local/bin/beacon-chain
+COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/validator/validator_/validator /usr/local/bin/validator
 COPY --from=prysm-builder /prysm.version /prysm.version
-COPY --from=prysm-builder /git/prysm_instrumented/symbols/* /opt/antithesis/symbols/
-COPY --from=prysm-builder /git/prysm_instrumented/customer /prysm_instrumented_code
+
 #
 COPY --from=lodestar-builder /git/lodestar /git/lodestar
 COPY --from=lodestar-builder /lodestar.version /lodestar.version
@@ -368,12 +341,7 @@ RUN ln -s /git/lodestar/node_modules/.bin/lodestar /usr/local/bin/lodestar
 
 # execution clients
 COPY --from=geth-builder /geth.version /geth.version
-# COPY --from=geth-builder /root/go/bin/geth /usr/local/bin/geth
-COPY --from=geth-builder /tmp/geth_uninstrumented /usr/local/bin/geth_uninstrumented
-COPY --from=geth-builder /tmp/geth_race /usr/local/bin/geth
-COPY --from=geth-builder /git/geth_instrumented/symbols/* /opt/antithesis/symbols/
-COPY --from=geth-builder /git/geth_instrumented/customer /geth_instrumented_code
-
+COPY --from=geth-builder /root/go/bin/geth /usr/local/bin/geth
 
 COPY --from=besu-builder /besu.version /besu.version
 COPY --from=besu-builder /git/besu/build/install/besu/. /opt/besu
