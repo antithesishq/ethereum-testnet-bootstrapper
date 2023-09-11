@@ -53,10 +53,10 @@ def move_trusted_setup_files(etb_config: ETBConfig):
     shutil.copy(trusted_setup_json, etb_config.files.trusted_setup_json_file)
 
 
-def make_prometheus_config(etb_config: dict[str, Any]) -> dict[str, Any]:
-    client_instances = etb_config["client-instances"]
-    consensus_configs = etb_config["consensus-configs"]
-    execution_configs = etb_config["execution-configs"]
+def make_prometheus_config(etb_config: ETBConfig) -> dict[str, Any]:
+    client_instances = etb_config.client_instances
+    consensus_configs = etb_config.consensus_configs
+    execution_configs = etb_config.execution_configs
 
     metrics_paths: dict[str, str] = dict()
     for config in consensus_configs.values():
@@ -65,21 +65,20 @@ def make_prometheus_config(etb_config: dict[str, Any]) -> dict[str, Any]:
         metrics_paths[config["client"]] = config["metrics-path"]
 
     targets = defaultdict(list)
-    for k, v in client_instances.items():
-        consensus_client = consensus_configs[v["consensus-config"]]
-        consensus_client_name = consensus_client["client"]
-        beacon_metric_port = consensus_client["beacon-metric-port"]
-        validator_metric_port = consensus_client["validator-metric-port"]
+    for k, client_nodes in client_instances.items():
+        for instance in client_nodes:
+            consensus_client = instance.consensus_config
+            consensus_client_name = consensus_client.client
+            beacon_metric_port = consensus_client.beacon_metric_port
+            validator_metric_port = consensus_client.validator_metric_port
 
-        execution_client = execution_configs[v["execution-config"]]
-        execution_client_name = execution_client["client"]
-        execution_metric_port = execution_client["metric-port"]
+            execution_client = instance.execution_config
+            execution_client_name = execution_client.client
+            execution_metric_port = execution_client.metric_port
 
-        nodes = [f"{k}-{n}" for n in range(v["num-nodes"])]
-        for n in nodes:
-            targets[consensus_client_name].append(f"{n}:{beacon_metric_port}")
-            targets[consensus_client_name].append(f"{n}:{validator_metric_port}")
-            targets[execution_client_name].append(f"{n}:{execution_metric_port}")
+            targets[consensus_client_name].append(f"{k}-{instance.ndx}:{beacon_metric_port}")
+            targets[consensus_client_name].append(f"{k}-{instance.ndx}:{validator_metric_port}")
+            targets[execution_client_name].append(f"{k}-{instance.ndx}:{execution_metric_port}")
 
     jobs = [
         {
@@ -229,8 +228,7 @@ class EthereumTestnetBootstrapper:
         # generate prometheus.yaml from the etb-config
         # (just read the etb-config file back in and parse what's needed, it's
         # less hassle)
-        with open(etb_config_path) as f:
-            prometheus_config = make_prometheus_config(yaml.safe_load(f))
+        prometheus_config = make_prometheus_config(etb_config)
 
         prometheus_conf_dir = etb_config.files.testnet_root / "prometheus" / "conf"
         prometheus_conf_dir.mkdir(exist_ok=True, parents=True)
