@@ -166,8 +166,8 @@ class BlobMonitorAction(TestnetMonitorAction):
 
 
 class PrometheusAction(TestnetMonitorAction):
-    def __init__(self):
-        super().__init__(name="prometheus", interval=TestnetMonitorActionInterval.EVERY_SLOT)
+    def __init__(self, interval: TestnetMonitorActionInterval):
+        super().__init__(name="prometheus", interval=interval)
 
     def perform_action(self) -> None:
         queries = {
@@ -183,12 +183,12 @@ class PrometheusAction(TestnetMonitorAction):
                 params=dict(query=query)
             )
             if resp.status_code != 200:
-                logging.info(f"prometheus query {query} responded with status code {resp.status_code}, skipping")
+                logging.debug(f"prometheus query {query} responded with status code {resp.status_code}, skipping")
                 return
 
             result_all = resp.json()
             if (result_status := result_all["status"]) != "success":
-                logging.info(f"prometheus query {query} has result status {result_status!r}, skipping")
+                logging.debug(f"prometheus query {query} has result status {result_status!r}, skipping")
                 return
 
             return key, result_all["data"]
@@ -196,7 +196,7 @@ class PrometheusAction(TestnetMonitorAction):
         with ThreadPoolExecutor(max_workers=8) as exc:
             results = dict(exc.map(lambda item: _one_request(*item), queries.items()))
 
-        logging.info(
+        logging(
             json.dumps({"prometheus_metrics": results})
         )
 
@@ -240,7 +240,8 @@ class NodeWatch:
             "peers": PeersMonitorAction,
             "blob": BlobMonitorAction,
             "execution_availability": HeadsMonitorExecutionAvailabilityCheckAction,
-            "consensus_availability": HeadsMonitorConsensusAvailabilityCheckAction
+            "consensus_availability": HeadsMonitorConsensusAvailabilityCheckAction,
+            "prometheus": PrometheusAction,
         }
 
         intervals = {
@@ -256,6 +257,7 @@ class NodeWatch:
                 raise Exception(f"Unknown metric: {metric}")
             if interval not in intervals:
                 raise Exception(f"Unknown interval: {interval}")
+            
 
             _interval = intervals[interval]
             testnet_monitor.add_action(
@@ -267,8 +269,6 @@ class NodeWatch:
                     interval=_interval,
                 )
             )
-
-        testnet_monitor.add_action(PrometheusAction())
 
         return testnet_monitor
 
