@@ -9,6 +9,7 @@
 import logging
 import json
 import pathlib
+import random
 import time
 from abc import abstractmethod
 from typing import Union, Any, Type
@@ -32,6 +33,8 @@ from etb.monitoring.testnet_monitor import (
     TestnetMonitorAction,
     TestnetMonitorActionInterval,
 )
+
+from etb.interfaces.external.ethdo import Ethdo
 
 
 class HeadsMonitorAction(TestnetMonitorAction):
@@ -164,6 +167,17 @@ class BlobMonitorAction(TestnetMonitorAction):
             f"{self.get_blob_monitor.run(self.instances_to_monitor)}\n"
         )
 
+class EpochPerformanceAction(TestnetMonitorAction):
+    def __init__(self, max_retries, timeout, client_instances: list[ClientInstance], interval: TestnetMonitorActionInterval):
+        super().__init__(name="prometheus", interval=interval)
+        self.instances_to_monitor = client_instances
+        self.ethdo = Ethdo()
+
+    def perform_action(self):
+        random_instance = self.instances_to_monitor[random.randint(0, len(self.instances_to_monitor) - 1)]
+        logging.debug(f"Getting epoch summary from {random_instance.name} {random_instance.name}")
+        self.ethdo.epoch_summary(f"http://{random_instance.ip_address}:{random_instance.consensus_config.beacon_api_port}", None)
+
 
 class PrometheusAction(TestnetMonitorAction):
     def __init__(self, interval: TestnetMonitorActionInterval):
@@ -242,6 +256,7 @@ class NodeWatch:
             "execution_availability": HeadsMonitorExecutionAvailabilityCheckAction,
             "consensus_availability": HeadsMonitorConsensusAvailabilityCheckAction,
             "prometheus": PrometheusAction,
+            "epoch_performance": EpochPerformanceAction,
         }
 
         intervals = {
