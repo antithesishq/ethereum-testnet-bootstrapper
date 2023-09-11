@@ -19,6 +19,8 @@ RUN git clone https://github.com/ethereum/go-ethereum.git \
 
 FROM debian:bullseye-slim
 
+VOLUME ["/data"]
+
 WORKDIR /
 
 EXPOSE 8000/tcp

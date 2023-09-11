@@ -289,7 +289,7 @@ client-instances:
     image: "etb-all-clients-race"
     tag: "dencun-devnet-8"
     start-ip-address: "10.0.20.80"
-    num-nodes: 3
+    num-nodes: 1
 
     # consensus-info
     consensus-config: "lighthouse-consensus-client"

@@ -168,7 +168,14 @@ class BlobMonitorAction(TestnetMonitorAction):
         )
 
 class EpochPerformanceAction(TestnetMonitorAction):
-    def __init__(self, max_retries, timeout, client_instances: list[ClientInstance], interval: TestnetMonitorActionInterval):
+    def __init__(
+        self,
+        client_instances: list[ClientInstance],
+        max_retries: int,
+        timeout: int,
+        max_retries_for_consensus: int,  # not used.
+        interval: TestnetMonitorActionInterval,
+    ):
         super().__init__(name="prometheus", interval=interval)
         self.instances_to_monitor = client_instances
         self.ethdo = Ethdo()
@@ -180,7 +187,14 @@ class EpochPerformanceAction(TestnetMonitorAction):
 
 
 class PrometheusAction(TestnetMonitorAction):
-    def __init__(self, interval: TestnetMonitorActionInterval):
+    def __init__(
+        self,
+        client_instances: list[ClientInstance],
+        max_retries: int,
+        timeout: int,
+        max_retries_for_consensus: int,  # not used.
+        interval: TestnetMonitorActionInterval,
+    ):
         super().__init__(name="prometheus", interval=interval)
 
     def perform_action(self) -> None:

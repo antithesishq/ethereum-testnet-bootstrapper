@@ -42,7 +42,11 @@ class Ethdo:
                     ["ethdo", "--connection=" + client, "epoch", "summary"], 
                     capture_output=True, text=True
                 )
+                if len(out.stderr) > 0:
+                 return Exception(out.stderr)
+                logging.debug(f"Result: {result.stdout}")
                 current_epoch_line = next(line for line in result.stdout.split('\n') if 'Epoch' in line)
+                logging.debug(f"Current epoch line: {current_epoch_line}")
                 current_epoch = int(current_epoch_line.split(':')[1].strip())
             except subprocess.CalledProcessError as e:
                 return Exception(e.stderr)
