@@ -282,7 +282,7 @@ class PrometheusAction(TestnetMonitorAction):
                 return (human_query, cleaned_data)
 
             except requests.exceptions.Timeout:
-                logging.info(f"prometheus query {query} timed out after {timeout_s}, skipping")
+                logging.debug(f"prometheus query {query} timed out after {timeout_s}, skipping")
                 return
 
             except Exception as e:
