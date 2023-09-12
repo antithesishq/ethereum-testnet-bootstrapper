@@ -365,7 +365,7 @@ class NodeWatch:
                 raise Exception(f"Unknown metric: {metric}")
             if interval not in intervals:
                 raise Exception(f"Unknown interval: {interval}")
-            
+
 
             _interval = intervals[interval]
             testnet_monitor.add_action(
