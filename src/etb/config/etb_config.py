@@ -408,6 +408,7 @@ class ExecutionInstanceConfig(Config):
         self.engine_http_port: int = config["engine-http-port"]
         self.engine_ws_port: int = config["engine-ws-port"]
         self.metric_port: int = config["metric-port"]
+        self.metrics_path: str = config["metrics-path"]
 
     def get_env_vars(self) -> dict[str, str]:
         """Returns the environment variables used by the execution client that
@@ -453,6 +454,7 @@ class ConsensusInstanceConfig(Config):
         self.validator_rpc_port: int = config["validator-rpc-port"]
         self.validator_metric_port: int = config["validator-metric-port"]
         self.num_validators: int = config["num-validators"]
+        self.metrics_path: int = config["metrics-path"]
 
     def get_env_vars(self) -> dict[str, str]:
         """Returns the environment variables used by the consensus client that

@@ -12,7 +12,7 @@ ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
 ARG LODESTAR_BRANCH="b34bbe355a9bd673044b63b9054b5436c9d4bade"
 #
 ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
-ARG NIMBUS_ETH2_BRANCH="887bdd41ea870c55cd694c8380fcae0d3d47a260"
+ARG NIMBUS_ETH2_BRANCH="8993d57"
 
 
 ARG TEKU_REPO="https://github.com/ConsenSys/teku.git"

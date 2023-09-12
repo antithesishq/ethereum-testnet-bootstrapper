@@ -285,7 +285,7 @@ client-instances:
     image: "etb-all-clients"
     tag: "dencun-devnet-8"
     start-ip-address: "10.0.20.80"
-    num-nodes: 3
+    num-nodes: 1
 
     # consensus-info
     consensus-config: "lighthouse-consensus-client"
@@ -405,7 +405,7 @@ generic-instances:
     tag: "dencun-devnet-8"
     start-ip-address: "10.0.20.203"
     num-nodes: 1
-    entrypoint: "python3 /source/src/node_watch.py --log-level info --monitor execution_availability:epoch --monitor consensus_availability:epoch --monitor heads:slot --monitor checkpoints:epoch --monitor peers:epoch --max-retries 3"
+    entrypoint: "python3 /source/src/node_watch.py --log-level info --monitor execution_availability:epoch --monitor consensus_availability:epoch --monitor prometheus:epoch --monitor epoch_performance:epoch --monitor heads:slot --monitor checkpoints:epoch --max-retries 3"
 
   tx-spammer:
     image: "etb-all-clients"
@@ -444,4 +444,4 @@ generic-instances:
       "--web.console.templates=/opt/bitnami/prometheus/conf/consoles",
     ]
     additional-volumes: ["./data/prometheus/conf:/opt/bitnami/prometheus/conf"]
-    ports: "9090:9090"
+    ports: ["9090:9090"]

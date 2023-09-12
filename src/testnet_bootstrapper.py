@@ -35,28 +35,6 @@ from etb.interfaces.external.eth2_val_tools import Eth2ValTools
 from etb.common.consensus import Epoch
 
 
-def rm_rf(*paths):
-    """Recursively delete paths, regardless of if they exist or are files/directories."""
-    for path in paths:
-        path = Path(path)
-        if path.exists():
-            if path.is_dir() and not path.is_symlink():
-                shutil.rmtree(path)
-
-            else:
-                path.unlink()
-
-
-def rm_contents(dir_path):
-    """Delete everything in the directory, but not the directory itself."""
-    with os.scandir(dir_path) as entries:
-        for entry in entries:
-            if entry.is_dir() and not entry.is_symlink():
-                shutil.rmtree(entry.path)
-            else:
-                os.remove(entry.path)
-
-
 def move_trusted_setup_files(etb_config: ETBConfig):
     """Move the trusted setup files to the correct location.
 
@@ -75,10 +53,10 @@ def move_trusted_setup_files(etb_config: ETBConfig):
     shutil.copy(trusted_setup_json, etb_config.files.trusted_setup_json_file)
 
 
-def make_prometheus_config(etb_config: dict[str, Any]) -> dict[str, Any]:
-    client_instances = etb_config["client-instances"]
-    consensus_configs = etb_config["consensus-configs"]
-    execution_configs = etb_config["execution-configs"]
+def make_prometheus_config(etb_config: ETBConfig) -> dict[str, Any]:
+    client_instances = etb_config.client_instances
+    consensus_configs = etb_config.consensus_configs
+    execution_configs = etb_config.execution_configs
 
     metrics_paths: dict[str, str] = dict()
     for config in consensus_configs.values():
@@ -87,21 +65,20 @@ def make_prometheus_config(etb_config: dict[str, Any]) -> dict[str, Any]:
         metrics_paths[config["client"]] = config["metrics-path"]
 
     targets = defaultdict(list)
-    for k, v in client_instances.items():
-        consensus_client = consensus_configs[v["consensus-config"]]
-        consensus_client_name = consensus_client["client"]
-        beacon_metric_port = consensus_client["beacon-metric-port"]
-        validator_metric_port = consensus_client["validator-metric-port"]
+    for k, client_nodes in client_instances.items():
+        for instance in client_nodes:
+            consensus_client = instance.consensus_config
+            consensus_client_name = consensus_client.client
+            beacon_metric_port = consensus_client.beacon_metric_port
+            validator_metric_port = consensus_client.validator_metric_port
 
-        execution_client = execution_configs[v["execution-config"]]
-        execution_client_name = execution_client["client"]
-        execution_metric_port = execution_client["metric-port"]
+            execution_client = instance.execution_config
+            execution_client_name = execution_client.client
+            execution_metric_port = execution_client.metric_port
 
-        nodes = [f"{k}-{n}" for n in range(v["num-nodes"])]
-        for n in nodes:
-            targets[consensus_client_name].append(f"{n}:{beacon_metric_port}")
-            targets[consensus_client_name].append(f"{n}:{validator_metric_port}")
-            targets[execution_client_name].append(f"{n}:{execution_metric_port}")
+            targets[consensus_client_name].append(f"{k}-{instance.ndx}:{beacon_metric_port}")
+            targets[consensus_client_name].append(f"{k}-{instance.ndx}:{validator_metric_port}")
+            targets[execution_client_name].append(f"{k}-{instance.ndx}:{execution_metric_port}")
 
     jobs = [
         {
@@ -119,9 +96,9 @@ def make_prometheus_config(etb_config: dict[str, Any]) -> dict[str, Any]:
             "metrics_path": "/metrics",
         }
     )
-
+    # Scrape at the rate of slot production. There is no reason to scrape more often.
     prometheus_config = {
-        "global": {"scrape_interval": "3s", "evaluation_interval": "3s"},
+        "global": {"scrape_interval": f"{etb_config.testnet_config.consensus_layer.preset_base.SECONDS_PER_SLOT.value}s", "evaluation_interval": f"{etb_config.testnet_config.consensus_layer.preset_base.SECONDS_PER_SLOT.value}s"},
         "scrape_configs": jobs
     }
 
@@ -149,6 +126,26 @@ class EthereumTestnetBootstrapper:
 
     def __init__(self):
         pass
+
+    def clean(self):
+        """Cleans up the testnet root directory and docker-compose file.
+
+        @return:
+        """
+        files_config = FilesConfig()
+        logging.info(
+            f"Cleaning up the testnet directories: {files_config.testnet_root}"
+        )
+        docker_compose_file = files_config.docker_compose_file
+        if files_config.testnet_root.exists():
+            for root, dirs, files in os.walk(files_config.testnet_root):
+                for file in files:
+                    Path(f"{root}/{file}").unlink()
+                for directory in dirs:
+                    shutil.rmtree(f"{root}/{directory}")
+
+        if docker_compose_file.exists():
+            docker_compose_file.unlink()
 
     def init_testnet(self, config_path: Path):
         """Initializes the testnet directory, 4 phases.
@@ -231,8 +228,7 @@ class EthereumTestnetBootstrapper:
         # generate prometheus.yaml from the etb-config
         # (just read the etb-config file back in and parse what's needed, it's
         # less hassle)
-        with open(etb_config_path) as f:
-            prometheus_config = make_prometheus_config(yaml.safe_load(f))
+        prometheus_config = make_prometheus_config(etb_config)
 
         prometheus_conf_dir = etb_config.files.testnet_root / "prometheus" / "conf"
         prometheus_conf_dir.mkdir(exist_ok=True, parents=True)
@@ -603,20 +599,13 @@ def main():
         log_level=args.log_level, name="testnet_bootstrapper", log_to_file=True
     )
 
-    if args.clean:
-        logging.info("cleaning up last run")
-
-        rm_rf(
-            "/source/docker-compose.yaml",
-            "/source/tranches",
-        )
-        rm_contents("/data")
-        Path("/data/logs").mkdir(parents=True)
-
-        return
 
     logging.info("testnet_bootstrapper has started.")
     etb = EthereumTestnetBootstrapper()
+
+    if args.clean:
+        etb.clean()
+        logging.debug("testnet_bootstrapper has finished cleaning the testnet.")
 
     if args.init_testnet:
         path_to_config = Path(args.config)

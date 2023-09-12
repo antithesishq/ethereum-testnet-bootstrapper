@@ -260,7 +260,7 @@ client-instances:
   #   image: "etb-all-clients-inst"
   #   tag: "dencun-devnet-8"
   #   start-ip-address: "10.0.20.30"
-  #   num-nodes: 3
+  #   num-nodes: 1
 
   #   # consensus-info
   #   consensus-config: "lighthouse-consensus-client"
@@ -357,4 +357,4 @@ generic-instances:
       "--web.console.templates=/opt/bitnami/prometheus/conf/consoles",
     ]
     additional-volumes: ["./data/prometheus/conf:/opt/bitnami/prometheus/conf"]
-    ports: "9090:9090"
+    ports: ["9090:9090"]

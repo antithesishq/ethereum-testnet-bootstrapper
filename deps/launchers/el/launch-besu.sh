@@ -31,12 +31,19 @@ while [ ! -f "$EXECUTION_CHECKPOINT_FILE" ]; do
   sleep 1
 done
 
+while [ ! -f "$JWT_SECRET_FILE" ]; do
+  echo "Waiting for jwt secret file: $JWT_SECRET_FILE"
+  sleep 1
+done
+
+# Fix because passing the path via --engine-jwt-secret does not seem to work properly.
+export BESU_ENGINE_JWT_SECRET=$JWT_SECRET_FILE
+
 besu_args=(
-  # --bootnodes="$EXECUTION_BOOTNODE"
   --data-path="$EXECUTION_NODE_DIR"
   --data-storage-format="BONSAI"
   --engine-host-allowlist="*"
-  --engine-jwt-enabled
+  --engine-jwt-enabled=true
   --engine-jwt-secret="$JWT_SECRET_FILE"
   --engine-rpc-enabled=true
   --engine-rpc-port="$EXECUTION_ENGINE_HTTP_PORT"

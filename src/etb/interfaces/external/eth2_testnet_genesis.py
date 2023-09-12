@@ -67,6 +67,8 @@ class Eth2TestnetGenesis:
             str(config_in),
             "--state-output",
             str(genesis_ssz_out),
+            "--tranches-dir",
+            "/data"
         ]
 
         # add preset args.
