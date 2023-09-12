@@ -188,7 +188,7 @@ consensus-configs:
     metrics-path: "/metrics"
 
 client-instances:
-   # Geth clients
+     # Geth clients
   prysm-geth:
     # docker-compose
     image: "etb-all-clients-race"
@@ -216,31 +216,31 @@ client-instances:
 
     validator-offset-start: 10
 
-  lighthouse-geth:
-    # docker-compose
-    image: "etb-all-clients-race"
-    tag: "dencun-devnet-8"
-    start-ip-address: "10.0.20.30"
-    num-nodes: 1
+  # lighthouse-geth:
+  #   # docker-compose
+  #   image: "etb-all-clients-race"
+  #   tag: "dencun-devnet-8"
+  #   start-ip-address: "10.0.20.30"
+  #   num-nodes: 1
 
-    # consensus-info
-    consensus-config: "lighthouse-consensus-client"
-    execution-config: "geth-execution-config"
+  #   # consensus-info
+  #   consensus-config: "lighthouse-consensus-client"
+  #   execution-config: "geth-execution-config"
 
-    validator-offset-start: 20
+  #   validator-offset-start: 20
 
-  lodestar-geth:
-    # docker-compose
-    image: "etb-all-clients-race"
-    tag: "dencun-devnet-8"
-    start-ip-address: "10.0.20.40"
-    num-nodes: 1
+  # lodestar-geth:
+  #   # docker-compose
+  #   image: "etb-all-clients-race"
+  #   tag: "dencun-devnet-8"
+  #   start-ip-address: "10.0.20.40"
+  #   num-nodes: 1
 
-    # consensus-info
-    consensus-config: "lodestar-consensus-client"
-    execution-config: "geth-execution-config"
+  #   # consensus-info
+  #   consensus-config: "lodestar-consensus-client"
+  #   execution-config: "geth-execution-config"
 
-    validator-offset-start: 30
+  #   validator-offset-start: 30
 
   nimbus-geth:
     # docker-compose
@@ -253,23 +253,23 @@ client-instances:
     consensus-config: "nimbus-consensus-client"
     execution-config: "geth-execution-config"
 
-    validator-offset-start: 35
+    validator-offset-start: 20
 
-  prysm-besu:
-    # docker-compose
-    image: "etb-all-clients-race"
-    tag: "dencun-devnet-8"
-    start-ip-address: "10.0.20.60"
-    num-nodes: 1
+  # prysm-besu:
+  #   # docker-compose
+  #   image: "etb-all-clients-race"
+  #   tag: "dencun-devnet-8"
+  #   start-ip-address: "10.0.20.60"
+  #   num-nodes: 1
 
-    # consensus-info
-    consensus-config: "prysm-consensus-client"
-    execution-config: "besu-execution-config"
+  #   # consensus-info
+  #   consensus-config: "prysm-consensus-client"
+  #   execution-config: "besu-execution-config"
 
-    validator-offset-start: 45
+  #   validator-offset-start: 50
 
-    additional-env:
-      validator-password: "testnet-password"
+  #   additional-env:
+  #     validator-password: "testnet-password"
 
   # teku-besu:
   #   # docker-compose
@@ -295,7 +295,7 @@ client-instances:
     consensus-config: "lighthouse-consensus-client"
     execution-config: "besu-execution-config"
 
-    validator-offset-start: 55
+    validator-offset-start: 30
 
   # lodestar-besu:
   #   # docker-compose
@@ -322,22 +322,22 @@ client-instances:
     # consensus-info
     consensus-config: "prysm-consensus-client"
     execution-config: "nethermind-execution-config"
-    validator-offset-start: 65
+    validator-offset-start: 40
     additional-env:
       validator-password: "testnet-password"
 
-  teku-nethermind:
-    # docker-compose
-    image: "etb-all-clients-race"
-    tag: "dencun-devnet-8"
-    start-ip-address: "10.0.20.120"
-    num-nodes: 1
+  # teku-nethermind:
+  #   # docker-compose
+  #   image: "etb-all-clients-race"
+  #   tag: "dencun-devnet-8"
+  #   start-ip-address: "10.0.20.120"
+  #   num-nodes: 1
 
-    # consensus-info
-    consensus-config: "teku-consensus-client"
-    execution-config: "nethermind-execution-config"
+  #   # consensus-info
+  #   consensus-config: "teku-consensus-client"
+  #   execution-config: "nethermind-execution-config"
 
-    validator-offset-start: 75
+  #   validator-offset-start: 80
 
   lighthouse-nethermind:
     # docker-compose
@@ -350,7 +350,7 @@ client-instances:
     consensus-config: "lighthouse-consensus-client"
     execution-config: "nethermind-execution-config"
 
-    validator-offset-start: 85
+    validator-offset-start: 50
 
   # lodestar-nethermind:
   #   # docker-compose
@@ -363,7 +363,7 @@ client-instances:
   #   consensus-config: "lodestar-consensus-client"
   #   execution-config: "nethermind-execution-config"
 
-  #   validator-offset-start: 110
+  #   validator-offset-start: 95
 
   nimbus-nethermind:
     # docker-compose
@@ -375,7 +375,7 @@ client-instances:
     # consensus-info
     consensus-config: "nimbus-consensus-client"
     execution-config: "nethermind-execution-config"
-    validator-offset-start: 95
+    validator-offset-start: 60
 
 # generic instances that run fuzzers/health checks/etc.
 generic-instances:
