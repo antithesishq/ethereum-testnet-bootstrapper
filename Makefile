@@ -38,7 +38,7 @@ clean:
 	docker run -v$(REPO_DIR)/:/source/ -v$(REPO_DIR)/data/:/data ethereum-testnet-bootstrapper --clean --log-level $(log_level)
 
 # init the testnet dirs and all files needed to later bootstrap the testnet.
-init-testnet:
+init-testnet: clean
 	docker run -v $(REPO_DIR)/:/source/ -v $(REPO_DIR)/data/:/data ethereum-testnet-bootstrapper --config $(config) --init-testnet --log-level $(log_level)
 
 # get an interactive shell into the testnet-bootstrapper
