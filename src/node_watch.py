@@ -187,8 +187,8 @@ class EpochPerformanceAction(TestnetMonitorAction):
         random_instance = None
         for i in range(0, self.max_retries):
             random_instance = self.instances_to_monitor[random.randint(0, len(self.instances_to_monitor) - 1)]
-            summary = self.ethdo.epoch_summary(f"http://{random_instance.ip_address}:{random_instance.consensus_config.beacon_api_port}", None)
             try:
+                summary = self.ethdo.epoch_summary(f"http://{random_instance.ip_address}:{random_instance.consensus_config.beacon_api_port}", None)
                 epoch_pattern = r'^Epoch\s*(\d+):'
                 data_pattern = r'^([\w\s]+):\s*(\d+/\d+)'
 
@@ -202,8 +202,8 @@ class EpochPerformanceAction(TestnetMonitorAction):
                 logging.info(f"epoch_summary:\n{json_data}")
                 return
 
-            except:
-                logging.error(f"error getting epoch summary {summary} from {random_instance.name} {random_instance.ip_address}")
+            except Exception as e:
+                logging.error(f"error getting epoch summary from: {random_instance.name} {random_instance.ip_address}\nerr: {e}")
 
 class PrometheusAction(TestnetMonitorAction):
     def __init__(

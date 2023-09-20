@@ -86,7 +86,7 @@ class Ethdo:
                 "--epoch",
                 str(epoch)
             ]
-            logging.debug(f"Running command; {cmd}")
+            logging.debug(f"Running command: {cmd}")
 
             try:
                 out = subprocess.run(cmd, capture_output=True, check=True)

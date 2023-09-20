@@ -406,6 +406,7 @@ generic-instances:
     start-ip-address: "10.0.20.203"
     num-nodes: 1
     entrypoint: "python3 /source/src/node_watch.py --log-level info --monitor execution_availability:epoch --monitor consensus_availability:epoch --monitor prometheus:epoch --monitor epoch_performance:epoch --monitor heads:slot --monitor checkpoints:epoch --max-retries 3"
+    restart: unless-stopped
 
   tx-spammer:
     image: "etb-all-clients"
@@ -414,6 +415,7 @@ generic-instances:
     num-nodes: 1
     # runs on the first prysm geth node.
     entrypoint: "python3 /source/src/tx_spammer.py --run-indefinitely --log-level debug --target-ip 10.0.20.10 --target-port 8645 --epoch-delay 2 --fuzz-mode blobs --no-al --tx-count 15 --tx-fuzz-path /usr/local/bin/livefuzzer"
+    restart: unless-stopped
 
   tx-spammer-nethermind:
     image: "etb-all-clients"
@@ -422,6 +424,7 @@ generic-instances:
     num-nodes: 1
     # runs on the first prysm geth node.
     entrypoint: "python3 /source/src/tx_spammer.py --run-indefinitely --log-level debug --target-ip 10.0.20.130 --target-port 8645 --epoch-delay 2 --fuzz-mode spam --no-al --tx-count 15 --tx-fuzz-path /usr/local/bin/livefuzzer"
+    restart: unless-stopped
 
   antithesis-checker:
     image: "ethereum-testnet-bootstrapper"
@@ -444,4 +447,4 @@ generic-instances:
       "--web.console.templates=/opt/bitnami/prometheus/conf/consoles",
     ]
     additional-volumes: ["./data/prometheus/conf:/opt/bitnami/prometheus/conf"]
-    ports: ["9090:9090"]
+    ports: ["9081:9090"]

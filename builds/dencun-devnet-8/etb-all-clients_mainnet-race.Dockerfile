@@ -6,7 +6,7 @@ ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
 ARG LIGHTHOUSE_BRANCH="ce824e00a3566e7e94e77600d97aab5be3b9a99c" 
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
-ARG PRYSM_BRANCH="c728e0923fc451c151c7ffe373fad3b57fab018e"
+ARG PRYSM_BRANCH="6b915ba"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
 ARG LODESTAR_BRANCH="b34bbe355a9bd673044b63b9054b5436c9d4bade"
@@ -32,7 +32,7 @@ ARG ETHEREUMJS_BRANCH="c47d2c7351f04f35744de0f2082c37d5f2d2afd0"
 
 # All of the fuzzers we will be using
 ARG TX_FUZZ_REPO="https://github.com/qu0b/tx-fuzz.git"
-ARG TX_FUZZ_BRANCH="4e2e7713aa44eb0200cd56d5079edc9cecfa3798"
+ARG TX_FUZZ_BRANCH="22631838d3ffd9f57f4b09e02a4e71686a921414"
 
 # Metrics gathering
 ARG BEACON_METRICS_GAZER_REPO="https://github.com/qu0b/beacon-metrics-gazer.git"
@@ -328,10 +328,10 @@ COPY --from=teku-builder  /git/teku/build/install/teku/. /opt/teku
 COPY --from=teku-builder /teku.version /teku.version
 RUN ln -s /opt/teku/bin/teku /usr/local/bin/teku
 
-# COPY --from=prysm-builder /beacon-chain /usr/local/bin/
-# COPY --from=prysm-builder /validator /usr/local/bin/
-COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /usr/local/bin/beacon-chain
-COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/validator/validator_/validator /usr/local/bin/validator
+COPY --from=prysm-builder /beacon-chain_race /usr/local/bin/
+COPY --from=prysm-builder /validator_race /usr/local/bin/
+# COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /usr/local/bin/beacon-chain
+# COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/validator/validator_/validator /usr/local/bin/validator
 COPY --from=prysm-builder /prysm.version /prysm.version
 
 #

@@ -6,7 +6,7 @@ ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
 ARG LIGHTHOUSE_BRANCH="ce824e00a3566e7e94e77600d97aab5be3b9a99c" 
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
-ARG PRYSM_BRANCH="c728e0923fc451c151c7ffe373fad3b57fab018e"
+ARG PRYSM_BRANCH="6b915ba"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
 ARG LODESTAR_BRANCH="b34bbe355a9bd673044b63b9054b5436c9d4bade"
@@ -34,7 +34,7 @@ ARG NETHERMIND_BRANCH="84d41bd174fd6c4f8350c5c6f0d4b746acee1c51"
 
 # All of the fuzzers we will be using
 ARG TX_FUZZ_REPO="https://github.com/qu0b/tx-fuzz.git"
-ARG TX_FUZZ_BRANCH="4e2e7713aa44eb0200cd56d5079edc9cecfa3798"
+ARG TX_FUZZ_BRANCH="22631838d3ffd9f57f4b09e02a4e71686a921414"
 
 # Metrics gathering
 ARG BEACON_METRICS_GAZER_REPO="https://github.com/qu0b/beacon-metrics-gazer.git"

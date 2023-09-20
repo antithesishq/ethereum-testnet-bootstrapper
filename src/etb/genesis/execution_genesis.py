@@ -317,6 +317,7 @@ deposit_contract_json = {
 
 
 # eip4788
+# updated to: 0xbEac00dDB15f3B6d645C48263dC93862413A222D
 eip4788_contract_address = "0x000000000000000000000000000000000000000b"
 
 eip4788_contract_json = {

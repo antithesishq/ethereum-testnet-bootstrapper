@@ -517,6 +517,9 @@ class InstanceCollectionConfig(Config):
 
         if "ports" in config:
             self.ports: list[str] = config["ports"]
+        
+        if "restart" in config:
+            self.restart: str = config["restart"]
 
         # special case for additional env
         if "additional-env" in config:
@@ -675,6 +678,9 @@ class Instance:
 
         if hasattr(self.collection_config, "ports"):
             entry["ports"] = self.collection_config.ports
+
+        if hasattr(self.collection_config, "restart"):
+            entry["restart"] = self.collection_config.restart
 
         # don't modify the global env vars
         env_vars = global_env_vars.copy()
