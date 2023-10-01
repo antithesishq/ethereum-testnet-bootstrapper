@@ -61,6 +61,8 @@ class MinimalPreset(PresetEnum, Enum):
     MAX_BLOB_COMMITMENTS_PER_BLOCK: 16
     # `uint64(6)`
     MAX_BLOBS_PER_BLOCK: 6
+    # [New in Deneb:EIP7514] 2**3 (= 8)
+    MAX_PER_EPOCH_ACTIVATION_CHURN_LIMIT: 8
     
 
 
@@ -107,6 +109,8 @@ class MainnetPreset(PresetEnum, Enum):
     MAX_BLOB_COMMITMENTS_PER_BLOCK: 4096
     # `uint64(6)`
     MAX_BLOBS_PER_BLOCK: 6
+    # [New in Deneb:EIP7514] 2**3 (= 8)
+    MAX_PER_EPOCH_ACTIVATION_CHURN_LIMIT: 8
 
 
 class MainnetCustomPreset(PresetEnum, Enum):
@@ -152,6 +156,8 @@ class MainnetCustomPreset(PresetEnum, Enum):
     MAX_BLOB_COMMITMENTS_PER_BLOCK: 4096
     # `uint64(6)`
     MAX_BLOBS_PER_BLOCK: 6
+    # [New in Deneb:EIP7514] 2**3 (= 8)
+    MAX_PER_EPOCH_ACTIVATION_CHURN_LIMIT: 8
 
 # Consensus values related to the merge, note that we only support post merge
 # testnets, however some clients still use these values for genesis.

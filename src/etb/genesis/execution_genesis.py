@@ -4,7 +4,8 @@ This module contains the logic for creating the execution layer genesis files.
 from typing import Any
 
 from web3.auto import w3
-
+import requests
+import time
 from ..common.consensus import Epoch, ConsensusFork
 from ..config.etb_config import ETBConfig, ForkVersionName
 
@@ -81,13 +82,20 @@ class ExecutionGenesisWriter:
                 mnemonic, account_path=acc, passphrase=password
             )
             allocs[acct.address] = {"balance": str(premines[acc]) + "0" * 18}
+        
+        # add the eip4788 fund account
+        allocs["0x0B799C86a49DEeb90402691F1041aa3AF2d3C875"] = {"balance": "100" + ("0" * 18) }
+        
+        # send to eth_sendRawTransaction
+        # f8838085e8d4a510008303d0908080b86a60618060095f395ff33373fffffffffffffffffffffffffffffffffffffffe14604d57602036146024575f5ffd5b5f35801560495762001fff810690815414603c575f5ffd5b62001fff01545f5260205ff35b5f5ffd5b62001fff42064281555f359062001fff0155001b820539851b9b6eb1f0
 
         # deposit contract
         allocs[
             self.etb_config.testnet_config.deposit_contract_address
         ] = deposit_contract_json
 
-        allocs[eip4788_contract_address] = eip4788_contract_json
+        # 4788 is deployed and no longer in genesis
+        # allocs[eip4788_contract_address] = eip4788_contract_json
 
         return allocs
 
@@ -273,6 +281,33 @@ class ExecutionGenesisWriter:
             ] = f"0x{self.cancun_fork_time:08x}"
 
         return self.genesis
+    
+    def deploy_4788(self) -> bool:
+        for instance in self.etb_config.get_client_instances():
+            instance.execution_config.http_port
+            instance.ip_address
+        
+            url = f"http://{instance.ip_address}:{instance.execution_config.http_port}"
+            headers = {
+                "Content-Type": "application/json"
+            }
+            data = {
+                "jsonrpc": "2.0",
+                "method": "eth_sendRawTransaction",
+                "params": ["0xf8838085e8d4a510008303d0908080b86a60618060095f395ff33373fffffffffffffffffffffffffffffffffffffffe14604d57602036146024575f5ffd5b5f35801560495762001fff810690815414603c575f5ffd5b62001fff01545f5260205ff35b5f5ffd5b62001fff42064281555f359062001fff0155001b820539851b9b6eb1f0"],
+                "id": 1
+            }
+
+            response = requests.post(url, headers=headers, json=data)
+            if response.status_code == 200:
+                print("deployed 4788 contract")
+                print(response.json())
+                break 
+            else:
+                print("failed to deploy 4788 contract")
+                print(response.json())
+
+        return True
 
 
 # pylint: disable=line-too-long
@@ -317,11 +352,10 @@ deposit_contract_json = {
 
 
 # eip4788
-# updated to: 0xbEac00dDB15f3B6d645C48263dC93862413A222D
-eip4788_contract_address = "0x000000000000000000000000000000000000000b"
+# eip4788_contract_address = "0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02"
 
-eip4788_contract_json = {
-        "nonce": 1,
-        "balance": 0,
-        "code": "0x3373fffffffffffffffffffffffffffffffffffffffe14604457602036146024575f5ffd5b620180005f350680545f35146037575f5ffd5b6201800001545f5260205ff35b42620180004206555f3562018000420662018000015500"
-}
+# eip4788_contract_json = {
+#         "nonce": 0,
+#         "balance": "1",
+#         "code": "0x3373fffffffffffffffffffffffffffffffffffffffe14604457602036146024575f5ffd5b620180005f350680545f35146037575f5ffd5b6201800001545f5260205ff35b42620180004206555f3562018000420662018000015500"
+# }

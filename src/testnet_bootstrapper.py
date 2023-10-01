@@ -360,6 +360,19 @@ class EthereumTestnetBootstrapper:
         ) as consensus_checkpoint:
             consensus_checkpoint.write("")
 
+        # wait for 5 slots to allow the CL clients to come up.
+        time.sleep(etb_config.testnet_config.consensus_layer.preset_base.SECONDS_PER_SLOT.value * 5)
+
+        # deploy 4788 contract
+        deploy_4788_attempts = 5
+        while deploy_4788_attempts > 0:
+            if egw.deploy_4788():
+                break
+            deploy_4788_attempts -= 1
+            time.sleep(etb_config.testnet_config.consensus_layer.preset_base.SECONDS_PER_SLOT.value)
+        
+
+
         logging.info("testnet bootstrapped.")
 
     def create_keystores(self, config_path: Path):

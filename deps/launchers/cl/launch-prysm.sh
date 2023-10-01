@@ -89,6 +89,20 @@ validator_args=(
   --verbosity="$CONSENSUS_LOG_LEVEL"
 )
 
+# mock_builder_args=(
+#   --cl localhost:4000
+#   --el localhost:8551
+#   --beacon-spec "$CONSENSUS_CONFIG_FILE"
+#   --jwt-secret "$(cat $JWT_SECRET_FILE)"
+#   --el-rpc-port 8645
+#   --extra-data "builder-payload"
+#   --log-level "info"
+#   --get-payload-delay-ms 200
+#   --bid-multiplier 0
+#   --port 18550
+#   --client-init-timeout 60
+# )
+
 beacon-chain "${beacon_args[@]}" > /data/logs/"service_$CONTAINER_NAME--prysm-bn" 2>&1 &
 
 sleep 10
@@ -96,3 +110,7 @@ sleep 10
 echo "Launching Prysm validator client in ${CONTAINER_NAME}"
 
 validator "${validator_args[@]}" > /data/logs/"service_$CONTAINER_NAME--prysm-vc" 2>&1
+
+# sleep 10
+
+# mock-builder "${mock_builder_args[@]}" > /data/logs/"service_$CONTAINER_NAME--prysm-builder" 2>&1 

@@ -192,8 +192,11 @@ RUN git clone "${PRYSM_REPO}" && \
     git log -n 1 --format=format:"%H" > /prysm.version
 
 RUN cd prysm && \
-   go build -race -tags minimal -o /validator_race ./cmd/validator && \
-   go build -race -tags minimal -o /beacon-chain_race ./cmd/beacon-chain
+    bazelisk build --config=release //cmd/beacon-chain:beacon-chain //cmd/validator:validator
+
+RUN cd prysm && \
+   go build -race -o /validator_race ./cmd/validator && \
+   go build -race -o /beacon-chain_race ./cmd/beacon-chain
 
 
 ############################# Execution  Clients  #############################
@@ -328,10 +331,10 @@ COPY --from=teku-builder  /git/teku/build/install/teku/. /opt/teku
 COPY --from=teku-builder /teku.version /teku.version
 RUN ln -s /opt/teku/bin/teku /usr/local/bin/teku
 
-COPY --from=prysm-builder /beacon-chain_race /usr/local/bin/
-COPY --from=prysm-builder /validator_race /usr/local/bin/
-# COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /usr/local/bin/beacon-chain
-# COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/validator/validator_/validator /usr/local/bin/validator
+COPY --from=prysm-builder /beacon-chain_race /usr/local/bin/beacon-chain
+COPY --from=prysm-builder /validator_race /usr/local/bin/validator
+COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /usr/local/bin/beacon-chain_uninstrumented
+COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/validator/validator_/validator /usr/local/bin/validator_uninstrumented
 COPY --from=prysm-builder /prysm.version /prysm.version
 
 #

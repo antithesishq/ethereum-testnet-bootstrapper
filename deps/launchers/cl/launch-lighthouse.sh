@@ -54,7 +54,6 @@ beacon_args=(
     --execution-endpoints="http://127.0.0.1:$EXECUTION_ENGINE_HTTP_PORT"
     --http-address=0.0.0.0
     --http-allow-origin="*"
-    --http-allow-sync-stalled
     --http-port="$CONSENSUS_BEACON_API_PORT"
     --jwt-secrets="$JWT_SECRET_FILE"
     --logfile-debug-level="$CONSENSUS_LOG_LEVEL_FILE"
@@ -68,6 +67,8 @@ beacon_args=(
     --subscribe-all-subnets
     --target-peers="$NUM_CLIENT_NODES"
 )
+# to test p2p we can disable scoring
+#    --disable-peer-scoring
 validator_args=(
     --beacon-nodes="http://127.0.0.1:$CONSENSUS_BEACON_API_PORT"
     --debug-level="$CONSENSUS_LOG_LEVEL"
@@ -75,7 +76,7 @@ validator_args=(
     --http
     --http-port="$CONSENSUS_VALIDATOR_RPC_PORT"
     --init-slashing-protection
-    --logfile-debug-level="$CONSENSUS_LOG_LEVEL_FILE"
+    --logfile-debug-level="debug"
     --logfile="/data/log_files/service_$CONTAINER_NAME--lighthouse-vc.log"
     --metrics
     --metrics-address=0.0.0.0

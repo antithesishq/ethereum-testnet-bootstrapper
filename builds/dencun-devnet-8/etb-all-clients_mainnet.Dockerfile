@@ -2,7 +2,7 @@
 #           Dockerfile to build all clients mainnet preset.           #
 ###############################################################################
 # Consensus Clients
-ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
+ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse.git"
 ARG LIGHTHOUSE_BRANCH="ce824e00a3566e7e94e77600d97aab5be3b9a99c" 
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
@@ -111,9 +111,11 @@ RUN npm install -g @bazel/bazelisk # prysm build system
 # setup cargo/rustc (lighthouse)
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable -y
 ENV PATH="$PATH:/root/.cargo/bin"
+
 # Build rocksdb
 RUN git clone --depth=1 https://github.com/facebook/rocksdb.git
 RUN cd rocksdb && make -j4 install
+
 
 RUN apt install -y protobuf-compiler libprotobuf-dev # protobuf compiler for lighthouse
 RUN ln -s /usr/local/bin/python3 /usr/local/bin/python
@@ -285,6 +287,8 @@ RUN cd beacon-metrics-gazer && \
     cargo update -p proc-macro2 && \
     cargo build --release
 
+RUN cargo install jwt-cli
+
 ########################### etb-all-clients runner  ###########################
 FROM debian:bullseye-slim
 
@@ -314,7 +318,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     openjdk-17-jre \
     python3-dev \
     python3-pip \
-    jq
+    jq \
+    xxd
 
 RUN pip3 install ruamel.yaml web3
 
@@ -334,6 +339,7 @@ COPY --from=misc-builder /git/tx-fuzz/cmd/livefuzzer/livefuzzer /usr/local/bin/l
 # beacon-metrics-gazer
 COPY --from=misc-builder /git/beacon-metrics-gazer/target/release/beacon-metrics-gazer /usr/local/bin/beacon-metrics-gazer
 
+COPY --from=misc-builder /root/.cargo/bin/jwt /usr/local/bin/jwt
 # consensus clients
 COPY --from=nimbus-eth2-builder /git/nimbus-eth2/build/nimbus_beacon_node /usr/local/bin/nimbus_beacon_node
 COPY --from=nimbus-eth2-builder /nimbus.version /nimbus.version

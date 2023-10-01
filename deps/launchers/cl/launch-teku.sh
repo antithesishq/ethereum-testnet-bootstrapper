@@ -45,7 +45,6 @@ done
 teku_args=(
   --data-path="$CONSENSUS_NODE_DIR"
   --data-storage-mode=PRUNE
-  --data-storage-non-canonical-blocks-enabled=true
   --ee-endpoint="http://127.0.0.1:$EXECUTION_ENGINE_HTTP_PORT"
   --ee-jwt-secret-file="$JWT_SECRET_FILE"
   --initial-state="$CONSENSUS_GENESIS_FILE"
@@ -77,6 +76,10 @@ teku_args=(
   --validators-graffiti="$CONSENSUS_GRAFFITI"
   --validators-keystore-locking-enabled=false
   --validators-proposer-default-fee-recipient=0xA18Fd83a55A9BEdB96d66C24b768259eED183be3
+  --data-storage-non-canonical-blocks-enabled=true
+  --Xlog-include-p2p-warnings-enabled
+  --Xpeer-rate-limit=100000
+  --Xpeer-request-limit=1000
 )
 if [ "$IS_DENEB" == 1 ]; then
   teku_args+=(
