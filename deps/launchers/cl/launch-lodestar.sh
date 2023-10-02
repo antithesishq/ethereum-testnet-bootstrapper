@@ -60,7 +60,6 @@ beacon_args=(
   --rest.port="$CONSENSUS_BEACON_API_PORT"
   --rest.namespace="*"
   --logLevel="$CONSENSUS_LOG_LEVEL"
-  --logFile="$CONSENSUS_NODE_DIR/beacon.log"
   --enr.ip="$IP_ADDRESS"
   --enr.tcp="$CONSENSUS_P2P_PORT"
   --enr.udp="$CONSENSUS_P2P_PORT"
@@ -68,6 +67,8 @@ beacon_args=(
   --eth1.depositContractDeployBlock=0
   --suggestedFeeRecipient=0x00000000219ab540356cbb839cbe05303d7705fa
 )
+
+#--logFile="$CONSENSUS_NODE_DIR/beacon.log"
 
 validator_args=(
   --metrics=true
@@ -79,11 +80,13 @@ validator_args=(
   --secretsDir="$CONSENSUS_NODE_DIR/secrets/"
   --beaconNodes="http://127.0.0.1:$CONSENSUS_BEACON_API_PORT"
   --validatorsDbDir="$CONSENSUS_NODE_DIR/validatorsdb"
-  --logFile="$CONSENSUS_NODE_DIR/validatordb/validator.log"
   --logLevel="$CONSENSUS_LOG_LEVEL"
   --graffiti="$CONSENSUS_GRAFFITI"
   --force
 )
+
+#  --logFile="$CONSENSUS_NODE_DIR/validatordb/validator.log"
+
 
 lodestar beacon "${beacon_args[@]}" > /data/logs/"service_$CONTAINER_NAME--lodestar-bn" 2>&1 &
 

@@ -45,7 +45,6 @@ beacon_args=(
   --dev
   --monitoring-host="$IP_ADDRESS"
   --monitoring-port="$CONSENSUS_BEACON_METRIC_PORT"
-  --log-file="$CONSENSUS_NODE_DIR/beacon.log"
   --accept-terms-of-use=true
   --datadir="$CONSENSUS_NODE_DIR"
   --chain-config-file="$CONSENSUS_CONFIG_FILE" 
@@ -72,10 +71,11 @@ beacon_args=(
   --min-sync-peers 1
 )
 
+#  --log-file="$CONSENSUS_NODE_DIR/beacon.log"
+
 validator_args=(
   --monitoring-host="$IP_ADDRESS"
   --monitoring-port="$CONSENSUS_VALIDATOR_METRIC_PORT"
-  --log-file="$CONSENSUS_NODE_DIR/validator.log"
   --accept-terms-of-use=true
   --datadir="$CONSENSUS_NODE_DIR"
   --chain-config-file="$CONSENSUS_CONFIG_FILE"
@@ -88,6 +88,9 @@ validator_args=(
   --suggested-fee-recipient=0x00000000219ab540356cbb839cbe05303d7705fa
   --verbosity="$CONSENSUS_LOG_LEVEL"
 )
+
+#  --log-file="$CONSENSUS_NODE_DIR/validator.log"
+
 
 # mock_builder_args=(
 #   --cl localhost:4000

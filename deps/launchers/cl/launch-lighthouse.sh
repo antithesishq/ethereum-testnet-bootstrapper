@@ -56,8 +56,6 @@ beacon_args=(
     --http-allow-origin="*"
     --http-port="$CONSENSUS_BEACON_API_PORT"
     --jwt-secrets="$JWT_SECRET_FILE"
-    --logfile-debug-level="$CONSENSUS_LOG_LEVEL_FILE"
-    --logfile="/data/log_files/service_$CONTAINER_NAME--lighthouse-bn.log"
     --listen-address=0.0.0.0
     --metrics
     --metrics-address=0.0.0.0
@@ -69,6 +67,9 @@ beacon_args=(
 )
 # to test p2p we can disable scoring
 #    --disable-peer-scoring
+# In case we want to log differently to a file
+#    --logfile-debug-level="$CONSENSUS_LOG_LEVEL_FILE"
+#    --logfile="/data/log_files/service_$CONTAINER_NAME--lighthouse-bn.log"
 validator_args=(
     --beacon-nodes="http://127.0.0.1:$CONSENSUS_BEACON_API_PORT"
     --debug-level="$CONSENSUS_LOG_LEVEL"

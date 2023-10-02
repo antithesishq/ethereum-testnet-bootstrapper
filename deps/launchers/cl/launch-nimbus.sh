@@ -49,7 +49,6 @@ beacon_args=(
   --metrics-port="$CONSENSUS_BEACON_METRIC_PORT"
   --non-interactive
   --data-dir="$CONSENSUS_NODE_DIR"
-  --log-file="$CONSENSUS_NODE_DIR/beacon-log.txt"
   --log-level="$CONSENSUS_LOG_LEVEL"
   --network="$CONSENSUS_NODE_DIR/../"
   --secrets-dir="$CONSENSUS_NODE_DIR/secrets"
@@ -74,5 +73,7 @@ beacon_args=(
   --dump:on
   --doppelganger-detection=off
 )
+
+#  --log-file="$CONSENSUS_NODE_DIR/beacon-log.txt"
 
 nimbus_beacon_node "${beacon_args[@]}" > /data/logs/"service_$CONTAINER_NAME--nimbus" 2>&1
