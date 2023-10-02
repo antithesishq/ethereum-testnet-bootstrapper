@@ -255,7 +255,7 @@ class EthereumTestnetBootstrapper:
         # 1 prep the shared etb-config.yaml file with the bootstrap time.
         logging.info("bootstrapping testnet..")
         etb_config: ETBConfig = ETBConfig(path=config_path)
-        etb_config.set_genesis_time(int(time.time()))
+        etb_config.set_genesis_time(int(time.time() + 30))
         etb_config.write_config(etb_config.files.testnet_root / "etb-config.yaml")
         with open(
             etb_config.files.etb_config_checkpoint_file, "w", encoding="utf-8"
@@ -369,7 +369,7 @@ class EthereumTestnetBootstrapper:
             if egw.deploy_4788():
                 break
             deploy_4788_attempts -= 1
-            time.sleep(etb_config.testnet_config.consensus_layer.preset_base.SECONDS_PER_SLOT.value)
+            time.sleep(etb_config.testnet_config.consensus_layer.preset_base.SECONDS_PER_SLOT.value * 2)
         
 
 

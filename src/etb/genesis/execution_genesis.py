@@ -283,6 +283,10 @@ class ExecutionGenesisWriter:
         return self.genesis
     
     def deploy_4788(self) -> bool:
+        if time.time() < self.etb_config.genesis_time:
+            print("waiting for genesis time")
+            time.sleep(time.time() - self.etb_config.genesis_time)
+            
         for instance in self.etb_config.get_client_instances():
             instance.execution_config.http_port
             instance.ip_address
