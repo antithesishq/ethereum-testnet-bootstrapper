@@ -316,6 +316,15 @@ class HeadsMonitor(ConsensusMetricMonitor):
                 .decode("utf-8")
                 .replace("\x00", "")
             )
+            if "extra_data" in block["body"]["execution_payload"] and len(block["body"]["execution_payload"]["extra_data"]) > 0:
+                extra_data = block["body"]["execution_payload"]["extra_data"]
+                extra_data = str(extra_data).replace("0x", "")
+                try:
+                    decoded_extra_data = bytes.fromhex(extra_data).decode("utf-8", errors='ignore').replace("\x00", "")
+                    if len(extra_data) > 0:
+                        graffiti = f"{graffiti} {decoded_extra_data}"
+                except Exception as e:
+                    logging.debug(f"Exception parsing response: {e} extra data: {extra_data}")
             return slot, state_root, graffiti
         except Exception as e:
             logging.debug(f"Exception parsing response: {e}")
