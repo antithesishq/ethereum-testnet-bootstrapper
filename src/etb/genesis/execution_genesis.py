@@ -283,11 +283,17 @@ class ExecutionGenesisWriter:
         return self.genesis
     
     def deploy_4788(self) -> bool:
-        if time.time() < self.etb_config.genesis_time:
-            print("waiting for genesis time")
-            time.sleep(time.time() - self.etb_config.genesis_time)
+        now = int(time.time())
+        if now < self.etb_config.genesis_time:
+            time_to_genesis = now - self.etb_config.genesis_time
+            print(f"waiting for genesis time {time_to_genesis} seconds")
+            time.sleep(time_to_genesis)
             
         for instance in self.etb_config.get_client_instances():
+            # only deploy contract to geth
+            if instance.execution_config.client != "geth":
+                continue
+
             instance.execution_config.http_port
             instance.ip_address
         
@@ -304,14 +310,56 @@ class ExecutionGenesisWriter:
 
             response = requests.post(url, headers=headers, json=data)
             if response.status_code == 200:
-                print("deployed 4788 contract")
-                print(response.json())
-                break 
+                data = response.json()
+                tx_hash = data["result"]
+                if self.wait_for_tx(url, tx_hash):
+                    return self.check_4788(url)
             else:
                 print("failed to deploy 4788 contract")
                 print(response.json())
 
-        return True
+        return False
+    def wait_for_tx(self, url, tx_hash) -> bool:
+            failed_attempts = 0
+            while True: 
+                data = {
+                    "jsonrpc": "2.0",
+                    "method": "eth_getTransactionReceipt",
+                    "params": [tx_hash],
+                    "id": 1
+                }
+                headers = {
+                    "Content-Type": "application/json"
+                }
+                response = requests.post(url, headers=headers, json=data)
+                if response.status_code == 200:
+                    print(response.json())
+                    if response.json()["result"] is not None:
+                        return True
+                else:
+                    if failed_attempts > 3:
+                        raise ConnectionError(f"HTTP error {response.status_code}: {response.text}")
+                    failed_attempts += 1
+                time.sleep(6)
+    def check_4788(self, url) -> bool:
+            headers = {
+                "Content-Type": "application/json"
+            }
+
+            data = {
+                "jsonrpc": "2.0",
+                "method": "eth_getCode",
+                "params": ["0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02", "latest"],
+                "id": 1
+            }
+
+            response = requests.post(url, headers=headers, json=data)
+            if response.status_code == 200:
+                data = response.json()
+                code = data['result']
+                if code == '0x3373fffffffffffffffffffffffffffffffffffffffe14604d57602036146024575f5ffd5b5f35801560495762001fff810690815414603c575f5ffd5b62001fff01545f5260205ff35b5f5ffd5b62001fff42064281555f359062001fff015500':
+                    return True
+            return False
 
 
 # pylint: disable=line-too-long
