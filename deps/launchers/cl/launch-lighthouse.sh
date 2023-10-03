@@ -64,6 +64,7 @@ beacon_args=(
     --staking
     --subscribe-all-subnets
     --target-peers="$NUM_CLIENT_NODES"
+    --trusted-setup-file-override="$TRUSTED_SETUP_JSON_FILE"
     
 )
     # --builder http://127.0.0.1:18550

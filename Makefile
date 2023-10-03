@@ -48,3 +48,10 @@ shell:
 # after an init this runs the bootstrapper and start up the testnet.
 run-bootstrapper:
 	docker run -it -v $(REPO_DIR)/:/source/ -v $(REPO_DIR)/data/:/data ethereum-testnet-bootstrapper --config $(config) --bootstrap-testnet --log-level $(log_level)
+
+# run testnet
+run-testnet:
+	docker-compose up --force-recreate --remove-orphans
+# remove last run.
+clean:
+	docker run -t -v $(REPO_DIR)/:/source/ -v $(REPO_DIR)/data/:/data ethereum-testnet-bootstrapper --clean --log-level $(log_level)

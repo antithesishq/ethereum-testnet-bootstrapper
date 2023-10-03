@@ -1,4 +1,4 @@
-# Running a mainnet spec local testnet with the current network conditions.
+# Running a minimal testnet with the current network conditions.
 # parameters for building the docker network
 docker:
     network-name: "ethereum-testnet"
@@ -32,10 +32,16 @@ testnet-config:
 
   # used for generating the consensus config placed in /data/eth2-config.yaml
   consensus-layer:
-    preset-base: 'mainnet'
-    config-name: "local-mainnet-testnet"
+    preset-base: 'minimal'
+    config-name: "local-minimal-testnet"
 
-    min-genesis-active-validator-count: 60 # custom pre-seeded into genesis state.
+    min-genesis-active-validator-count: 80 # custom pre-seeded into genesis state.
+
+    # optional config param overrides
+    min-validator-withdrawability-delay: 2 # increase the withdrawal speed
+    shard-committee-period: 2 # increase the withdrawal speed
+    # MIN_VALIDATOR_WITHDRAWABILITY_DELAY + CHURN_LIMIT_QUOTIENT // 2
+    min-epochs-for-block-requests: 17
 
     # the validator mnemonic to use for all validators
     validator-mnemonic: "ocean style run case glory clip into nature guess jacket document firm fiscal hello kite disagree symptom tide net coral envelope wink render festival"
@@ -78,13 +84,12 @@ execution-configs:
     engine-http-port: 8551   # http/ws same port.
     engine-ws-port: 8551   # include for nimbus
     metric-port: 9001
-    metrics-path: "/debug/metrics/prometheus"
     json-snooper-proxy-port: 8765
 
   reth-execution-config:
     client: "reth"
     launcher: "/source/deps/launchers/el/launch-reth.sh"
-    log-level: "vvvv" # detail
+    log-level: "vvvv" # log level for reth is v*log-level
     http-apis: "eth,net,admin,web3"
     ws-apis: "eth,net,admin,web3"
     http-port: 8645
@@ -107,12 +112,11 @@ execution-configs:
     engine-http-port: 8551
     engine-ws-port: 8551
     metric-port: 9001
-    metrics-path: "/metrics"
     json-snooper-proxy-port: 8765
 
   nethermind-execution-config:
     client: "nethermind"
-    log-level: "info"
+    log-level: "DEBUG"
     launcher: "/source/deps/launchers/el/launch-nethermind.sh"
     http-apis: "net,eth,consensus,subscribe,web3,admin"
     ws-apis: "net,eth,consensus,subscribe,web3,admin"
@@ -122,7 +126,6 @@ execution-configs:
     engine-ws-port: 8552
     p2p-port: 666
     metric-port: 9001
-    metrics-path: "/metrics"
     json-snooper-proxy-port: 8765
 
 # configuration options used for consensus clients
@@ -139,9 +142,8 @@ consensus-configs:
     beacon-api-port: 5000   # start port used for the beacon rest API
     beacon-rpc-port: 5500
     validator-rpc-port: 6500
-    beacon-metric-port: 5054 # start port used for beacon node metrics.
-    validator-metric-port: 5064 # start port used for validator client metrics.
-    metrics-path: "/metrics"
+    beacon-metric-port: 8000 # start port used for beacon node metrics.
+    validator-metric-port: 9000 # start port used for validator client metrics.
 
   nimbus-consensus-client:
     client: "nimbus"
@@ -154,9 +156,8 @@ consensus-configs:
     beacon-api-port: 5000   # start port used for the beacon rest API
     beacon-rpc-port: 5500
     validator-rpc-port: 6500
-    beacon-metric-port: 5054 # start port used for beacon node metrics.
-    validator-metric-port: 5064 # start port used for validator client metrics.
-    metrics-path: "/metrics"
+    beacon-metric-port: 8000 # start port used for beacon node metrics.
+    validator-metric-port: 9000 # start port used for validator client metrics.
 
   teku-consensus-client:
     client: "teku"
@@ -169,9 +170,8 @@ consensus-configs:
     beacon-api-port: 5000   # start port used for the beacon rest API
     beacon-rpc-port: 5500
     validator-rpc-port: 6500
-    beacon-metric-port: 5054 # start port used for beacon node metrics.
-    validator-metric-port: 5064 # start port used for validator client metrics.
-    metrics-path: "/metrics"
+    beacon-metric-port: 8000 # start port used for beacon node metrics.
+    validator-metric-port: 9000 # start port used for validator client metrics.
 
   lighthouse-consensus-client:
     client: "lighthouse"
@@ -183,9 +183,8 @@ consensus-configs:
     beacon-api-port: 5000   # start port used for the beacon rest API
     beacon-rpc-port: 5500
     validator-rpc-port: 6500
-    beacon-metric-port: 5054 # start port used for beacon node metrics.
-    validator-metric-port: 5064 # start port used for validator client metrics.
-    metrics-path: "/metrics"
+    beacon-metric-port: 8000 # start port used for beacon node metrics.
+    validator-metric-port: 9000 # start port used for validator client metrics.
 
   lodestar-consensus-client:
     client: "lodestar"
@@ -197,9 +196,8 @@ consensus-configs:
     beacon-api-port: 5000   # start port used for the beacon rest API
     beacon-rpc-port: 5500
     validator-rpc-port: 6500
-    beacon-metric-port: 5054 # start port used for beacon node metrics.
-    validator-metric-port: 5064 # start port used for validator client metrics.
-    metrics-path: "/metrics"
+    beacon-metric-port: 8000 # start port used for beacon node metrics.
+    validator-metric-port: 9000 # start port used for validator client metrics.
 
 client-instances:
 ###############################################################################
@@ -210,7 +208,7 @@ client-instances:
   prysm-geth:
     # docker-compose
     image: "etb-all-clients"
-    tag: "mainnet-current"
+    tag: "minimal-current"
     start-ip-address: "10.0.20.10"
     num-nodes: 1
 
@@ -226,7 +224,7 @@ client-instances:
   teku-geth:
     # docker-compose
     image: "etb-all-clients"
-    tag: "mainnet-current"
+    tag: "minimal-current"
     start-ip-address: "10.0.20.20"
     num-nodes: 1
 
@@ -239,7 +237,7 @@ client-instances:
   lighthouse-geth:
     # docker-compose
     image: "etb-all-clients"
-    tag: "mainnet-current"
+    tag: "minimal-current"
     start-ip-address: "10.0.20.30"
     num-nodes: 1
 
@@ -252,7 +250,7 @@ client-instances:
   lodestar-geth:
     # docker-compose
     image: "etb-all-clients"
-    tag: "mainnet-current"
+    tag: "minimal-current"
     start-ip-address: "10.0.20.40"
     num-nodes: 1
 
@@ -262,10 +260,13 @@ client-instances:
 
     validator-offset-start: 12
 
+    additional-env:
+      lodestar-preset: "minimal"
+
   nimbus-geth:
     # docker-compose
     image: "etb-all-clients"
-    tag: "mainnet-current"
+    tag: "minimal-current"
     start-ip-address: "10.0.20.50"
     num-nodes: 1
 
@@ -280,7 +281,7 @@ client-instances:
   prysm-besu:
     # docker-compose
     image: "etb-all-clients"
-    tag: "mainnet-current"
+    tag: "minimal-current"
     start-ip-address: "10.0.20.60"
     num-nodes: 1
 
@@ -296,7 +297,7 @@ client-instances:
   teku-besu:
     # docker-compose
     image: "etb-all-clients"
-    tag: "mainnet-current"
+    tag: "minimal-current"
     start-ip-address: "10.0.20.70"
     num-nodes: 1
 
@@ -309,20 +310,20 @@ client-instances:
   lighthouse-besu:
     # docker-compose
     image: "etb-all-clients"
-    tag: "mainnet-current"
+    tag: "minimal-current"
     start-ip-address: "10.0.20.80"
     num-nodes: 1
 
     # consensus-info
     consensus-config: "lighthouse-consensus-client"
-    execution-config: "besu-execution-config"
+    execution-config: "geth-execution-config"
 
     validator-offset-start: 28
 
   lodestar-besu:
     # docker-compose
     image: "etb-all-clients"
-    tag: "mainnet-current"
+    tag: "minimal-current"
     start-ip-address: "10.0.20.90"
     num-nodes: 1
 
@@ -332,10 +333,13 @@ client-instances:
 
     validator-offset-start: 32
 
+    additional-env:
+      lodestar-preset: "minimal"
+
   nimbus-besu:
     # docker-compose
     image: "etb-all-clients"
-    tag: "mainnet-current"
+    tag: "minimal-current"
     start-ip-address: "10.0.20.100"
     num-nodes: 1
 
@@ -350,7 +354,7 @@ client-instances:
   prysm-nethermind:
     # docker-compose
     image: "etb-all-clients"
-    tag: "mainnet-current"
+    tag: "minimal-current"
     start-ip-address: "10.0.20.110"
     num-nodes: 1
 
@@ -366,7 +370,7 @@ client-instances:
   teku-nethermind:
     # docker-compose
     image: "etb-all-clients"
-    tag: "mainnet-current"
+    tag: "minimal-current"
     start-ip-address: "10.0.20.120"
     num-nodes: 1
 
@@ -379,7 +383,7 @@ client-instances:
   lighthouse-nethermind:
     # docker-compose
     image: "etb-all-clients"
-    tag: "mainnet-current"
+    tag: "minimal-current"
     start-ip-address: "10.0.20.130"
     num-nodes: 1
 
@@ -392,7 +396,7 @@ client-instances:
   lodestar-nethermind:
     # docker-compose
     image: "etb-all-clients"
-    tag: "mainnet-current"
+    tag: "minimal-current"
     start-ip-address: "10.0.20.140"
     num-nodes: 1
 
@@ -402,10 +406,13 @@ client-instances:
 
     validator-offset-start: 52
 
+    additional-env:
+      lodestar-preset: "minimal"
+
   nimbus-nethermind:
     # docker-compose
     image: "etb-all-clients"
-    tag: "mainnet-current"
+    tag: "minimal-current"
     start-ip-address: "10.0.20.150"
     num-nodes: 1
 
@@ -415,6 +422,80 @@ client-instances:
 
     validator-offset-start: 56
 
+  # Geth clients
+  prysm-reth:
+    # docker-compose
+    image: "etb-all-clients"
+    tag: "minimal-current"
+    start-ip-address: "10.0.20.160"
+    num-nodes: 1
+
+    # consensus-info
+    consensus-config: "prysm-consensus-client"
+    execution-config: "reth-execution-config"
+
+    validator-offset-start: 60
+
+    additional-env:
+      validator-password: "testnet-password"
+
+  teku-reth:
+    # docker-compose
+    image: "etb-all-clients"
+    tag: "minimal-current"
+    start-ip-address: "10.0.20.170"
+    num-nodes: 1
+
+    # consensus-info
+    consensus-config: "teku-consensus-client"
+    execution-config: "reth-execution-config"
+
+    validator-offset-start: 64
+
+  lighthouse-reth:
+    # docker-compose
+    image: "etb-all-clients"
+    tag: "minimal-current"
+    start-ip-address: "10.0.20.180"
+    num-nodes: 1
+
+    # consensus-info
+    consensus-config: "lighthouse-consensus-client"
+    execution-config: "reth-execution-config"
+
+    validator-offset-start: 68
+
+  lodestar-reth:
+    # docker-compose
+    image: "etb-all-clients"
+    tag: "minimal-current"
+    start-ip-address: "10.0.20.190"
+    num-nodes: 1
+
+    # consensus-info
+    consensus-config: "lodestar-consensus-client"
+    execution-config: "reth-execution-config"
+
+    validator-offset-start: 72
+
+    additional-env:
+      lodestar-preset: "minimal"
+
+  nimbus-reth:
+    # docker-compose
+    image: "etb-all-clients"
+    tag: "minimal-current"
+    start-ip-address: "10.0.20.195"
+    num-nodes: 1
+
+    # consensus-info
+    consensus-config: "nimbus-consensus-client"
+    execution-config: "reth-execution-config"
+
+    validator-offset-start: 76
+
+
+
 # generic instances that run fuzzers/health checks/etc.
 generic-instances:
 # the bootstrapper that builds the network.
@@ -423,7 +504,7 @@ generic-instances:
     tag: "latest"
     start-ip-address: "10.0.20.201"
     num-nodes: 1
-    entrypoint: "/source/entrypoint.sh --bootstrap-testnet --log-level info"
+    entrypoint: "/source/entrypoint.sh --bootstrap-testnet --log-level debug"
 
   # required instance, bootnode to connect all CL clients together
   eth2-bootnode:
@@ -446,7 +527,7 @@ generic-instances:
     tag: "latest"
     start-ip-address: "10.0.20.203"
     num-nodes: 1
-    entrypoint: "python3 /source/src/node_watch.py --log-level info --monitor execution_availability:epoch --monitor consensus_availability:epoch --monitor heads:slot --monitor checkpoints:slot --monitor peers:epoch --max-retries 3"
+    entrypoint: "python3 /source/src/node_watch.py --log-level info --monitor heads:slot --monitor checkpoints:slot --monitor peers:epoch --max-retries 3"
 
   tx-spammer:
     image: "etb-all-clients"
@@ -455,26 +536,3 @@ generic-instances:
     num-nodes: 1
     # runs on the first prysm geth node.
     entrypoint: "python3 /source/src/tx_spammer.py --target-ip 10.0.20.10 --target-port 8645 --epoch-delay 1 --fuzz-mode spam --tx-fuzz-path /usr/local/bin/livefuzzer"
-
-  antithesis-checker:
-    image: "ethereum-testnet-bootstrapper"
-    tag: "latest"
-    start-ip-address: "10.0.20.205"
-    num-nodes: 1
-    entrypoint: "python3 /source/src/antithesis_checker.py --config /data/etb-config.yaml --phase0-slot '96' --phase1-slot '104' --phase2-slot '120' --phase3-slot '128'"
-
-
-  prometheus:
-    image: "docker.io/bitnami/prometheus"
-    tag: "latest"
-    start-ip-address: "10.0.20.210"
-    num-nodes: 1
-    entrypoint: "/opt/bitnami/prometheus/bin/prometheus"
-    command: [
-      "--config.file=/opt/bitnami/prometheus/conf/prometheus.yml",
-      "--storage.tsdb.path=/opt/bitnami/prometheus/data",
-      "--web.console.libraries=/opt/bitnami/prometheus/conf/console_libraries",
-      "--web.console.templates=/opt/bitnami/prometheus/conf/consoles",
-    ]
-    additional-volumes: ["./data/prometheus/conf:/opt/bitnami/prometheus/conf"]
-    ports: ["9090:9090"]

@@ -24,6 +24,9 @@ ARG BESU_BRANCH="main"
 ARG GETH_REPO="https://github.com/ethereum/go-ethereum.git"
 ARG GETH_BRANCH="master"
 
+ARG RETH_REPO="https://github.com/paradigmxyz/reth.git"
+ARG RETH_BRANCH="main"
+
 ARG NETHERMIND_REPO="https://github.com/NethermindEth/nethermind.git"
 ARG NETHERMIND_BRANCH="master"
 
@@ -34,6 +37,9 @@ ARG TX_FUZZ_BRANCH="master"
 # Metrics gathering
 ARG BEACON_METRICS_GAZER_REPO="https://github.com/dapplion/beacon-metrics-gazer.git"
 ARG BEACON_METRICS_GAZER_BRANCH="master"
+
+ARG JSON_RPC_SNOOP_REPO="https://github.com/ethDreamer/json_rpc_snoop.git"
+ARG JSON_RPC_SNOOP_BRANCH="master"
 ###############################################################################
 # Builder to build all of the clients.
 FROM debian:bullseye-slim AS etb-client-builder
@@ -191,6 +197,17 @@ RUN git clone "${GETH_REPO}" && \
 RUN cd go-ethereum && \
     go install ./...
 
+FROM etb-client-builder AS reth-builder
+ARG RETH_BRANCH
+ARG RETH_REPO
+RUN git clone "${RETH_REPO}" && \
+    cd reth && \
+    git checkout "${RETH_BRANCH}" && \
+    git log -n 1 --format=format:"%H" > /reth.version
+
+RUN cd reth && \
+    cargo build --release
+
 # Besu
 FROM etb-client-builder AS besu-builder
 ARG BESU_BRANCH
@@ -221,6 +238,8 @@ ARG TX_FUZZ_BRANCH
 ARG TX_FUZZ_REPO
 ARG BEACON_METRICS_GAZER_REPO
 ARG BEACON_METRICS_GAZER_BRANCH
+ARG JSON_RPC_SNOOP_REPO
+ARG JSON_RPC_SNOOP_BRANCH
 
 RUN go install github.com/wealdtech/ethereal/v2@latest \
     && go install github.com/wealdtech/ethdo@latest \
@@ -240,6 +259,13 @@ RUN git clone "${BEACON_METRICS_GAZER_REPO}" && \
 RUN cd beacon-metrics-gazer && \
     cargo update -p proc-macro2 && \
     cargo build --release
+
+RUN git clone "${JSON_RPC_SNOOP_REPO}" && \
+    cd json_rpc_snoop && \
+    git checkout "${JSON_RPC_SNOOP_BRANCH}"
+
+RUN cd json_rpc_snoop && \
+    make
 ########################### etb-all-clients runner  ###########################
 FROM debian:bullseye-slim
 
@@ -270,7 +296,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-dev \
     python3-pip
 
-RUN pip3 install ruamel.yaml web3
+RUN pip3 install ruamel.yaml web3 pydantic
 
 # for coverage artifacts and runtime libraries.
 RUN wget --no-check-certificate https://apt.llvm.org/llvm.sh && \
@@ -287,13 +313,19 @@ COPY --from=misc-builder /root/go/bin/eth2-val-tools /usr/local/bin/eth2-val-too
 COPY --from=misc-builder /git/tx-fuzz/cmd/livefuzzer/livefuzzer /usr/local/bin/livefuzzer
 # beacon-metrics-gazer
 COPY --from=misc-builder /git/beacon-metrics-gazer/target/release/beacon-metrics-gazer /usr/local/bin/beacon-metrics-gazer
+# json-rpc-snoop
+COPY --from=misc-builder /git/json_rpc_snoop/target/release/json_rpc_snoop /usr/local/bin/json_rpc_snoop
 
 # consensus clients
-COPY --from=nimbus-eth2-builder /git/nimbus-eth2/build/nimbus_beacon_node /usr/local/bin/nimbus_beacon_node
-COPY --from=nimbus-eth2-builder /nimbus.version /nimbus.version
-
 COPY --from=lighthouse-builder /lighthouse.version /lighthouse.version
 COPY --from=lighthouse-builder /git/lighthouse/target/release/lighthouse /usr/local/bin/lighthouse
+
+COPY --from=lodestar-builder /git/lodestar /git/lodestar
+COPY --from=lodestar-builder /lodestar.version /lodestar.version
+RUN ln -s /git/lodestar/node_modules/.bin/lodestar /usr/local/bin/lodestar
+
+COPY --from=nimbus-eth2-builder /git/nimbus-eth2/build/nimbus_beacon_node /usr/local/bin/nimbus_beacon_node
+COPY --from=nimbus-eth2-builder /nimbus.version /nimbus.version
 
 COPY --from=teku-builder  /git/teku/build/install/teku/. /opt/teku
 COPY --from=teku-builder /teku.version /teku.version
@@ -303,13 +335,13 @@ COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/beacon-chain/beacon-chain_/be
 COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/validator/validator_/validator /usr/local/bin/validator
 COPY --from=prysm-builder /prysm.version /prysm.version
 
-COPY --from=lodestar-builder /git/lodestar /git/lodestar
-COPY --from=lodestar-builder /lodestar.version /lodestar.version
-RUN ln -s /git/lodestar/node_modules/.bin/lodestar /usr/local/bin/lodestar
 
-# execution clients
+## execution clients
 COPY --from=geth-builder /geth.version /geth.version
 COPY --from=geth-builder /root/go/bin/geth /usr/local/bin/geth
+
+COPY --from=reth-builder /reth.version /reth.version
+COPY --from=reth-builder /git/reth/target/release/reth /usr/local/bin/reth
 
 COPY --from=besu-builder /besu.version /besu.version
 COPY --from=besu-builder /git/besu/build/install/besu/. /opt/besu

@@ -36,6 +36,8 @@ ARG TX_FUZZ_BRANCH="4844"
 ARG BEACON_METRICS_GAZER_REPO="https://github.com/qu0b/beacon-metrics-gazer.git"
 ARG BEACON_METRICS_GAZER_BRANCH="master"
 
+ARG JSON_RPC_SNOOP_REPO="https://github.com/ethDreamer/json_rpc_snoop.git"
+ARG JSON_RPC_SNOOP_BRANCH="master"
 ###############################################################################
 # Builder to build all of the clients.
 FROM debian:bullseye-slim AS etb-client-builder
@@ -274,7 +276,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-pip \
     jq
 
-RUN pip3 install ruamel.yaml web3
+RUN pip3 install ruamel.yaml web3 pydantic
 
 # for coverage artifacts and runtime libraries.
 RUN wget --no-check-certificate https://apt.llvm.org/llvm.sh && \

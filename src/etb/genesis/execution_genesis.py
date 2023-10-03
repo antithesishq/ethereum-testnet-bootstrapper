@@ -35,14 +35,14 @@ class ExecutionGenesisWriter:
             raise Exception("Pre-merge forks no longer supported.")
 
         self.merge_fork_time = (
-            self.etb_config.get_consensus_fork_delay_seconds("bellatrix")
-            + self.etb_config.genesis_time
+                self.etb_config.get_consensus_fork_delay_seconds("bellatrix")
+                + self.etb_config.genesis_time
         )
         self.merge_fork_block = 0  # genesis.
 
         self.shanghai_fork_time = (
-            self.etb_config.get_consensus_fork_delay_seconds("capella")
-            + self.etb_config.genesis_time
+                self.etb_config.get_consensus_fork_delay_seconds("capella")
+                + self.etb_config.genesis_time
         )
         if genesis_fork.name >= ForkVersionName.capella:
             self.shanghai_fork_block = 0
@@ -53,8 +53,8 @@ class ExecutionGenesisWriter:
             )
 
         self.cancun_fork_time = (
-            self.etb_config.get_consensus_fork_delay_seconds("deneb")
-            + self.etb_config.genesis_time
+                self.etb_config.get_consensus_fork_delay_seconds("deneb")
+                + self.etb_config.genesis_time
         )
         if genesis_fork.name >= ForkVersionName.deneb:
             self.cancun_fork_block = 0
@@ -131,9 +131,9 @@ class ExecutionGenesisWriter:
             "berlinBlock": 0,
             "londonBlock": 0,
             "mergeForkBlock": self.merge_fork_block,
-            "shanghaiTime": self.shanghai_fork_time,
             "terminalTotalDifficulty": 0,
             "terminalTotalDifficultyPassed": True,
+            "shanghaiTime": self.shanghai_fork_time,
         }
 
         # for next based experiments
@@ -176,6 +176,9 @@ class ExecutionGenesisWriter:
                 "berlinBlock": 0,
                 "londonBlock": 0,
                 "preMergeForkBlock": self.merge_fork_block,
+                # "arrowGlacierBlock": self.merge_fork_block,
+                # "grayGlacierBlock": self.merge_fork_block,
+                "shanghaiTime": self.shanghai_fork_time,
                 "terminalTotalDifficulty": 0,
                 "shanghaiTime": self.shanghai_fork_time,
                 "ethash": {},
@@ -274,6 +277,17 @@ class ExecutionGenesisWriter:
             "nodes": [],
         }
 
+        # self.genesis["engine"]["Ethash"] = {
+        #     "params": {
+        #         "minimumDifficulty": "0x20000",
+        #         "difficultyBoundDivisor": "0x800",
+        #         "durationLimit": "0xd",
+        #         "blockReward": {"0x0": "0x1BC16D674EC80000"},
+        #         "homesteadTransition": "0x0",
+        #         "eip100bTransition": "0x0",
+        #         "difficultyBombDelays": {},
+        #     }
+        # }
         # for next based experiments
         if self.etb_config.is_deneb:
             self.genesis["params"][

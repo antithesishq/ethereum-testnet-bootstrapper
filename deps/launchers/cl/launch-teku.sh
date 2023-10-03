@@ -78,8 +78,6 @@ teku_args=(
   --validators-proposer-default-fee-recipient=0xA18Fd83a55A9BEdB96d66C24b768259eED183be3
   --data-storage-non-canonical-blocks-enabled=true
   --Xlog-include-p2p-warnings-enabled
-  --Xpeer-rate-limit=100000
-  --Xpeer-request-limit=1000
 )
 if [ "$IS_DENEB" == 1 ]; then
   teku_args+=(
