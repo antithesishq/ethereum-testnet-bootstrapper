@@ -64,7 +64,11 @@ beacon_args=(
     --staking
     --subscribe-all-subnets
     --target-peers="$NUM_CLIENT_NODES"
+    
 )
+    # --builder http://127.0.0.1:18550
+    # --builder-profit-threshold 0
+    # --builder-fallback-disable-checks
 # to test p2p we can disable scoring
 #    --disable-peer-scoring
 # In case we want to log differently to a file
@@ -77,8 +81,6 @@ validator_args=(
     --http
     --http-port="$CONSENSUS_VALIDATOR_RPC_PORT"
     --init-slashing-protection
-    --logfile-debug-level="debug"
-    --logfile="/data/log_files/service_$CONTAINER_NAME--lighthouse-vc.log"
     --metrics
     --metrics-address=0.0.0.0
     --metrics-allow-origin="*"
@@ -86,6 +88,10 @@ validator_args=(
     --suggested-fee-recipient=0x00000000219ab540356cbb839cbe05303d7705fa
     --validators-dir "$CONSENSUS_NODE_DIR/keys"
 )
+# --builder-proposals
+
+# --logfile-debug-level="debug"
+# --logfile="/data/log_files/service_$CONTAINER_NAME--lighthouse-vc.log"
 
 if [ "$IS_DENEB" == 1 ]; then
   beacon_args+=(
@@ -95,8 +101,25 @@ if [ "$IS_DENEB" == 1 ]; then
 else
   echo "Launching Lighthouse beacon node in ${CONTAINER_NAME}"
 fi
-lighthouse --testnet-dir="$COLLECTION_DIR" bn "${beacon_args[@]}" > /data/logs/"service_$CONTAINER_NAME--lighthouse-bn" 2>&1 &
+
+# mock_builder_args=(
+#   --cl 127.0.0.1:5000
+#   --el 127.0.0.1:8551
+#   --jwt-secret "$(cat $JWT_SECRET_FILE)"
+#   --el-rpc-port 8645
+#   --extra-data "$CONTAINER_NAME-builder"
+#   --log-level "info"
+#   --get-payload-delay-ms 200
+#   --bid-multiplier 5
+#   --port 18550
+#   --client-init-timeout 60
+# )
+
+
+# mock-builder "${mock_builder_args[@]}" > /data/logs/"service_$CONTAINER_NAME--builder" 2>&1 &
+
+lighthouse --testnet-dir="$COLLECTION_DIR" bn "${beacon_args[@]}" > /data/logs/"service_$CONTAINER_NAME--bn" 2>&1 &
 
 sleep 10
 echo "Launching Lighthouse validator client in ${CONTAINER_NAME}"
-lighthouse --testnet-dir="$COLLECTION_DIR" vc "${validator_args[@]}" > /data/logs/"service_$CONTAINER_NAME--lighthouse-vc" 2>&1
+lighthouse --testnet-dir="$COLLECTION_DIR" vc "${validator_args[@]}" > /data/logs/"service_$CONTAINER_NAME--vc" 2>&1

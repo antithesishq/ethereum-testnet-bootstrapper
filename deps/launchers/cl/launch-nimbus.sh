@@ -74,6 +74,26 @@ beacon_args=(
   --doppelganger-detection=off
 )
 
+  # --payload-builder=true 
+  # --payload-builder-url=http://127.0.0.1:18550
+
 #  --log-file="$CONSENSUS_NODE_DIR/beacon-log.txt"
+
+# mock_builder_args=(
+#   --cl 127.0.0.1:5000
+#   --el 127.0.0.1:8551
+#   --jwt-secret "$(cat $JWT_SECRET_FILE)"
+#   --el-rpc-port 8645
+#   --extra-data "$CONTAINER_NAME-builder"
+#   --log-level "info"
+#   --get-payload-delay-ms 200
+#   --bid-multiplier 5
+#   --port 18550
+#   --client-init-timeout 60
+# )
+
+
+# mock-builder "${mock_builder_args[@]}" > /data/logs/"service_$CONTAINER_NAME--builder" 2>&1 &
+
 
 nimbus_beacon_node "${beacon_args[@]}" > /data/logs/"service_$CONTAINER_NAME--nimbus" 2>&1
