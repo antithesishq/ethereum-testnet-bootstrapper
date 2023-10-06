@@ -41,7 +41,6 @@ while [ ! -f "$CONSENSUS_CHECKPOINT_FILE" ]; do
   sleep 1
 done
 
-echo "Launching nimbus in ${CONTAINER_NAME}"
 
 beacon_args=(
   --metrics
@@ -74,26 +73,30 @@ beacon_args=(
   --doppelganger-detection=off
 )
 
-  # --payload-builder=true 
-  # --payload-builder-url=http://127.0.0.1:18550
+mock_builder_args=(
+  --cl "127.0.0.1:$CONSENSUS_BEACON_API_PORT"
+  --el "127.0.0.1:$EXECUTION_ENGINE_HTTP_PORT"
+  --jwt-secret "$(cat $JWT_SECRET_FILE)"
+  --el-rpc-port $EXECUTION_HTTP_PORT
+  --extra-data "mock-builder"
+  --log-level "info"
+  --get-payload-delay-ms 100
+  --bid-multiplier 5
+  --port 18550
+  --client-init-timeout 60    
+)
 
-#  --log-file="$CONSENSUS_NODE_DIR/beacon-log.txt"
+if [ "$MOCK_BUILDER" == 1 ]; then
+  echo "Launching mock builder"
+  beacon_args+=(
+    --payload-builder=true
+    --payload-builder-url=http://127.0.0.1:18550
+  )
+  validator_args+=(
+    --enable-builder
+  )
+  mock-builder "${mock_builder_args[@]}" > /data/logs/"service_$CONTAINER_NAME--builder" 2>&1 &
+fi
 
-# mock_builder_args=(
-#   --cl 127.0.0.1:5000
-#   --el 127.0.0.1:8551
-#   --jwt-secret "$(cat $JWT_SECRET_FILE)"
-#   --el-rpc-port 8645
-#   --extra-data "$CONTAINER_NAME-builder"
-#   --log-level "info"
-#   --get-payload-delay-ms 200
-#   --bid-multiplier 5
-#   --port 18550
-#   --client-init-timeout 60
-# )
-
-
-# mock-builder "${mock_builder_args[@]}" > /data/logs/"service_$CONTAINER_NAME--builder" 2>&1 &
-
-
+echo "Launching nimbus in ${CONTAINER_NAME}"
 nimbus_beacon_node "${beacon_args[@]}" > /data/logs/"service_$CONTAINER_NAME--nimbus" 2>&1

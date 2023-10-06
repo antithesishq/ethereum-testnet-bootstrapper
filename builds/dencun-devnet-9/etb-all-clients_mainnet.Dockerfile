@@ -20,6 +20,9 @@ ARG NIMBUS_ETH2_BRANCH="e9c8f8"
 ARG TEKU_REPO="https://github.com/ConsenSys/teku.git"
 ARG TEKU_BRANCH="9ac49f5d71"
 
+ARG TEKU_EVIL_REPO="https://github.com/tbenr/teku"
+ARG TEKU_EVIL_BRANCH="evil-blobs"
+
 # Execution Clients
 ARG BESU_REPO="https://github.com/hyperledger/besu.git"
 ARG BESU_BRANCH="62159dc5"
@@ -176,6 +179,20 @@ ARG TEKU_REPO
 RUN git clone "${TEKU_REPO}" && \
     cd teku && \
     git checkout "${TEKU_BRANCH}" && \
+    git submodule update --init --recursive && \
+    git log -n 1 --format=format:"%H" > /teku.version
+
+RUN cd teku && \
+    ./gradlew installDist
+
+
+# TEKU-EVIL
+FROM etb-client-builder AS teku-evil-builder
+ARG TEKU_EVIL_BRANCH
+ARG TEKU_EVIL_REPO
+RUN git clone "${TEKU_EVIL_REPO}" && \
+    cd teku && \
+    git checkout "${TEKU_EVIL_BRANCH}" && \
     git submodule update --init --recursive && \
     git log -n 1 --format=format:"%H" > /teku.version
 
@@ -365,6 +382,10 @@ COPY --from=lighthouse-builder /git/lighthouse/target/release/lighthouse /usr/lo
 COPY --from=teku-builder  /git/teku/build/install/teku/. /opt/teku
 COPY --from=teku-builder /teku.version /teku.version
 RUN ln -s /opt/teku/bin/teku /usr/local/bin/teku
+
+COPY --from=teku-evil-builder  /git/teku/build/install/teku/. /opt/teku_evil
+COPY --from=teku-evil-builder /teku.version /teku_evil.version
+RUN ln -s /opt/teku_evil/bin/teku /usr/local/bin/teku-evil
 
 COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /usr/local/bin/beacon-chain
 COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/validator/validator_/validator /usr/local/bin/validator

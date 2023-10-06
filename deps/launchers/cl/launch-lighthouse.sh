@@ -65,13 +65,9 @@ beacon_args=(
     --subscribe-all-subnets
     --target-peers="$NUM_CLIENT_NODES"
     --trusted-setup-file-override="$TRUSTED_SETUP_JSON_FILE"
-    
+    --disable-peer-scoring
 )
-    # --builder http://127.0.0.1:18550
-    # --builder-profit-threshold 0
-    # --builder-fallback-disable-checks
 # to test p2p we can disable scoring
-#    --disable-peer-scoring
 # In case we want to log differently to a file
 #    --logfile-debug-level="$CONSENSUS_LOG_LEVEL_FILE"
 #    --logfile="/data/log_files/service_$CONTAINER_NAME--lighthouse-bn.log"
@@ -89,7 +85,7 @@ validator_args=(
     --suggested-fee-recipient=0x00000000219ab540356cbb839cbe05303d7705fa
     --validators-dir "$CONSENSUS_NODE_DIR/keys"
 )
-# --builder-proposals
+# 
 
 # --logfile-debug-level="debug"
 # --logfile="/data/log_files/service_$CONTAINER_NAME--lighthouse-vc.log"
@@ -103,21 +99,31 @@ else
   echo "Launching Lighthouse beacon node in ${CONTAINER_NAME}"
 fi
 
-# mock_builder_args=(
-#   --cl 127.0.0.1:5000
-#   --el 127.0.0.1:8551
-#   --jwt-secret "$(cat $JWT_SECRET_FILE)"
-#   --el-rpc-port 8645
-#   --extra-data "$CONTAINER_NAME-builder"
-#   --log-level "info"
-#   --get-payload-delay-ms 200
-#   --bid-multiplier 5
-#   --port 18550
-#   --client-init-timeout 60
-# )
+mock_builder_args=(
+  --cl "127.0.0.1:$CONSENSUS_BEACON_API_PORT"
+  --el "127.0.0.1:$EXECUTION_ENGINE_HTTP_PORT"
+  --jwt-secret "$(cat $JWT_SECRET_FILE)"
+  --el-rpc-port $EXECUTION_HTTP_PORT
+  --extra-data "mock-builder"
+  --log-level "info"
+  --get-payload-delay-ms 100
+  --bid-multiplier 5
+  --port 18550
+  --client-init-timeout 60    
+)
 
-
-# mock-builder "${mock_builder_args[@]}" > /data/logs/"service_$CONTAINER_NAME--builder" 2>&1 &
+if [ "$MOCK_BUILDER" == 1 ]; then
+  echo "Launching mock builder"
+  beacon_args+=(
+    --builder http://127.0.0.1:18550
+    --builder-profit-threshold 0
+    --builder-fallback-disable-checks
+  )
+  validator_args+=(
+    --builder-proposals
+  )
+  mock-builder "${mock_builder_args[@]}" > /data/logs/"service_$CONTAINER_NAME--builder" 2>&1 &
+fi
 
 lighthouse --testnet-dir="$COLLECTION_DIR" bn "${beacon_args[@]}" > /data/logs/"service_$CONTAINER_NAME--bn" 2>&1 &
 

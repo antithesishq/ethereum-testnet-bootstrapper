@@ -364,10 +364,10 @@ class EthereumTestnetBootstrapper:
         time.sleep(etb_config.testnet_config.consensus_layer.preset_base.SECONDS_PER_SLOT.value * 5)
 
         # deploy 4788 contract
-        if egw.deploy_4788():
-            print("successfully deployed 4788 contract")
-        else: 
-            print("failed to deploy 4788 contract")
+        # if egw.deploy_4788():
+        #     print("successfully deployed 4788 contract")
+        # else: 
+        #     print("failed to deploy 4788 contract")
         
 
 

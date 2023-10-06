@@ -35,7 +35,7 @@ class ClientInstanceRequest:
     """
 
     def __init__(
-        self, payload: Union[dict, str], max_retries: int = 3, timeout: int = 5
+        self, payload: Union[dict, str], max_retries: int = 3, timeout: int = 5, backoff: int = 1
     ):
         """A request to a client instance.
 
@@ -46,6 +46,7 @@ class ClientInstanceRequest:
         self.payload: Union[dict, str] = payload
         self.max_retries: int = max_retries
         self.timeout: int = timeout
+        self.backoff: int = backoff
 
     @abstractmethod
     def perform_request(
@@ -66,7 +67,7 @@ class ExecutionJSONRPCRequest(ClientInstanceRequest):
     """A request to an execution client."""
 
     def __init__(self, payload: dict, max_retries: int = 3, timeout: int = 5, backoff: int = 1):
-        super().__init__(payload=payload, max_retries=max_retries, timeout=timeout)
+        super().__init__(payload=payload, max_retries=max_retries, timeout=timeout, backoff=backoff)
 
     def perform_request(
         self, instance: ClientInstance

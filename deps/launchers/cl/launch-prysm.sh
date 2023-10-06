@@ -24,6 +24,7 @@ env_vars=(
   "$JWT_SECRET_FILE"
   "$COLLECTION_DIR"
   "$NUM_CLIENT_NODES"
+  "$EXECUTION_HTTP_PORT"
   "$EXECUTION_ENGINE_HTTP_PORT"
   "$EXECUTION_ENGINE_WS_PORT"
 )
@@ -39,7 +40,6 @@ while [ ! -f "$CONSENSUS_CHECKPOINT_FILE" ]; do
   sleep 1
 done
 
-echo "Launching Prysm beacon node in ${CONTAINER_NAME}"
 
 beacon_args=(
   --dev
@@ -70,7 +70,6 @@ beacon_args=(
   --execution-endpoint="http://127.0.0.1:$EXECUTION_ENGINE_HTTP_PORT"
   --min-sync-peers 1
 )
-  # --http-mev-relay http://127.0.0.1:18550
 
 #  --log-file="$CONSENSUS_NODE_DIR/beacon.log"
 
@@ -89,26 +88,32 @@ validator_args=(
   --suggested-fee-recipient=0x00000000219ab540356cbb839cbe05303d7705fa
   --verbosity="$CONSENSUS_LOG_LEVEL"
 )
-  # --enable-builder
 
-#  --log-file="$CONSENSUS_NODE_DIR/validator.log"
+mock_builder_args=(
+  --cl "127.0.0.1:$CONSENSUS_BEACON_API_PORT"
+  --el "127.0.0.1:$EXECUTION_ENGINE_HTTP_PORT"
+  --jwt-secret "$(cat $JWT_SECRET_FILE)"
+  --el-rpc-port $EXECUTION_HTTP_PORT
+  --extra-data "mock-builder"
+  --log-level "info"
+  --get-payload-delay-ms 100
+  --bid-multiplier 5
+  --port 18550
+  --client-init-timeout 60    
+)
 
-# mock_builder_args=(
-#   --cl 127.0.0.1:5000
-#   --el 127.0.0.1:8551
-#   --jwt-secret "$(cat $JWT_SECRET_FILE)"
-#   --el-rpc-port 8645
-#   --extra-data "mock-builder"
-#   --log-level "debug"
-#   --get-payload-delay-ms 100
-#   --bid-multiplier 5
-#   --port 18550
-#   --client-init-timeout 60
-# )
+if [ "$MOCK_BUILDER" == 1 ]; then
+  echo "Launching mock builder"
+  beacon_args+=(
+    --http-mev-relay http://127.0.0.1:18550
+  )
+  validator_args+=(
+    --enable-builder
+  )
+  mock-builder "${mock_builder_args[@]}" > /data/logs/"service_$CONTAINER_NAME--builder" 2>&1 &
+fi
 
-
-# mock-builder "${mock_builder_args[@]}" > /data/logs/"service_$CONTAINER_NAME--builder" 2>&1 &
-
+echo "Launching Prysm beacon node in ${CONTAINER_NAME}"
 beacon-chain "${beacon_args[@]}" > /data/logs/"service_$CONTAINER_NAME--prysm-bn" 2>&1 &
 
 sleep 10

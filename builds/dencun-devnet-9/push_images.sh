@@ -11,7 +11,8 @@ CONFIG_IMAGE="etb-mainnet-config"
 CONFIG_IMAGE_INST="etb-mainnet-config-inst"
 CONFIG_IMAGE_RACE="etb-mainnet-config-race"
 CONFIG_IMAGE_CUSTOM="etb-mainnet-config-custom"
-
+CONFIG_IMAGE_EVIL="etb-mainnet-config-evil"
+CONFIG_IMAGE_BUILDER="etb-mainnet-config-builder"
 # CONFIG_IMAGE_MINIMAL="etb-minimal-config"
 # CONFIG_IMAGE_MINIMAL_INST="etb-minimal-config-inst"
 
@@ -40,6 +41,12 @@ docker tag "$CONFIG_IMAGE:latest" "$CONTAINER_REPOSITORY/$CONFIG_IMAGE_RACE:$TAG
 make build-config config=builds/$TAG/mainnet-testnet-custom.yaml
 docker tag "$CONFIG_IMAGE:latest" "$CONTAINER_REPOSITORY/$CONFIG_IMAGE_CUSTOM:$TAG"
 
+make build-config config=builds/$TAG/mainnet-testnet-evil.yaml
+docker tag "$CONFIG_IMAGE:latest" "$CONTAINER_REPOSITORY/$CONFIG_IMAGE_EVIL:$TAG"
+
+make build-config config=builds/$TAG/mainnet-testnet-builder.yaml
+docker tag "$CONFIG_IMAGE:latest" "$CONTAINER_REPOSITORY/$CONFIG_IMAGE_BUILDER:$TAG"
+
 # make build-config config=builds/$TAG/minimal-testnet.yaml
 # docker tag "$CONFIG_IMAGE:latest" "$CONTAINER_REPOSITORY/$CONFIG_IMAGE_MINIMAL:$TAG"
 
@@ -56,6 +63,11 @@ docker push "$CONTAINER_REPOSITORY/$CONFIG_IMAGE:$TAG"
 docker push "$CONTAINER_REPOSITORY/$CONFIG_IMAGE_INST:$TAG"
 docker push "$CONTAINER_REPOSITORY/$CONFIG_IMAGE_RACE:$TAG"
 docker push "$CONTAINER_REPOSITORY/$CONFIG_IMAGE_CUSTOM:$TAG"
+
+docker push "$CONTAINER_REPOSITORY/$CONFIG_IMAGE_EVIL:$TAG"
+docker push "$CONTAINER_REPOSITORY/$CONFIG_IMAGE_BUILDER:$TAG"
+
+
 docker push "$CONTAINER_REPOSITORY/$BOOTSTRAPPER:$TAG"
 docker push "$CONTAINER_REPOSITORY/$ETB_ALL_CLIENTS:$TAG"
 docker push "$CONTAINER_REPOSITORY/$ETB_ALL_CLIENTS_INST:$TAG"

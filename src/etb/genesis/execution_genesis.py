@@ -90,9 +90,6 @@ class ExecutionGenesisWriter:
         
         # add the eip4788 fund account
         allocs["0x0B799C86a49DEeb90402691F1041aa3AF2d3C875"] = {"balance": "100" + ("0" * 18) }
-        
-        # send to eth_sendRawTransaction
-        # f8838085e8d4a510008303d0908080b86a60618060095f395ff33373fffffffffffffffffffffffffffffffffffffffe14604d57602036146024575f5ffd5b5f35801560495762001fff810690815414603c575f5ffd5b62001fff01545f5260205ff35b5f5ffd5b62001fff42064281555f359062001fff0155001b820539851b9b6eb1f0
 
         # deposit contract
         allocs[
@@ -100,7 +97,7 @@ class ExecutionGenesisWriter:
         ] = deposit_contract_json
 
         # 4788 is deployed and no longer in genesis
-        # allocs[eip4788_contract_address] = eip4788_contract_json
+        allocs[eip4788_contract_address] = eip4788_contract_json
 
         return allocs
 
@@ -307,12 +304,12 @@ class ExecutionGenesisWriter:
             time_to_genesis = now - self.etb_config.genesis_time
             print(f"waiting for genesis time {time_to_genesis} seconds")
             time.sleep(time_to_genesis)
-            
+        geth_found = False
         for instance in self.etb_config.get_client_instances():
             # only deploy contract to geth
             if instance.execution_config.client != "geth":
                 continue
-
+            geth_found = True
             instance.execution_config.http_port
             instance.ip_address
         
@@ -345,7 +342,12 @@ class ExecutionGenesisWriter:
             code = eth_code.get_code(resp)
 
             if code == '0x3373fffffffffffffffffffffffffffffffffffffffe14604d57602036146024575f5ffd5b5f35801560495762001fff810690815414603c575f5ffd5b62001fff01545f5260205ff35b5f5ffd5b62001fff42064281555f359062001fff015500':
+                    logging.info("Successfully deployed eip4788 contract")
                     return True
+            else:
+                logging.error(f"error unexpected code received: {code}")
+        if not geth_found:
+            logging.error(f"error no geth instances found did not deploy 4788 contract")
                     
             return False
                 
@@ -393,10 +395,10 @@ deposit_contract_json = {
 
 
 # eip4788
-# eip4788_contract_address = "0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02"
+eip4788_contract_address = "0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02"
 
-# eip4788_contract_json = {
-#         "nonce": 0,
-#         "balance": "1",
-#         "code": "0x3373fffffffffffffffffffffffffffffffffffffffe14604457602036146024575f5ffd5b620180005f350680545f35146037575f5ffd5b6201800001545f5260205ff35b42620180004206555f3562018000420662018000015500"
-# }
+eip4788_contract_json = {
+        "nonce": 1,
+        "balance": "1",
+        "code": "0x3373fffffffffffffffffffffffffffffffffffffffe14604d57602036146024575f5ffd5b5f35801560495762001fff810690815414603c575f5ffd5b62001fff01545f5260205ff35b5f5ffd5b62001fff42064281555f359062001fff015500"
+}

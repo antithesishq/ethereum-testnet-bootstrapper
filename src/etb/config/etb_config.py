@@ -571,6 +571,10 @@ class InstanceCollectionConfig(Config):
         if "restart" in config:
             self.restart: str = config["restart"]
 
+        self.mock_builder = "0"
+        if "mock-builder" in config:
+            self.mock_builder = config["mock-builder"]
+
         # special case for additional env
         if "additional-env" in config:
             for key, value in config["additional-env"].items():
@@ -588,6 +592,8 @@ class InstanceCollectionConfig(Config):
         @return: env_vars as dict.
         """
         env_dict: dict[str, str] = {}
+        env_dict["MOCK_BUILDER"] = self.mock_builder
+
         # some contain additional env vars.
         for key, value in self.additional_env.items():
             env_dict[key.replace("-", "_").upper()] = value

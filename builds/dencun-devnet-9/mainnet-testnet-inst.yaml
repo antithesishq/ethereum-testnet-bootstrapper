@@ -35,7 +35,7 @@ testnet-config:
     preset-base: 'mainnet'
     config-name: "local-mainnet-testnet"
 
-    min-genesis-active-validator-count: 60 # custom pre-seeded into genesis state.
+    min-genesis-active-validator-count: 70 # custom pre-seeded into genesis state.
 
     # the validator mnemonic to use for all validators
     validator-mnemonic: "ocean style run case glory clip into nature guess jacket document firm fiscal hello kite disagree symptom tide net coral envelope wink render festival"
