@@ -18,17 +18,17 @@ ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
 ARG NIMBUS_ETH2_BRANCH="e9c8f8"
 
 ARG TEKU_REPO="https://github.com/ConsenSys/teku.git"
-ARG TEKU_BRANCH="fd2e81c7da"
+ARG TEKU_BRANCH="9ac49f5d71"
 
 # Execution Clients
 ARG BESU_REPO="https://github.com/hyperledger/besu.git"
-ARG BESU_BRANCH="4f49ec94"
+ARG BESU_BRANCH="62159dc5"
 
 ARG GETH_REPO="https://github.com/lightclient/go-ethereum.git"
-ARG GETH_BRANCH="f988b2332e5974a5d9f123ab056232bc5890c7ef"
+ARG GETH_BRANCH="6e6c723b4d74fa2ec4491f11354facadb32e8cfb"
 
 ARG NETHERMIND_REPO="https://github.com/NethermindEth/nethermind.git"
-ARG NETHERMIND_BRANCH="dc1781d8"
+ARG NETHERMIND_BRANCH="3320d241"
 
 # ARG ETHEREUMJS_REPO="https://github.com/ethereumjs/ethereumjs-monorepo.git"
 # ARG ETHEREUMJS_BRANCH="41ebb15173af913f5c65e4410fcd335d35db536b"
@@ -37,7 +37,7 @@ ARG NETHERMIND_BRANCH="dc1781d8"
 # ARG ERIGON_BRANCH="901edf91810e22a0f4147d64c9a73754b30a2c33"
 
 ARG RETH_REPO="https://github.com/paradigmxyz/reth"
-ARG RETH_BRANCH="602e775"
+ARG RETH_BRANCH="1e7d028"
 
 # All of the fuzzers we will be using
 ARG TX_FUZZ_REPO="https://github.com/qu0b/tx-fuzz.git"
