@@ -152,6 +152,7 @@ DEFAULT_EXECUTION_ENGINE_HTTP_PORT = 8551
 DEFAULT_EXECUTION_ENGINE_WS_PORT = 8551
 DEFAULT_EXECUTION_ENGINE_WS_PORT_NETHERMIND = 8552  # nethermind needs a separate ws-port
 DEFAULT_EXECUTION_METRIC_PORT = 6060
+DEFAUT_EXECUTION_METRICS_PATH = "/metrics"
 
 # consensus-configs
 DEFAULT_CONSENSUS_CLIENT_CONFIG_NAME_TEKU = "teku-consensus-client"
@@ -182,6 +183,7 @@ DEFAULT_CONSENSUS_BEACON_RPC_PORT = 3500
 DEFAULT_CONSENSUS_BEACON_METRIC_PORT = 8080
 DEFAULT_CONSENSUS_VALIDATOR_METRIC_PORT = 8081
 DEFAULT_CONSENSUS_VALIDATOR_RPC_PORT = 7000
+DEFAULT_CONSENSUS_METRICS_PATH = "/metrics"
 
 # consensus-configs (client specific)
 DEFAULT_PRYSM_VALIDATOR_PASSWORD = "testnet-password"
@@ -221,6 +223,7 @@ DEFAULT_EXECUTION_CONFIG_FIELDS = [
     "engine-http-port",
     "engine-ws-port",
     "metric-port",
+    "metrics-path"
 ]
 # default config maps
 DEFAULT_EXECUTION_CLIENT_SPECIFIC_VALUES_MAP = {
@@ -240,7 +243,7 @@ DEFAULT_EXECUTION_CLIENT_SPECIFIC_VALUES_MAP = {
     ("nethermind", "log-level"): DEFAULT_EXECUTION_LOG_LEVEL_NETHERMIND,
     ("nethermind", "ws-apis"): DEFAULT_EXECUTION_APIS_NETHERMIND,
     ("nethermind", "http-apis"): DEFAULT_EXECUTION_APIS_NETHERMIND,
-    ("nethermind", "engine-ws-port"): DEFAULT_EXECUTION_ENGINE_WS_PORT_NETHERMIND,
+    ("nethermind", "engine-ws-port"): DEFAULT_EXECUTION_ENGINE_WS_PORT_NETHERMIND
 }
 
 DEFAULT_EXECUTION_VALUES_MAP = {
@@ -250,6 +253,7 @@ DEFAULT_EXECUTION_VALUES_MAP = {
     "http-port": DEFAULT_EXECUTION_HTTP_PORT,
     "ws-port": DEFAULT_EXECUTION_WS_PORT,
     "metric-port": DEFAULT_EXECUTION_METRIC_PORT,
+    "metrics-path": DEFAUT_EXECUTION_METRICS_PATH
 }
 
 DEFAULT_EXECUTION_CONFIG = {
@@ -268,7 +272,8 @@ DEFAULT_CONSENSUS_CONFIG_FIELDS = [
     "beacon-rpc-port",
     "beacon-metric-port",
     "validator-rpc-port",
-    "validator-metric-port"
+    "validator-metric-port",
+    "metrics-path"
 ]
 
 DEFAULT_CONSENSUS_CLIENT_SPECIFIC_VALUES_MAP = {
@@ -292,6 +297,7 @@ DEFAULT_CONSENSUS_VALUES_MAP = {
     "validator-rpc-port": DEFAULT_CONSENSUS_VALIDATOR_RPC_PORT,
     "validator-metric-port": DEFAULT_CONSENSUS_VALIDATOR_METRIC_PORT,
     "num-validators": DEFAULT_NUM_VALIDATORS,
+    "metrics-path": DEFAULT_CONSENSUS_METRICS_PATH
 }
 
 DEFAULT_CONSENSUS_CONFIG = {
@@ -304,6 +310,7 @@ DEFAULT_CONSENSUS_CONFIG = {
         "beacon-metric-port": DEFAULT_CONSENSUS_BEACON_METRIC_PORT,
         "validator-rpc-port": DEFAULT_CONSENSUS_VALIDATOR_RPC_PORT,
         "validator-metric-port": DEFAULT_CONSENSUS_VALIDATOR_METRIC_PORT,
+        "metrics-path": DEFAULT_CONSENSUS_METRICS_PATH,
     },
     DEFAULT_CONSENSUS_CLIENT_CONFIG_NAME_LIGHTHOUSE: {
         "client": "lighthouse",
@@ -314,6 +321,7 @@ DEFAULT_CONSENSUS_CONFIG = {
         "beacon-metric-port": DEFAULT_CONSENSUS_BEACON_METRIC_PORT,
         "validator-rpc-port": DEFAULT_CONSENSUS_VALIDATOR_RPC_PORT,
         "validator-metric-port": DEFAULT_CONSENSUS_VALIDATOR_METRIC_PORT,
+        "metrics-path": DEFAULT_CONSENSUS_METRICS_PATH,
     },
     DEFAULT_CONSENSUS_CLIENT_CONFIG_NAME_LODESTAR: {
         "client": "lodestar",
@@ -324,6 +332,7 @@ DEFAULT_CONSENSUS_CONFIG = {
         "beacon-metric-port": DEFAULT_CONSENSUS_BEACON_METRIC_PORT,
         "validator-rpc-port": DEFAULT_CONSENSUS_VALIDATOR_RPC_PORT,
         "validator-metric-port": DEFAULT_CONSENSUS_VALIDATOR_METRIC_PORT,
+        "metrics-path": DEFAULT_CONSENSUS_METRICS_PATH,
     },
     DEFAULT_CONSENSUS_CLIENT_CONFIG_NAME_NIMBUS: {
         "client": "nimbus",
@@ -334,6 +343,7 @@ DEFAULT_CONSENSUS_CONFIG = {
         "beacon-metric-port": DEFAULT_CONSENSUS_BEACON_METRIC_PORT,
         "validator-rpc-port": DEFAULT_CONSENSUS_VALIDATOR_RPC_PORT,
         "validator-metric-port": DEFAULT_CONSENSUS_VALIDATOR_METRIC_PORT,
+        "metrics-path": DEFAULT_CONSENSUS_METRICS_PATH,
     },
     DEFAULT_CONSENSUS_CLIENT_CONFIG_NAME_TEKU: {
         "client": "teku",
@@ -344,6 +354,7 @@ DEFAULT_CONSENSUS_CONFIG = {
         "beacon-metric-port": DEFAULT_CONSENSUS_BEACON_METRIC_PORT,
         "validator-rpc-port": DEFAULT_CONSENSUS_VALIDATOR_RPC_PORT,
         "validator-metric-port": DEFAULT_CONSENSUS_VALIDATOR_METRIC_PORT,
+        "metrics-path": DEFAULT_CONSENSUS_METRICS_PATH,
     }
 }
 

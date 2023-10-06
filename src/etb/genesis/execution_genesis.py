@@ -2,6 +2,7 @@
 This module contains the logic for creating the execution layer genesis files.
 """
 from typing import Any
+import logging
 
 from web3.auto import w3
 import requests
@@ -11,7 +12,11 @@ from ..config.etb_config import ETBConfig, ForkVersionName
 
 w3.eth.account.enable_unaudited_hdwallet_features()
 
-
+from etb.interfaces.client_request import (
+    eth_sendRawTransaction,
+    eth_getTransactionReceipt,
+    eth_getCode
+)
 class ExecutionGenesisWriter:
     """
     Superclass to write the execution layer genesis files.
@@ -315,65 +320,35 @@ class ExecutionGenesisWriter:
             headers = {
                 "Content-Type": "application/json"
             }
-            data = {
-                "jsonrpc": "2.0",
-                "method": "eth_sendRawTransaction",
-                "params": ["0xf8838085e8d4a510008303d0908080b86a60618060095f395ff33373fffffffffffffffffffffffffffffffffffffffe14604d57602036146024575f5ffd5b5f35801560495762001fff810690815414603c575f5ffd5b62001fff01545f5260205ff35b5f5ffd5b62001fff42064281555f359062001fff0155001b820539851b9b6eb1f0"],
-                "id": 1
-            }
 
-            response = requests.post(url, headers=headers, json=data)
-            if response.status_code == 200:
-                data = response.json()
-                tx_hash = data["result"]
-                if self.wait_for_tx(url, tx_hash):
-                    return self.check_4788(url)
-            else:
-                print("failed to deploy 4788 contract")
-                print(response.json())
+            raw_tx = "0xf8838085e8d4a510008303d0908080b86a60618060095f395ff33373fffffffffffffffffffffffffffffffffffffffe14604d57602036146024575f5ffd5b5f35801560495762001fff810690815414603c575f5ffd5b62001fff01545f5260205ff35b5f5ffd5b62001fff42064281555f359062001fff0155001b820539851b9b6eb1f0"
 
-        return False
-    def wait_for_tx(self, url, tx_hash) -> bool:
-            failed_attempts = 0
-            while True: 
-                data = {
-                    "jsonrpc": "2.0",
-                    "method": "eth_getTransactionReceipt",
-                    "params": [tx_hash],
-                    "id": 1
-                }
-                headers = {
-                    "Content-Type": "application/json"
-                }
-                response = requests.post(url, headers=headers, json=data)
-                if response.status_code == 200:
-                    print(response.json())
-                    if response.json()["result"] is not None:
-                        return True
-                else:
-                    if failed_attempts > 3:
-                        raise ConnectionError(f"HTTP error {response.status_code}: {response.text}")
-                    failed_attempts += 1
-                time.sleep(6)
-    def check_4788(self, url) -> bool:
-            headers = {
-                "Content-Type": "application/json"
-            }
 
-            data = {
-                "jsonrpc": "2.0",
-                "method": "eth_getCode",
-                "params": ["0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02", "latest"],
-                "id": 1
-            }
+            send_tx = eth_sendRawTransaction(raw_tx)
+            resp = send_tx.perform_request(instance)
+            if not send_tx.is_valid(resp):
+                logging.error(f"error sending raw transaction {resp}")
+                raise resp
+            tx_hash = send_tx.get_hash(resp)
+            
+            tx_reciept = eth_getTransactionReceipt(tx_hash)
+            resp = tx_reciept.perform_request(instance)
+            if not tx_reciept.is_valid(resp):
+                logging.error(f"error getting transaction receipt {resp}")
+                raise resp
+           
+            eth_code = eth_getCode("0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02", "latest")
+            resp = eth_code.perform_request(instance)
+            if not eth_code.is_valid(resp):
+                logging.error(f"error getting code {resp}")
+                raise resp
+            code = eth_code.get_code(resp)
 
-            response = requests.post(url, headers=headers, json=data)
-            if response.status_code == 200:
-                data = response.json()
-                code = data['result']
-                if code == '0x3373fffffffffffffffffffffffffffffffffffffffe14604d57602036146024575f5ffd5b5f35801560495762001fff810690815414603c575f5ffd5b62001fff01545f5260205ff35b5f5ffd5b62001fff42064281555f359062001fff015500':
+            if code == '0x3373fffffffffffffffffffffffffffffffffffffffe14604d57602036146024575f5ffd5b5f35801560495762001fff810690815414603c575f5ffd5b62001fff01545f5260205ff35b5f5ffd5b62001fff42064281555f359062001fff015500':
                     return True
+                    
             return False
+                
 
 
 # pylint: disable=line-too-long

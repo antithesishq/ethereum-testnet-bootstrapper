@@ -9,13 +9,13 @@ ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
 ARG PRYSM_BRANCH="c20f188966f09b831096b5fcb939a76aad543511"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
-ARG LODESTAR_BRANCH="3cfa9cd"
+ARG LODESTAR_BRANCH="d9e6f1a"
 #
 ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
 ARG NIMBUS_ETH2_BRANCH="e9c8f8"
 
 ARG TEKU_REPO="https://github.com/ConsenSys/teku.git"
-ARG TEKU_BRANCH="b54882aae2"
+ARG TEKU_BRANCH="fd2e81c7da"
 
 # Execution Clients
 ARG BESU_REPO="https://github.com/hyperledger/besu.git"
@@ -29,6 +29,9 @@ ARG NETHERMIND_BRANCH="dc1781d8"
 
 ARG ETHEREUMJS_REPO="https://github.com/ethereumjs/ethereumjs-monorepo.git"
 ARG ETHEREUMJS_BRANCH="7a0a37b7355c77ce841d5b04da55a2a4b53fe550"
+
+ARG RETH_REPO="https://github.com/paradigmxyz/reth"
+ARG ARG RETH_BRANCH="602e775"
 
 # All of the fuzzers we will be using
 ARG TX_FUZZ_REPO="https://github.com/qu0b/tx-fuzz.git"
@@ -263,6 +266,23 @@ RUN git clone "${NETHERMIND_REPO}" && \
 RUN cd nethermind && \
     dotnet publish -p:PublishReadyToRun=false src/Nethermind/Nethermind.Runner -c release -o out
 
+# RETH
+FROM etb-client-builder AS RETH-builder
+ARG RETH_BRANCH
+ARG RETH_REPO
+RUN git clone "${RETH_REPO}" && \
+    cd reth && \
+    git checkout "${RETH_BRANCH}" && \
+    git log -n 1 --format=format:"%H" > /reth.version
+
+RUN cd reth && \
+    cargo build --release && \
+    mv target/release/reth target/release/reth_uninstrumented
+
+# Antithesis instrumented lighthouse binary
+RUN cd reth && \ 
+LD_LIBRARY_PATH=/usr/lib/ RUSTFLAGS="-Cpasses=sancov-module -Cllvm-args=-sanitizer-coverage-level=3 -Cllvm-args=-sanitizer-coverage-trace-pc-guard -Ccodegen-units=1 -Cdebuginfo=2 -L/usr/lib/ -lvoidstar" cargo build --release 
+
 ############################### Misc.  Modules  ###############################
 FROM etb-client-builder AS misc-builder
 ARG TX_FUZZ_BRANCH
@@ -336,7 +356,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     jq \
     xxd
 
-RUN pip3 install ruamel.yaml web3
+RUN pip3 install ruamel.yaml web3 pydantic
 
 # for coverage artifacts and runtime libraries.
 RUN wget --no-check-certificate https://apt.llvm.org/llvm.sh && \
@@ -392,6 +412,9 @@ COPY --from=geth-builder /tmp/geth_race /usr/local/bin/geth_race
 COPY --from=geth-builder /git/geth_instrumented/symbols/* /opt/antithesis/symbols/
 COPY --from=geth-builder /git/geth_instrumented/customer /geth_instrumented_code
 
+COPY --from=reth-builder /reth.version /reth.version
+COPY --from=reth-builder /git/reth/target/release/reth /usr/local/bin/reth
+COPY --from=reth-builder /git/reth/target/release/reth_uninstrumented /usr/local/bin/reth_uninstrumented
 
 COPY --from=besu-builder /besu.version /besu.version
 COPY --from=besu-builder /git/besu/build/install/besu/. /opt/besu

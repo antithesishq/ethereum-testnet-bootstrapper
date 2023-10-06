@@ -3,6 +3,7 @@
 REPO_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
 log_level ?= "info"
+config ?= "$(REPO_DIR)/configs/minimal-testnet.yaml"
 # Build ethereum-testnet-bootstrapper image
 build-bootstrapper:
 	docker build -t ethereum-testnet-bootstrapper -f bootstrapper.Dockerfile .
@@ -32,11 +33,6 @@ rebuild-client-images-inst:
 build-all-images: build-bootstrapper build-client-images build-config
 rebuild-all-images: rebuild-bootstrapper rebuild-client-images rebuild-config
 
-# remove last run.
-# this has to be done through docker because of filesystem permissions
-clean:
-	docker run -v$(REPO_DIR)/:/source/ -v$(REPO_DIR)/data/:/data ethereum-testnet-bootstrapper --clean --log-level $(log_level)
-
 # init the testnet dirs and all files needed to later bootstrap the testnet.
 init-testnet:
 	docker run -v $(REPO_DIR)/:/source/ -v $(REPO_DIR)/data/:/data ethereum-testnet-bootstrapper --config $(config) --init-testnet --log-level $(log_level)
@@ -53,5 +49,6 @@ run-bootstrapper:
 run-testnet:
 	docker-compose up --force-recreate --remove-orphans
 # remove last run.
+# this has to be done through docker because of filesystem permissions
 clean:
 	docker run -t -v $(REPO_DIR)/:/source/ -v $(REPO_DIR)/data/:/data ethereum-testnet-bootstrapper --clean --log-level $(log_level)

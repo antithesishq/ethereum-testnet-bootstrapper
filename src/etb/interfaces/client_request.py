@@ -65,7 +65,7 @@ class ClientInstanceRequest:
 class ExecutionJSONRPCRequest(ClientInstanceRequest):
     """A request to an execution client."""
 
-    def __init__(self, payload: dict, max_retries: int = 3, timeout: int = 5):
+    def __init__(self, payload: dict, max_retries: int = 3, timeout: int = 5, backoff: int = 1):
         super().__init__(payload=payload, max_retries=max_retries, timeout=timeout)
 
     def perform_request(
@@ -114,7 +114,7 @@ class ExecutionJSONRPCRequest(ClientInstanceRequest):
                     )
                     return e
 
-            time.sleep(1)  # don't spam the clients.
+            time.sleep(self.backoff)  # don't spam the clients.
         return Exception("Unknown error occurred.")  # should not occur.
 
 
@@ -220,6 +220,100 @@ class eth_getBlockByNumber(ExecutionJSONRPCRequest):
         else:
             return response
 
+
+class eth_sendRawTransaction(ExecutionJSONRPCRequest):
+    """
+    eth_sendRawTransaction jsonRPCRequest
+    """
+
+    def __init__(
+        self, raw_tx="", _id: int = 1, max_retries: int = 3, timeout: int = 5
+    ):
+        payload = {
+            "method": "eth_sendRawTransaction",
+            "params": [raw_tx],
+            "jsonrpc": "2.0",
+            "id": _id,
+        }
+        super().__init__(
+            payload=payload,
+            max_retries=max_retries,
+            timeout=timeout,
+        )
+
+    def get_hash(self, response):
+        """Get the hash from the response, if it is valid. Returns exception
+        otherwise.
+
+        @param response: @return:
+        """
+        if self.is_valid(response):
+            return response.json()["result"]
+        else:
+            return response
+
+class eth_getTransactionReceipt(ExecutionJSONRPCRequest):
+    """
+    eth_getTransactionReceipt jsonRPCRequest
+    """
+
+    def __init__(
+        self, tx_hash="", _id: int = 1, max_retries: int = 3, timeout: int = 5, backoff: int = 6
+    ):
+        payload = {
+            "method": "eth_getTransactionReceipt",
+            "params": [tx_hash],
+            "jsonrpc": "2.0",
+            "id": _id,
+        }
+        super().__init__(
+            payload=payload,
+            max_retries=max_retries,
+            timeout=timeout,
+            backoff=backoff
+        )
+
+    def get_reciept(self, response):
+        """Get the transaction receipt from the response, if it is valid. Returns exception
+        otherwise.
+
+        @param response: @return:
+        """
+        if self.is_valid(response):
+            return response.json()["result"]
+        else:
+            return response
+        
+class eth_getCode(ExecutionJSONRPCRequest):
+    """
+    eth_getCode jsonRPCRequest
+    """
+
+    def __init__(
+        self, address="", version="latest", _id: int = 1, max_retries: int = 3, timeout: int = 5
+    ):
+        payload = {
+            "method": "eth_getCode",
+            "params": [address, version],
+            "jsonrpc": "2.0",
+            "id": _id,
+        }
+        super().__init__(
+            payload=payload,
+            max_retries=max_retries,
+            timeout=timeout,
+        )
+
+    def get_code(self, response):
+        """Get the contract code from the response, if it is valid. Returns exception
+        otherwise.
+
+        @param response: @return:
+        """
+        if self.is_valid(response):
+            return response.json()["result"]
+        else:
+            return response
 
 class admin_nodeInfo(ExecutionJSONRPCRequest):
     """
