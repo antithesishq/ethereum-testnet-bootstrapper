@@ -33,6 +33,9 @@ done
 
 echo "{}" >/tmp/nethermind.cfg
 
+# Edit the nethermind logging file to not log to a file
+sed -i -e "s/.*writeTo=\"file-async\".*//g" /nethermind/NLog.config
+
 nethermind_args=(
   --Init.ChainSpecPath="$EXECUTION_GENESIS_FILE"
   --Init.DiagnosticMode="None"
