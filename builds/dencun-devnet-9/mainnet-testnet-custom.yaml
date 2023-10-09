@@ -191,7 +191,6 @@ client-instances:
     tag: "dencun-devnet-9"
     start-ip-address: "10.0.20.10"
     num-nodes: 1
-    mock-builder: "1"
     # consensus-info
     consensus-config: "prysm-consensus-client"
     execution-config: "geth-execution-config"

@@ -15,11 +15,11 @@ ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
 ARG NIMBUS_ETH2_BRANCH="e9c8f8"
 
 ARG TEKU_REPO="https://github.com/ConsenSys/teku.git"
-ARG TEKU_BRANCH="9ac49f5d71"
+ARG TEKU_BRANCH="ef391e99ca"
 
 # Execution Clients
 ARG BESU_REPO="https://github.com/hyperledger/besu.git"
-ARG BESU_BRANCH="62159dc5"
+ARG BESU_BRANCH="4b822d67"
 
 ARG GETH_REPO="https://github.com/lightclient/go-ethereum.git"
 ARG GETH_BRANCH="6e6c723b4d74fa2ec4491f11354facadb32e8cfb"
