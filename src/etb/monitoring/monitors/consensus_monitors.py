@@ -1,7 +1,6 @@
 """
 ConsensusMonitors provide a generic interface that allows you to
 create and run various metrics.
-
 The metric defines:
     - measure_metric: A method that given a client, takes a measurement.
     - collect_metrics: Defines how to collect the measurements from the clients.
@@ -13,9 +12,7 @@ from concurrent.futures import Future, ThreadPoolExecutor
 from typing import Union, Any, Callable, Optional
 import logging
 import json
-
 import requests
-
 from ...config.etb_config import ClientInstance
 from ...interfaces.client_request import (
     ExecutionJSONRPCRequest,
@@ -32,16 +29,18 @@ from ...interfaces.client_request import (
 Consensus Monitors are meant to be standalone actions that can be performed
 by a testnet_monitor or any other module.
 """
-
 # The client instance and the result of the metric
 ClientMonitorResult = dict[ClientInstance, Any]
+
 # The result of the metric and the clients that returned that result
 ConsensusMonitorResult = dict[Any, list[ClientInstance]]
-# results are grouped by client, unreachable_clients, invalid_response_clients
+
+# results are grouped by client, unreachable_clients_connection_error, invalid_response_clients
 ClientMonitorReport = tuple[
     ClientMonitorResult, list[ClientInstance], list[ClientInstance]
 ]
-# clients grouped by result, unreachable_clients, invalid_response_clients
+
+# clients grouped by result, unreachable_clients_connection_error, invalid_response_clients
 ConsensusMonitorReport = tuple[
     ConsensusMonitorResult, list[ClientInstance], list[ClientInstance]
 ]
@@ -50,22 +49,17 @@ ConsensusMonitorReport = tuple[
 class ClientMetricMonitor:
     """
     A monitor that can be run on a testnet.
-
     Provides a small interface to perform a query async on a client.
-
     A client query should:
         return an exception if we couldn't get a response from the client.
         return Any if got a response from the client.
-
     A response_parser should give the response of the query:
         return the parsed result.
         return None if the response is invalid.
-
     After each run the monitor will populate the following fields:
         - results: A dictionary of results grouped by result. {ClientInstance: Any [result]}
-        - unreachable_clients: A list of clients that were unreachable.
+        - unreachable_clients_connection_error: A list of clients that were unreachable.
         - invalid_response_clients: A list of clients that returned an invalid response.
-
     A report_metric routine is implemented by the user to report the metric.
     """
 
@@ -78,15 +72,18 @@ class ClientMetricMonitor:
         self.client_query = client_query
         self.response_parser = response_parser
         self.max_retries = max_retries
-
         self.results: ClientMonitorResult = {}
-        self.unreachable_clients: list[ClientInstance] = []
+        self.timeout_clients: list[ClientInstance] = []
+        self.unreachable_clients_connection_error: list[ClientInstance] = []
+        self.unreachable_clients_unknown_reason: list[ClientInstance] = []
         self.invalid_response_clients: list[ClientInstance] = []
 
     def _clear_results(self):
         """clear the results of the monitor"""
         self.results = {}
-        self.unreachable_clients = []
+        self.timeout_clients = []
+        self.unreachable_clients_connection_error = []
+        self.unreachable_clients_unknown_reason = []
         self.invalid_response_clients = []
 
     def query_clients_for_metric(self, clients_to_monitor: list[ClientInstance]):
@@ -99,15 +96,23 @@ class ClientMetricMonitor:
         with ThreadPoolExecutor(max_workers=len(clients_to_monitor)) as executor:
             for client in clients_to_monitor:
                 client_futures[client] = executor.submit(self.client_query, client)
-
         # iterate through the futures and group them by result, unreachable, invalid_response
         for client, future in client_futures.items():
             result = future.result()
             # connection error
-            if isinstance(result, Exception):
-                self.unreachable_clients.append(client)
+            if isinstance(result, requests.exceptions.ReadTimeout):
+                self.timeout_clients.append(client)
+                logging.debug("Timeout!")
                 continue
-
+            if isinstance(result, requests.exceptions.ConnectionError):
+                logging.debug("Client most likely offline!")
+                self.unreachable_clients_connection_error.append(client)
+                continue
+            if isinstance(result, Exception):
+                logging.debug("Unknown error!")
+                logging.debug(type(result))
+                self.unreachable_clients_unknown_reason.append(client)
+                continue
             parsed_result = self.response_parser(result)
             # parsing error
             if parsed_result is None:
@@ -121,8 +126,8 @@ class ClientMetricMonitor:
         out = ""
         for client, result in self.results.items():
             out += f"{client}: {result}\n"
-        if len(self.unreachable_clients) > 0:
-            out += f"Unreachable Clients: {[client.name for client in self.unreachable_clients]}\n"
+        if len(self.unreachable_clients_connection_error) > 0:
+            out += f"Unreachable Clients: {[client.name for client in self.unreachable_clients_connection_error]}\n"
         if len(self.invalid_response_clients) > 0:
             out += f"Invalid Response Clients: {[client.name for client in self.invalid_response_clients]}\n"
         return out
@@ -136,7 +141,7 @@ class ClientMetricMonitor:
             self._clear_results()
             self.query_clients_for_metric(clients_to_monitor)
             if (
-                len(self.unreachable_clients) == 0
+                len(self.unreachable_clients_connection_error) == 0
                 and len(self.invalid_response_clients) == 0
             ):
                 return
@@ -150,25 +155,19 @@ class ClientMetricMonitor:
 class ConsensusMetricMonitor(ClientMetricMonitor):
     """
     A monitor that can be run on a testnet.
-
     Provides a small interface to perform a query async on a client.
-
     A client query should:
         return an exception if we couldn't get a response from the client.
         return Any if got a response from the client.
-
     A response_parser should given the response of the query:
         return the parsed result.
         return None if the response is invalid.
-
     A report_metric routine is implemented by the user to report the metric.
-
     The monitor will attempt to query the clients (max_retries_for_consensus) times
     until it gets a consensus.
-
     After each run the monitor will populate the following fields:
         - results: A dictionary of results grouped by result. {Any [result]: list[ClientInstance]}
-        - unreachable_clients: A list of clients that were unreachable.
+        - unreachable_clients_connection_error: A list of clients that were unreachable.
         - invalid_response_clients: A list of clients that returned an invalid response.
     """
 
@@ -179,7 +178,6 @@ class ConsensusMetricMonitor(ClientMetricMonitor):
         max_retries: int = 3,
         max_retries_for_consensus: int = 3,
     ):
-
         super().__init__(client_query, response_parser)
         self.max_retries_for_consensus = max_retries_for_consensus
         self.consensus_results: ConsensusMonitorResult = {}
@@ -193,7 +191,7 @@ class ConsensusMetricMonitor(ClientMetricMonitor):
         """Check if we reached consensus."""
         return (
             len(self.results) == 1
-            and len(self.unreachable_clients) == 0
+            and len(self.unreachable_clients_connection_error) == 0
             and len(self.invalid_response_clients) == 0
         )
 
@@ -206,7 +204,6 @@ class ConsensusMetricMonitor(ClientMetricMonitor):
             if result not in consensus_results:
                 consensus_results[result] = []
             consensus_results[result].append(client)
-
         return consensus_results
 
     def report_metric(self) -> str:
@@ -214,8 +211,8 @@ class ConsensusMetricMonitor(ClientMetricMonitor):
         out = ""
         for result, clients in self.consensus_results.items():
             out += f"{result}: {[client.name for client in clients]}\n"
-        if len(self.unreachable_clients) > 0:
-            out += f"Unreachable Clients: {[client.name for client in self.unreachable_clients]}\n"
+        if len(self.unreachable_clients_connection_error) > 0:
+            out += f"Unreachable Clients: {[client.name for client in self.unreachable_clients_connection_error]}\n"
         if len(self.invalid_response_clients) > 0:
             out += f"Invalid Response Clients: {[client.name for client in self.invalid_response_clients]}\n"
         return out
@@ -237,7 +234,9 @@ class ConsensusMetricMonitor(ClientMetricMonitor):
         self.collect_metrics(clients_to_monitor)
         return self.report_metric()
 
+
 ClientHead = tuple[int, str, str]
+
 
 class HeadsMonitorExecutionAvailabilityCheck(ClientMetricMonitor):
     """
@@ -253,21 +252,22 @@ class HeadsMonitorExecutionAvailabilityCheck(ClientMetricMonitor):
             "jsonrpc": "2.0",
             "method": "eth_getBlockByNumber",
             "params": ["latest", False],
-            "id": 1
+            "id": 1,
         }
-        self.query = ExecutionJSONRPCRequest(payload=payload, max_retries=max_retries, timeout=timeout)
-        self.max_retry_for_consensus = max_retries_for_consensus
-
+        self.query = ExecutionJSONRPCRequest(
+            payload=payload, max_retries=max_retries, timeout=timeout
+        )
         super().__init__(
             client_query=self.query.perform_request,
             response_parser=self._get_client_head_from_block,
+            max_retries=max_retries,
         )
 
     def _get_client_head_from_block(
         self, response: requests.Response
     ) -> Optional[ClientHead]:
         try:
-            if (self.query.is_valid(response)) :
+            if self.query.is_valid(response):
                 hash = response.json()["result"]["hash"]
                 print(f"block {hash}")
                 return hash
@@ -278,14 +278,60 @@ class HeadsMonitorExecutionAvailabilityCheck(ClientMetricMonitor):
 
     def report_metric(self) -> str:
         """Report the results obtained from the measurements."""
-        out = {}
+        out = {
+            "available_execution_clients": [],
+            "unreachable_execution_clients_connection_error": [],
+            "invalid_response_execution_clients": [],
+            "unreachable_execution_clients_unknown_reason": [],
+            "timeout_execution_clients": [],
+        }
         if len(self.results.items()) > 0:
-            out["available_execution_clients"] = [{"client_pair": client.name, "client_ip": client.ip_address, "client_execution": client.collection_config.execution_config.client} for client, _result in  self.results.items()]
-        if len(self.unreachable_clients) > 0:
-            out["unreachable_execution_clients"] = [{"client_pair": client.name, "client_ip": client.ip_address, "client_execution": client.collection_config.execution_config.client} for client in self.unreachable_clients]
+            out["available_execution_clients"] = [
+                {
+                    "client_pair": client.name,
+                    "client_ip": client.ip_address,
+                    "client_execution": client.collection_config.execution_config.client,
+                }
+                for client, _result in self.results.items()
+            ]
+        if len(self.unreachable_clients_connection_error) > 0:
+            out["unreachable_execution_clients_connection_error"] = [
+                {
+                    "client_pair": client.name,
+                    "client_ip": client.ip_address,
+                    "client_execution": client.collection_config.execution_config.client,
+                }
+                for client in self.unreachable_clients_connection_error
+            ]
         if len(self.invalid_response_clients) > 0:
-            out["invalid_response_execution_clients"] = [{"client_pair": client.name, "client_ip": client.ip_address, "client_execution": client.collection_config.execution_config.client} for client in self.invalid_response_clients]
+            out["invalid_response_execution_clients"] = [
+                {
+                    "client_pair": client.name,
+                    "client_ip": client.ip_address,
+                    "client_execution": client.collection_config.execution_config.client,
+                }
+                for client in self.invalid_response_clients
+            ]
+        if len(self.unreachable_clients_unknown_reason) > 0:
+            out["unreachable_execution_clients_unknown_reason"] = [
+                {
+                    "client_pair": client.name,
+                    "client_ip": client.ip_address,
+                    "client_execution": client.collection_config.execution_config.client,
+                }
+                for client in self.unreachable_clients_unknown_reason
+            ]
+        if len(self.timeout_clients) > 0:
+            out["timeout_execution_clients"] = [
+                {
+                    "client_pair": client.name,
+                    "client_ip": client.ip_address,
+                    "client_execution": client.collection_config.execution_config.client,
+                }
+                for client in self.timeout_clients
+            ]
         return json.dumps(out)
+
 
 class HeadsMonitor(ConsensusMetricMonitor):
     """
@@ -297,11 +343,10 @@ class HeadsMonitor(ConsensusMetricMonitor):
         self, max_retries: int = 3, timeout: int = 5, max_retries_for_consensus: int = 3
     ):
         self.query = BeaconAPIgetBlockV2(max_retries=max_retries, timeout=timeout)
-        self.max_retry_for_consensus = max_retries_for_consensus
-
         super().__init__(
             client_query=self.query.perform_request,
             response_parser=self._get_client_head_from_block,
+            max_retries_for_consensus=max_retries_for_consensus,
         )
 
     def _get_client_head_from_block(
@@ -316,15 +361,6 @@ class HeadsMonitor(ConsensusMetricMonitor):
                 .decode("utf-8")
                 .replace("\x00", "")
             )
-            if "extra_data" in block["body"]["execution_payload"] and len(block["body"]["execution_payload"]["extra_data"]) > 0:
-                extra_data = block["body"]["execution_payload"]["extra_data"]
-                extra_data = str(extra_data).replace("0x", "")
-                try:
-                    decoded_extra_data = bytes.fromhex(extra_data).decode("utf-8", errors='ignore').replace("\x00", "")
-                    if len(extra_data) > 0:
-                        graffiti = f"{graffiti} {decoded_extra_data}"
-                except Exception as e:
-                    logging.debug(f"Exception parsing response: {e} extra data: {extra_data}")
             return slot, state_root, graffiti
         except Exception as e:
             logging.debug(f"Exception parsing response: {e}")
@@ -342,6 +378,7 @@ class HeadsMonitorConsensusAvailabilityCheck(HeadsMonitor):
     A monitor that reports the heads of the clients.
     It will retry the query up to max_retries_for_consensus times.
     """
+
     def _get_client_head_from_block(
         self, response: requests.Response
     ) -> Optional[ClientHead]:
@@ -355,13 +392,58 @@ class HeadsMonitorConsensusAvailabilityCheck(HeadsMonitor):
 
     def report_metric(self) -> str:
         """Report the results obtained from the measurements."""
-        out = {}
+        out = {
+            "available_consensus_clients": [],
+            "unreachable_consensus_clients_connection_error": [],
+            "invalid_response_consensus_clients": [],
+            "unreachable_consensus_clients_unknown_reason": [],
+            "timeout_consensus_clients": [],
+        }
         if len(self.results.items()) > 0:
-            out["available_consensus_clients"] = [{"client_pair": client.name, "client_ip": client.ip_address, "client_consensus": client.collection_config.consensus_config.client} for client, _result in  self.results.items()]
-        if len(self.unreachable_clients) > 0:
-            out["unreachable_consensus_clients"] = [{"client_pair": client.name, "client_ip": client.ip_address, "client_consensus": client.collection_config.consensus_config.client} for client in self.unreachable_clients]
+            out["available_consensus_clients"] = [
+                {
+                    "client_pair": client.name,
+                    "client_ip": client.ip_address,
+                    "client_consensus": client.collection_config.consensus_config.client,
+                }
+                for client, _result in self.results.items()
+            ]
+        if len(self.unreachable_clients_connection_error) > 0:
+            out["unreachable_consensus_clients_connection_error"] = [
+                {
+                    "client_pair": client.name,
+                    "client_ip": client.ip_address,
+                    "client_consensus": client.collection_config.consensus_config.client,
+                }
+                for client in self.unreachable_clients_connection_error
+            ]
         if len(self.invalid_response_clients) > 0:
-            out["invalid_response_consensus_clients"] = [{"client_pair": client.name, "client_ip": client.ip_address, "client_consensus": client.collection_config.consensus_config.client} for client in self.invalid_response_clients]
+            out["invalid_response_consensus_clients"] = [
+                {
+                    "client_pair": client.name,
+                    "client_ip": client.ip_address,
+                    "client_consensus": client.collection_config.consensus_config.client,
+                }
+                for client in self.invalid_response_clients
+            ]
+        if len(self.unreachable_clients_unknown_reason) > 0:
+            out["unreachable_consensus_clients_unknown_reason"] = [
+                {
+                    "client_pair": client.name,
+                    "client_ip": client.ip_address,
+                    "client_consensus": client.collection_config.consensus_config.client,
+                }
+                for client in self.unreachable_clients_unknown_reason
+            ]
+        if len(self.timeout_clients) > 0:
+            out["timeout_consensus_clients"] = [
+                {
+                    "client_pair": client.name,
+                    "client_ip": client.ip_address,
+                    "client_consensus": client.collection_config.consensus_config.client,
+                }
+                for client in self.timeout_clients
+            ]
         return json.dumps(out)
 
 
@@ -378,11 +460,10 @@ class CheckpointsMonitor(ConsensusMetricMonitor):
         self.query = BeaconAPIgetFinalityCheckpoints(
             max_retries=max_retries, timeout=timeout
         )
-        self.max_retry_for_consensus = max_retries_for_consensus
-
         super().__init__(
             client_query=self.query.perform_request,
             response_parser=self._get_checkpoints,
+            max_retries_for_consensus=max_retries_for_consensus,
         )
 
     def _get_checkpoints(self, response: requests.Response) -> Optional[str]:
@@ -391,29 +472,78 @@ class CheckpointsMonitor(ConsensusMetricMonitor):
             finalized_cp: tuple[int, str]
             current_justified_cp: tuple[int, str]
             previous_justified_cp: tuple[int, str]
-
             finalized_cp = self.query.get_finalized_checkpoint(response)
             fc_epoch = finalized_cp[0]
             fc_root = f"0x{finalized_cp[1][-8:]}"
             fc = (fc_epoch, fc_root)
-
             current_justified_cp = self.query.get_current_justified_checkpoint(response)
             cj_epoch = current_justified_cp[0]
             cj_root = f"0x{current_justified_cp[1][-8:]}"
             cj = (cj_epoch, cj_root)
-
             previous_justified_cp = self.query.get_previous_justified_checkpoint(
                 response
             )
             pj_epoch = previous_justified_cp[0]
             pj_root = f"0x{previous_justified_cp[1][-8:]}"
             pj = (pj_epoch, pj_root)
-
-            return f"finalized: {fc}, current justified: {cj}, previous justified: {pj}"
-
+            return json.dumps({"fc": fc, "cj": cj, "pj": pj})
         except Exception as e:
             logging.debug(f"Exception parsing response: {e}")
             return None
+
+    def report_metric(self) -> str:
+        """Report the results obtained from the measurements."""
+        out = {
+            "checkpoints": {
+                "finalization_data": [],
+                "unreachable_clients_connection_error": [],
+                "invalid_response_clients": [],
+                "unreachable_clients_unknown_reason": [],
+                "timeout_clients": [],
+            }
+        }
+        items = self.consensus_results.items()
+        if len(items):
+            for clients, result in items:
+                logging.debug(f"{result} {type(result)}")
+            out["checkpoints"]["finalization_data"] = [
+                {
+                    "finalized": json.loads(result)["fc"],
+                    "current_justified": json.loads(result)["cj"],
+                    "previous_justified": json.loads(result)["pj"],
+                    "clients": [client.name for client in clients],
+                }
+                for result, clients in items
+            ]
+        if len(self.unreachable_clients_connection_error) > 0:
+            out["checkpoints"]["unreachable_clients_connection_error"] = [
+                {"client_pair": client.name, "client_ip": client.ip_address}
+                for client in self.unreachable_clients_connection_error
+            ]
+        if len(self.invalid_response_clients) > 0:
+            out["checkpoints"]["invalid_response_clients"] = [
+                {"client_pair": client.name, "client_ip": client.ip_address}
+                for client in self.invalid_response_clients
+            ]
+        if len(self.unreachable_clients_unknown_reason) > 0:
+            out["checkpoints"]["unreachable_clients_unknown_reason"] = [
+                {
+                    "client_pair": client.name,
+                    "client_ip": client.ip_address,
+                    "client_consensus": client.collection_config.consensus_config.client,
+                }
+                for client in self.unreachable_clients_unknown_reason
+            ]
+        if len(self.timeout_clients) > 0:
+            out["checkpoints"]["timeout_clients"] = [
+                {
+                    "client_pair": client.name,
+                    "client_ip": client.ip_address,
+                    "client_consensus": client.collection_config.consensus_config.client,
+                }
+                for client in self.timeout_clients
+            ]
+        return json.dumps(out)
 
 
 # peer_id : {state: "", direction: ""}
@@ -449,7 +579,6 @@ class ConsensusLayerPeersMonitor(ClientMetricMonitor):
         self.query = BeaconAPIgetPeers(
             max_retries=max_retries, timeout=timeout, states=["connected"]
         )
-
         super().__init__(
             client_query=self.query.perform_request,
             response_parser=self._get_client_peers,
@@ -479,7 +608,6 @@ class ConsensusLayerIdentityMonitor(ClientMetricMonitor):
 
     def __init__(self, max_retries: int = 3, timeout: int = 5):
         self.query = BeaconAPIgetIdentity(max_retries=max_retries, timeout=timeout)
-
         super().__init__(
             client_query=self.query.perform_request,
             response_parser=self._get_peer_id,
@@ -523,7 +651,6 @@ class ConsensusLayerPeeringSummary:
         """Run the monitor."""
         self.peers_monitor.collect_metrics(clients_to_monitor)
         self.identity_monitor.collect_metrics(clients_to_monitor)
-
         # better summary
         # mapping to go from peer_id to ClientInstance
         peer_id_client_map: dict[str, ClientInstance] = {}
@@ -531,7 +658,6 @@ class ConsensusLayerPeeringSummary:
         for client, identity in self.identity_monitor.results.items():
             peer_id_client_map[identity] = client
             client_peer_id_map[client] = identity
-
         out = ""
         inbound_peer_map: dict[ClientInstance, list[Union[ClientInstance, str]]] = {}
         outbound_peer_map: dict[ClientInstance, list[Union[ClientInstance, str]]] = {}
@@ -555,11 +681,11 @@ class ConsensusLayerPeeringSummary:
                 out += f"{client.name}:\n"
                 out += f"\tinbound: {inbound_peer_map[client]}\n"
                 out += f"\toutbound: {outbound_peer_map[client]}\n"
-
         return out
 
 
 BlobSideCar = tuple[int, str, int]
+
 
 class BlobMonitor(ConsensusMetricMonitor):
     """
@@ -571,16 +697,13 @@ class BlobMonitor(ConsensusMetricMonitor):
         self, max_retries: int = 3, timeout: int = 5, max_retries_for_consensus: int = 3
     ):
         self.query = BeaconAPIgetBlob(max_retries=max_retries, timeout=timeout)
-        self.max_retry_for_consensus = max_retries_for_consensus
-
         super().__init__(
             client_query=self.query.perform_request,
             response_parser=self._get_blob_metadata,
+            max_retries_for_consensus=max_retries_for_consensus,
         )
 
-    def _get_blob_metadata(
-        self, response: requests.Response
-    ) -> Optional[BlobSideCar]:
+    def _get_blob_metadata(self, response: requests.Response) -> Optional[BlobSideCar]:
         try:
             blob = self.query.get_blob(response)
             slot = blob["slot"]
