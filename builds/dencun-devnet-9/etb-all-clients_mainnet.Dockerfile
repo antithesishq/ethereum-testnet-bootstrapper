@@ -25,7 +25,7 @@ ARG TEKU_EVIL_BRANCH="evil-blobs"
 
 # Execution Clients
 ARG BESU_REPO="https://github.com/hyperledger/besu.git"
-ARG BESU_BRANCH="4b822d67"
+ARG BESU_BRANCH="a56a35f1"
 
 ARG GETH_REPO="https://github.com/lightclient/go-ethereum.git"
 ARG GETH_BRANCH="6e6c723b4d74fa2ec4491f11354facadb32e8cfb"
