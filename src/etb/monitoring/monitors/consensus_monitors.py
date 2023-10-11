@@ -31,15 +31,12 @@ by a testnet_monitor or any other module.
 """
 # The client instance and the result of the metric
 ClientMonitorResult = dict[ClientInstance, Any]
-
 # The result of the metric and the clients that returned that result
 ConsensusMonitorResult = dict[Any, list[ClientInstance]]
-
 # results are grouped by client, unreachable_clients_connection_error, invalid_response_clients
 ClientMonitorReport = tuple[
     ClientMonitorResult, list[ClientInstance], list[ClientInstance]
 ]
-
 # clients grouped by result, unreachable_clients_connection_error, invalid_response_clients
 ConsensusMonitorReport = tuple[
     ConsensusMonitorResult, list[ClientInstance], list[ClientInstance]
@@ -278,55 +275,58 @@ class HeadsMonitorExecutionAvailabilityCheck(ClientMetricMonitor):
 
     def report_metric(self) -> str:
         """Report the results obtained from the measurements."""
+        # out = {"available_execution_clients": [], "unreachable_execution_clients_connection_error": [], "invalid_response_execution_clients": [], "unreachable_execution_clients_unknown_reason": [], "timeout_execution_clients": []}
         out = {
-            "available_execution_clients": [],
-            "unreachable_execution_clients_connection_error": [],
-            "invalid_response_execution_clients": [],
-            "unreachable_execution_clients_unknown_reason": [],
-            "timeout_execution_clients": [],
+            "execution_availability": {
+                "available": [],
+                "unreachable_connection_error": [],
+                "invalid_response": [],
+                "unreachable_unknown_reason": [],
+                "timeout": [],
+            }
         }
         if len(self.results.items()) > 0:
-            out["available_execution_clients"] = [
+            out["execution_availability"]["available"] = [
                 {
-                    "client_pair": client.name,
-                    "client_ip": client.ip_address,
-                    "client_execution": client.collection_config.execution_config.client,
+                    "container": client.name,
+                    "ip": client.ip_address,
+                    "execution": client.collection_config.execution_config.client,
                 }
                 for client, _result in self.results.items()
             ]
         if len(self.unreachable_clients_connection_error) > 0:
-            out["unreachable_execution_clients_connection_error"] = [
+            out["execution_availability"]["unreachable_connection_error"] = [
                 {
-                    "client_pair": client.name,
-                    "client_ip": client.ip_address,
-                    "client_execution": client.collection_config.execution_config.client,
+                    "container": client.name,
+                    "ip": client.ip_address,
+                    "execution": client.collection_config.execution_config.client,
                 }
                 for client in self.unreachable_clients_connection_error
             ]
         if len(self.invalid_response_clients) > 0:
-            out["invalid_response_execution_clients"] = [
+            out["execution_availability"]["invalid_response"] = [
                 {
-                    "client_pair": client.name,
-                    "client_ip": client.ip_address,
-                    "client_execution": client.collection_config.execution_config.client,
+                    "container": client.name,
+                    "ip": client.ip_address,
+                    "execution": client.collection_config.execution_config.client,
                 }
                 for client in self.invalid_response_clients
             ]
         if len(self.unreachable_clients_unknown_reason) > 0:
-            out["unreachable_execution_clients_unknown_reason"] = [
+            out["execution_availability"]["unreachable_unknown_reason"] = [
                 {
-                    "client_pair": client.name,
-                    "client_ip": client.ip_address,
-                    "client_execution": client.collection_config.execution_config.client,
+                    "container": client.name,
+                    "ip": client.ip_address,
+                    "execution": client.collection_config.execution_config.client,
                 }
                 for client in self.unreachable_clients_unknown_reason
             ]
         if len(self.timeout_clients) > 0:
-            out["timeout_execution_clients"] = [
+            out["execution_availability"]["timeout"] = [
                 {
-                    "client_pair": client.name,
-                    "client_ip": client.ip_address,
-                    "client_execution": client.collection_config.execution_config.client,
+                    "container": client.name,
+                    "ip": client.ip_address,
+                    "execution": client.collection_config.execution_config.client,
                 }
                 for client in self.timeout_clients
             ]
@@ -392,55 +392,58 @@ class HeadsMonitorConsensusAvailabilityCheck(HeadsMonitor):
 
     def report_metric(self) -> str:
         """Report the results obtained from the measurements."""
+        # out = {"available_consensus_clients": [], "unreachable_consensus_clients_connection_error": [], "invalid_response_consensus_clients": [], "unreachable_consensus_clients_unknown_reason": [], "timeout_consensus_clients": []}
         out = {
-            "available_consensus_clients": [],
-            "unreachable_consensus_clients_connection_error": [],
-            "invalid_response_consensus_clients": [],
-            "unreachable_consensus_clients_unknown_reason": [],
-            "timeout_consensus_clients": [],
+            "consensus_availability": {
+                "available": [],
+                "unreachable_connection_error": [],
+                "invalid_response": [],
+                "unreachable_unknown_reason": [],
+                "timeout": [],
+            }
         }
         if len(self.results.items()) > 0:
-            out["available_consensus_clients"] = [
+            out["consensus_availability"]["available"] = [
                 {
-                    "client_pair": client.name,
-                    "client_ip": client.ip_address,
-                    "client_consensus": client.collection_config.consensus_config.client,
+                    "container": client.name,
+                    "ip": client.ip_address,
+                    "consensus": client.collection_config.consensus_config.client,
                 }
                 for client, _result in self.results.items()
             ]
         if len(self.unreachable_clients_connection_error) > 0:
-            out["unreachable_consensus_clients_connection_error"] = [
+            out["consensus_availability"]["unreachable_connection_error"] = [
                 {
-                    "client_pair": client.name,
-                    "client_ip": client.ip_address,
-                    "client_consensus": client.collection_config.consensus_config.client,
+                    "container": client.name,
+                    "ip": client.ip_address,
+                    "consensus": client.collection_config.consensus_config.client,
                 }
                 for client in self.unreachable_clients_connection_error
             ]
         if len(self.invalid_response_clients) > 0:
-            out["invalid_response_consensus_clients"] = [
+            out["consensus_availability"]["invalid_response"] = [
                 {
-                    "client_pair": client.name,
-                    "client_ip": client.ip_address,
-                    "client_consensus": client.collection_config.consensus_config.client,
+                    "container": client.name,
+                    "ip": client.ip_address,
+                    "consensus": client.collection_config.consensus_config.client,
                 }
                 for client in self.invalid_response_clients
             ]
         if len(self.unreachable_clients_unknown_reason) > 0:
-            out["unreachable_consensus_clients_unknown_reason"] = [
+            out["consensus_availability"]["unreachable_unknown_reason"] = [
                 {
-                    "client_pair": client.name,
-                    "client_ip": client.ip_address,
-                    "client_consensus": client.collection_config.consensus_config.client,
+                    "container": client.name,
+                    "ip": client.ip_address,
+                    "consensus": client.collection_config.consensus_config.client,
                 }
                 for client in self.unreachable_clients_unknown_reason
             ]
         if len(self.timeout_clients) > 0:
-            out["timeout_consensus_clients"] = [
+            out["consensus_availability"]["timeout"] = [
                 {
-                    "client_pair": client.name,
-                    "client_ip": client.ip_address,
-                    "client_consensus": client.collection_config.consensus_config.client,
+                    "container": client.name,
+                    "ip": client.ip_address,
+                    "consensus": client.collection_config.consensus_config.client,
                 }
                 for client in self.timeout_clients
             ]
@@ -496,10 +499,10 @@ class CheckpointsMonitor(ConsensusMetricMonitor):
         out = {
             "checkpoints": {
                 "finalization_data": [],
-                "unreachable_clients_connection_error": [],
-                "invalid_response_clients": [],
-                "unreachable_clients_unknown_reason": [],
-                "timeout_clients": [],
+                "unreachable_connection_error": [],
+                "invalid_response": [],
+                "unreachable_unknown_reason": [],
+                "timeout": [],
             }
         }
         items = self.consensus_results.items()
@@ -516,30 +519,30 @@ class CheckpointsMonitor(ConsensusMetricMonitor):
                 for result, clients in items
             ]
         if len(self.unreachable_clients_connection_error) > 0:
-            out["checkpoints"]["unreachable_clients_connection_error"] = [
-                {"client_pair": client.name, "client_ip": client.ip_address}
+            out["checkpoints"]["unreachable_connection_error"] = [
+                {"container": client.name, "ip": client.ip_address}
                 for client in self.unreachable_clients_connection_error
             ]
         if len(self.invalid_response_clients) > 0:
-            out["checkpoints"]["invalid_response_clients"] = [
-                {"client_pair": client.name, "client_ip": client.ip_address}
+            out["checkpoints"]["invalid_response"] = [
+                {"container": client.name, "ip": client.ip_address}
                 for client in self.invalid_response_clients
             ]
         if len(self.unreachable_clients_unknown_reason) > 0:
-            out["checkpoints"]["unreachable_clients_unknown_reason"] = [
+            out["checkpoints"]["unreachable_unknown_reason"] = [
                 {
-                    "client_pair": client.name,
-                    "client_ip": client.ip_address,
-                    "client_consensus": client.collection_config.consensus_config.client,
+                    "container": client.name,
+                    "ip": client.ip_address,
+                    "consensus": client.collection_config.consensus_config.client,
                 }
                 for client in self.unreachable_clients_unknown_reason
             ]
         if len(self.timeout_clients) > 0:
-            out["checkpoints"]["timeout_clients"] = [
+            out["checkpoints"]["timeout"] = [
                 {
-                    "client_pair": client.name,
-                    "client_ip": client.ip_address,
-                    "client_consensus": client.collection_config.consensus_config.client,
+                    "container": client.name,
+                    "ip": client.ip_address,
+                    "consensus": client.collection_config.consensus_config.client,
                 }
                 for client in self.timeout_clients
             ]
