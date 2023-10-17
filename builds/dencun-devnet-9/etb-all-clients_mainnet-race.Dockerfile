@@ -3,10 +3,10 @@
 ###############################################################################
 # Consensus Clients
 ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
-ARG LIGHTHOUSE_BRANCH="57edc0f" 
+ARG LIGHTHOUSE_BRANCH="e9c8f8" 
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
-ARG PRYSM_BRANCH="c20f188966f09b831096b5fcb939a76aad543511"
+ARG PRYSM_BRANCH="be9b6ea837d9a88fe28d5c2b0b65fb4bded777bb"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
 ARG LODESTAR_BRANCH="d9e6f1a"
