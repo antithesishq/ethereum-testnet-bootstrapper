@@ -5,7 +5,8 @@ package instrumentation
 	need not be set, since the Antithesis instrumentation functions are declared
 	inline, below. In the unlikely event that any of these changes, this file
 	must also be changed. Inlining these declarations has proven to be less brittle
-	than imposing a compile-time requirement on "instrumentation.h".
+	than imposing a compile-time requirement on "instrumentation.h", which would
+	fall on every user of this package.
 
 	Flags for CGO are collected, so the blank declarations have no effect.
 	However, they can be modified in build scripts to be built into customer code.

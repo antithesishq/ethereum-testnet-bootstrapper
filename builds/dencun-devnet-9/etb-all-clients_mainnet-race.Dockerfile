@@ -3,7 +3,7 @@
 ###############################################################################
 # Consensus Clients
 ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
-ARG LIGHTHOUSE_BRANCH="e9c8f8" 
+ARG LIGHTHOUSE_BRANCH="38e7172" 
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
 ARG PRYSM_BRANCH="be9b6ea837d9a88fe28d5c2b0b65fb4bded777bb"
@@ -15,17 +15,17 @@ ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
 ARG NIMBUS_ETH2_BRANCH="e9c8f8"
 
 ARG TEKU_REPO="https://github.com/ConsenSys/teku.git"
-ARG TEKU_BRANCH="ef391e99ca"
+ARG TEKU_BRANCH="ccaf7a4"
 
 # Execution Clients
 ARG BESU_REPO="https://github.com/hyperledger/besu.git"
 ARG BESU_BRANCH="a56a35f1"
 
 ARG GETH_REPO="https://github.com/lightclient/go-ethereum.git"
-ARG GETH_BRANCH="6e6c723b4d74fa2ec4491f11354facadb32e8cfb"
+ARG GETH_BRANCH="05d844c962fac591ef70dd91e5beb71f1467e261"
 
 ARG NETHERMIND_REPO="https://github.com/NethermindEth/nethermind.git"
-ARG NETHERMIND_BRANCH="3320d241"
+ARG NETHERMIND_BRANCH="ae8950a2"
 
 ARG ETHEREUMJS_REPO="https://github.com/ethereumjs/ethereumjs-monorepo.git"
 ARG ETHEREUMJS_BRANCH="7a0a37b7355c77ce841d5b04da55a2a4b53fe550"
