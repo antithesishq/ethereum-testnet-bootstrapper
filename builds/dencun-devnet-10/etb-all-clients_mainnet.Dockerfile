@@ -31,7 +31,7 @@ ARG GETH_REPO="https://github.com/lightclient/go-ethereum.git"
 ARG GETH_BRANCH="4d161dee0c4cb19e7b391b3f0fe4edd139aecbc8"
 
 ARG NETHERMIND_REPO="https://github.com/NethermindEth/nethermind.git"
-ARG NETHERMIND_BRANCH="75a4b33b"
+ARG NETHERMIND_BRANCH="4847b067"
 
 # ARG ETHEREUMJS_REPO="https://github.com/ethereumjs/ethereumjs-monorepo.git"
 # ARG ETHEREUMJS_BRANCH="41ebb15173af913f5c65e4410fcd335d35db536b"
