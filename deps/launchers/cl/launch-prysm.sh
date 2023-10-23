@@ -102,6 +102,8 @@ mock_builder_args=(
   --client-init-timeout 60    
 )
 
+# reduce further --get-payload-delay-ms 100
+
 if [ "$MOCK_BUILDER" == 1 ]; then
   echo "Launching mock builder"
   beacon_args+=(
