@@ -434,7 +434,8 @@ class TestnetStatusCheckerV2(object):
         #     print(f"terminate", flush=True)
 
         # antithesis
-        print("start_tx_fuzzer", flush=True)
+        # print("start_tx_fuzzer", flush=True)
+        Path.touch("/data/tx-fuzzer-ready")
 
         self.testnet_monitor.wait_for_slot(phase1_slot)
         print("start_faults", flush=True)
