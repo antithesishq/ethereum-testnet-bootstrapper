@@ -3,16 +3,16 @@
 ###############################################################################
 # Consensus Clients
 ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
-ARG LIGHTHOUSE_BRANCH="b7a3f52" 
+ARG LIGHTHOUSE_BRANCH="9c1f3a6" 
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
-ARG PRYSM_BRANCH="b83d0a08198587403c0c80cce7e50eaf021b5450"
+ARG PRYSM_BRANCH="56c65b8527fef4449792e7b593343d193340993e"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
-ARG LODESTAR_BRANCH="d9e6f1a"
+ARG LODESTAR_BRANCH="v1.11.3"
 
 ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
-ARG NIMBUS_ETH2_BRANCH="a986a1"
+ARG NIMBUS_ETH2_BRANCH="34eade"
 
 ARG TEKU_REPO="https://github.com/ConsenSys/teku.git"
 ARG TEKU_BRANCH="d418f8d"
@@ -235,198 +235,198 @@ RUN /opt/antithesis/go_instrumentation/bin/goinstrumentor \
     -antithesis /opt/antithesis/go_instrumentation/instrumentation/go/wrappers \
     go-ethereum geth_instrumented
 
-# RUN cd geth_instrumented/customer && \
-#     go install -race ./... && mv /root/go/bin/geth /tmp/geth_race
+RUN cd geth_instrumented/customer && \
+    go install -race ./... && mv /root/go/bin/geth /tmp/geth_race
 
-# RUN cd geth_instrumented/customer && \
-#     go install ./...
-
-
-# # Besu
-# FROM etb-client-builder AS besu-builder
-# ARG BESU_BRANCH
-# ARG BESU_REPO
-# RUN git clone "${BESU_REPO}" && \
-#     cd besu && \
-#     git checkout "${BESU_BRANCH}" && \
-#     git log -n 1 --format=format:"%H" > /besu.version
-
-# RUN cd besu && \
-#     ./gradlew installDist
-
-# # Nethermind
-# FROM etb-client-builder AS nethermind-builder
-# ARG NETHERMIND_BRANCH
-# ARG NETHERMIND_REPO
-# RUN git clone "${NETHERMIND_REPO}" && \
-#     cd nethermind && \
-#     git checkout "${NETHERMIND_BRANCH}" && \
-#     git log -n 1 --format=format:"%H" > /nethermind.version
-
-# RUN cd nethermind && \
-#     dotnet publish -p:PublishReadyToRun=false src/Nethermind/Nethermind.Runner -c release -o out
-
-# # RETH
-# FROM etb-client-builder AS RETH-builder
-# ARG RETH_BRANCH
-# ARG RETH_REPO
-# RUN git clone "${RETH_REPO}" && \
-#     cd reth && \
-#     git checkout "${RETH_BRANCH}" && \
-#     git log -n 1 --format=format:"%H" > /reth.version
-
-# RUN cd reth && \
-#     cargo build --release && \
-#     mv target/release/reth target/release/reth_uninstrumented
-
-# # Antithesis instrumented lighthouse binary
-# RUN cd reth && \ 
-# LD_LIBRARY_PATH=/usr/lib/ RUSTFLAGS="-Cpasses=sancov-module -Cllvm-args=-sanitizer-coverage-level=3 -Cllvm-args=-sanitizer-coverage-trace-pc-guard -Ccodegen-units=1 -Cdebuginfo=2 -L/usr/lib/ -lvoidstar" cargo build --release 
-
-# ############################### Misc.  Modules  ###############################
-# FROM etb-client-builder AS misc-builder
-# ARG TX_FUZZ_BRANCH
-# ARG TX_FUZZ_REPO
-# ARG BEACON_METRICS_GAZER_REPO
-# ARG BEACON_METRICS_GAZER_BRANCH
-
-# RUN go install github.com/wealdtech/ethereal/v2@latest \
-#     &&  go install github.com/wealdtech/ethdo@latest \
-#     && go install github.com/protolambda/eth2-val-tools@latest
-
-# RUN git clone "${TX_FUZZ_REPO}" && \
-#     cd tx-fuzz && \
-#     git checkout "${TX_FUZZ_BRANCH}"
-
-# RUN cd tx-fuzz && \
-#     cd cmd/livefuzzer && go build
-
-# RUN git clone "${BEACON_METRICS_GAZER_REPO}" && \
-#     cd beacon-metrics-gazer && \
-#     git checkout "${BEACON_METRICS_GAZER_BRANCH}"
-
-# RUN cd beacon-metrics-gazer && \
-#     cargo update -p proc-macro2 && \
-#     cargo build --release
-
-# RUN cargo install jwt-cli
-
-# ARG MOCK_BUILDER_REPO
-# ARG MOCK_BUILDER_BRANCH
-# RUN git clone --branch "${MOCK_BUILDER_BRANCH}" "${MOCK_BUILDER_REPO}" && \
-#     cd mock-builder && \
-#     go build .
-
-# ########################### etb-all-clients runner  ###########################
-# FROM debian:bullseye-slim
-
-# # Antithesis instrumentation files
-# COPY instrumentation/lib/libvoidstar.so /usr/lib/libvoidstar.so
-# RUN mkdir -p /opt/antithesis/
-# COPY instrumentation/go_instrumentation /opt/antithesis/go_instrumentation
-# RUN /opt/antithesis/go_instrumentation/bin/goinstrumentor -version
+RUN cd geth_instrumented/customer && \
+    go install ./...
 
 
-# WORKDIR /git
+# Besu
+FROM etb-client-builder AS besu-builder
+ARG BESU_BRANCH
+ARG BESU_REPO
+RUN git clone "${BESU_REPO}" && \
+    cd besu && \
+    git checkout "${BESU_BRANCH}" && \
+    git log -n 1 --format=format:"%H" > /besu.version
 
-# RUN apt update && apt install curl ca-certificates -y --no-install-recommends \
-#     wget \
-#     lsb-release \
-#     software-properties-common && \
-#     curl -sL https://deb.nodesource.com/setup_18.x | bash -
+RUN cd besu && \
+    ./gradlew installDist
 
-# RUN wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh && \
-#     chmod +x dotnet-install.sh && \
-#     ./dotnet-install.sh --channel 7.0
+# Nethermind
+FROM etb-client-builder AS nethermind-builder
+ARG NETHERMIND_BRANCH
+ARG NETHERMIND_REPO
+RUN git clone "${NETHERMIND_REPO}" && \
+    cd nethermind && \
+    git checkout "${NETHERMIND_BRANCH}" && \
+    git log -n 1 --format=format:"%H" > /nethermind.version
 
-# ENV PATH="$PATH:/root/.dotnet/"
-# ENV DOTNET_ROOT=/root/.dotnet
+RUN cd nethermind && \
+    dotnet publish -p:PublishReadyToRun=false src/Nethermind/Nethermind.Runner -c release -o out
 
-# RUN apt-get update && apt-get install -y --no-install-recommends \
-#     nodejs \
-#     libgflags-dev \
-#     libsnappy-dev \
-#     zlib1g-dev \
-#     libbz2-dev \
-#     liblz4-dev \
-#     libzstd-dev \
-#     openjdk-17-jre \
-#     python3-dev \
-#     python3-pip \
-#     jq \
-#     xxd
+# RETH
+FROM etb-client-builder AS RETH-builder
+ARG RETH_BRANCH
+ARG RETH_REPO
+RUN git clone "${RETH_REPO}" && \
+    cd reth && \
+    git checkout "${RETH_BRANCH}" && \
+    git log -n 1 --format=format:"%H" > /reth.version
 
-# RUN pip3 install ruamel.yaml web3 pydantic
+RUN cd reth && \
+    cargo build --release && \
+    mv target/release/reth target/release/reth_uninstrumented
 
-# # for coverage artifacts and runtime libraries.
-# RUN wget --no-check-certificate https://apt.llvm.org/llvm.sh && \
-#     chmod +x llvm.sh && \
-#     ./llvm.sh 15
+# Antithesis instrumented lighthouse binary
+RUN cd reth && \ 
+LD_LIBRARY_PATH=/usr/lib/ RUSTFLAGS="-Cpasses=sancov-module -Cllvm-args=-sanitizer-coverage-level=3 -Cllvm-args=-sanitizer-coverage-trace-pc-guard -Ccodegen-units=1 -Cdebuginfo=2 -L/usr/lib/ -lvoidstar" cargo build --release 
 
-# ENV LLVM_CONFIG=llvm-config-15
+############################### Misc.  Modules  ###############################
+FROM etb-client-builder AS misc-builder
+ARG TX_FUZZ_BRANCH
+ARG TX_FUZZ_REPO
+ARG BEACON_METRICS_GAZER_REPO
+ARG BEACON_METRICS_GAZER_BRANCH
 
-# # misc tools used in etb
-# COPY --from=misc-builder /root/go/bin/ethereal /usr/local/bin/ethereal
-# COPY --from=misc-builder /root/go/bin/ethdo /usr/local/bin/ethdo
-# COPY --from=misc-builder /root/go/bin/eth2-val-tools /usr/local/bin/eth2-val-tools
-# # tx-fuzz
-# COPY --from=misc-builder /git/tx-fuzz/cmd/livefuzzer/livefuzzer /usr/local/bin/livefuzzer
-# # beacon-metrics-gazer
-# COPY --from=misc-builder /git/beacon-metrics-gazer/target/release/beacon-metrics-gazer /usr/local/bin/beacon-metrics-gazer
+RUN go install github.com/wealdtech/ethereal/v2@latest \
+    &&  go install github.com/wealdtech/ethdo@latest \
+    && go install github.com/protolambda/eth2-val-tools@latest
 
-# COPY --from=misc-builder /root/.cargo/bin/jwt /usr/local/bin/jwt
-# # mock-builder
-# COPY --from=misc-builder /git/mock-builder/mock-builder /usr/local/bin/mock-builder
+RUN git clone "${TX_FUZZ_REPO}" && \
+    cd tx-fuzz && \
+    git checkout "${TX_FUZZ_BRANCH}"
 
-# # consensus clients
-# COPY --from=nimbus-eth2-builder /git/nimbus-eth2/build/nimbus_beacon_node /usr/local/bin/nimbus_beacon_node
-# COPY --from=nimbus-eth2-builder /nimbus.version /nimbus.version
+RUN cd tx-fuzz && \
+    cd cmd/livefuzzer && go build
 
-# COPY --from=lighthouse-builder /lighthouse.version /lighthouse.version
-# COPY --from=lighthouse-builder /git/lighthouse/target/release/lighthouse_uninstrumented /usr/local/bin/lighthouse_uninstrumented
-# COPY --from=lighthouse-builder /git/lighthouse/target/release/lighthouse /usr/local/bin/lighthouse
+RUN git clone "${BEACON_METRICS_GAZER_REPO}" && \
+    cd beacon-metrics-gazer && \
+    git checkout "${BEACON_METRICS_GAZER_BRANCH}"
 
-# COPY --from=teku-builder  /git/teku/build/install/teku/. /opt/teku
-# COPY --from=teku-builder /teku.version /teku.version
-# RUN ln -s /opt/teku/bin/teku /usr/local/bin/teku
+RUN cd beacon-metrics-gazer && \
+    cargo update -p proc-macro2 && \
+    cargo build --release
 
-# # COPY --from=prysm-buildeer /git/lodestar /git/lodestar
-# COPY --from=lodestar-builder /lodestar.version /lodestar.version
-# RUN ln -s /git/lodestar/node_modules/.bin/lodestar /usr/local/bin/lodestar
+RUN cargo install jwt-cli
 
-# # execution clients
-# COPY --from=geth-builder /geth.version /geth.version
-# COPY --from=geth-builder /root/go/bin/geth /usr/local/bin/geth
-# COPY --from=geth-builder /tmp/geth_uninstrumented /usr/local/bin/geth_uninstrumented
-# COPY --from=geth-builder /tmp/geth_race /usr/local/bin/geth_race
-# COPY --from=geth-builder /git/geth_instrumented/symbols/* /opt/antithesis/symbols/
-# COPY --from=geth-builder /git/geth_instrumented/customer /geth_instrumented_code
+ARG MOCK_BUILDER_REPO
+ARG MOCK_BUILDER_BRANCH
+RUN git clone --branch "${MOCK_BUILDER_BRANCH}" "${MOCK_BUILDER_REPO}" && \
+    cd mock-builder && \
+    go build .
 
-# COPY --from=reth-builder /reth.version /reth.version
-# COPY --from=reth-builder /git/reth/target/release/reth /usr/local/bin/reth
-# COPY --from=reth-builder /git/reth/target/release/reth_uninstrumented /usr/local/bin/reth_uninstrumented
+########################### etb-all-clients runner  ###########################
+FROM debian:bullseye-slim
 
-# COPY --from=besu-builder /besu.version /besu.version
-# COPY --from=besu-builder /git/besu/build/install/besu/. /opt/besu
-# RUN ln -s /opt/besu/bin/besu /usr/local/bin/besu
+# Antithesis instrumentation files
+COPY instrumentation/lib/libvoidstar.so /usr/lib/libvoidstar.so
+RUN mkdir -p /opt/antithesis/
+COPY instrumentation/go_instrumentation /opt/antithesis/go_instrumentation
+RUN /opt/antithesis/go_instrumentation/bin/goinstrumentor -version
 
-# COPY --from=nethermind-builder /nethermind.version /nethermind.version
-# COPY --from=nethermind-builder /git/nethermind/out /nethermind/
-# RUN ln -s /nethermind/nethermind /usr/local/bin/nethermindr /beacon-chain /usr/local/bin/
-# # COPY --from=prysm-builder /validator /usr/local/bin/
-# COPY --from=prysm-builder /beacon-chain_race /usr/local/bin/beacon-chain
-# COPY --from=prysm-builder /validator_race /usr/local/bin/validator
-# COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /usr/local/bin/beacon-chain_uninstrumented
-# COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/validator/validator_/validator /usr/local/bin/validator_uninstrumented
-# COPY --from=prysm-builder /prysm.version /prysm.version
-# COPY --from=prysm-builder /git/prysm_instrumented/symbols/* /opt/antithesis/symbols/
-# COPY --from=prysm-builder /git/prysm_instrumented/customer /prysm_instrumented_code
-# #
+
+WORKDIR /git
+
+RUN apt update && apt install curl ca-certificates -y --no-install-recommends \
+    wget \
+    lsb-release \
+    software-properties-common && \
+    curl -sL https://deb.nodesource.com/setup_18.x | bash -
+
+RUN wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh && \
+    chmod +x dotnet-install.sh && \
+    ./dotnet-install.sh --channel 7.0
+
+ENV PATH="$PATH:/root/.dotnet/"
+ENV DOTNET_ROOT=/root/.dotnet
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    nodejs \
+    libgflags-dev \
+    libsnappy-dev \
+    zlib1g-dev \
+    libbz2-dev \
+    liblz4-dev \
+    libzstd-dev \
+    openjdk-17-jre \
+    python3-dev \
+    python3-pip \
+    jq \
+    xxd
+
+RUN pip3 install ruamel.yaml web3 pydantic
+
+# for coverage artifacts and runtime libraries.
+RUN wget --no-check-certificate https://apt.llvm.org/llvm.sh && \
+    chmod +x llvm.sh && \
+    ./llvm.sh 15
+
+ENV LLVM_CONFIG=llvm-config-15
+
+# misc tools used in etb
+COPY --from=misc-builder /root/go/bin/ethereal /usr/local/bin/ethereal
+COPY --from=misc-builder /root/go/bin/ethdo /usr/local/bin/ethdo
+COPY --from=misc-builder /root/go/bin/eth2-val-tools /usr/local/bin/eth2-val-tools
+# tx-fuzz
+COPY --from=misc-builder /git/tx-fuzz/cmd/livefuzzer/livefuzzer /usr/local/bin/livefuzzer
+# beacon-metrics-gazer
+COPY --from=misc-builder /git/beacon-metrics-gazer/target/release/beacon-metrics-gazer /usr/local/bin/beacon-metrics-gazer
+
+COPY --from=misc-builder /root/.cargo/bin/jwt /usr/local/bin/jwt
+# mock-builder
+COPY --from=misc-builder /git/mock-builder/mock-builder /usr/local/bin/mock-builder
+
+# consensus clients
+COPY --from=nimbus-eth2-builder /git/nimbus-eth2/build/nimbus_beacon_node /usr/local/bin/nimbus_beacon_node
+COPY --from=nimbus-eth2-builder /nimbus.version /nimbus.version
+
+COPY --from=lighthouse-builder /lighthouse.version /lighthouse.version
+COPY --from=lighthouse-builder /git/lighthouse/target/release/lighthouse_uninstrumented /usr/local/bin/lighthouse_uninstrumented
+COPY --from=lighthouse-builder /git/lighthouse/target/release/lighthouse /usr/local/bin/lighthouse
+
+COPY --from=teku-builder  /git/teku/build/install/teku/. /opt/teku
+COPY --from=teku-builder /teku.version /teku.version
+RUN ln -s /opt/teku/bin/teku /usr/local/bin/teku
+
+COPY --from=lodestar-builder /git/lodestar /git/lodestar
+COPY --from=lodestar-builder /lodestar.version /lodestar.version
+RUN ln -s /git/lodestar/node_modules/.bin/lodestar /usr/local/bin/lodestar
+
+# execution clients
+COPY --from=geth-builder /geth.version /geth.version
+COPY --from=geth-builder /root/go/bin/geth /usr/local/bin/geth
+COPY --from=geth-builder /tmp/geth_uninstrumented /usr/local/bin/geth_uninstrumented
+COPY --from=geth-builder /tmp/geth_race /usr/local/bin/geth_race
+COPY --from=geth-builder /git/geth_instrumented/symbols/* /opt/antithesis/symbols/
+COPY --from=geth-builder /git/geth_instrumented/customer /geth_instrumented_code
+
+COPY --from=reth-builder /reth.version /reth.version
+COPY --from=reth-builder /git/reth/target/release/reth /usr/local/bin/reth
+COPY --from=reth-builder /git/reth/target/release/reth_uninstrumented /usr/local/bin/reth_uninstrumented
+
+COPY --from=besu-builder /besu.version /besu.version
+COPY --from=besu-builder /git/besu/build/install/besu/. /opt/besu
+RUN ln -s /opt/besu/bin/besu /usr/local/bin/besu
+
+COPY --from=nethermind-builder /nethermind.version /nethermind.version
+COPY --from=nethermind-builder /git/nethermind/out /nethermind/
+RUN ln -s /nethermind/nethermind /usr/local/bin/nethermindr /beacon-chain /usr/local/bin/
+# COPY --from=prysm-builder /validator /usr/local/bin/
+COPY --from=prysm-builder /beacon-chain_race /usr/local/bin/beacon-chain
+COPY --from=prysm-builder /validator_race /usr/local/bin/validator
+COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /usr/local/bin/beacon-chain_uninstrumented
+COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/validator/validator_/validator /usr/local/bin/validator_uninstrumented
+COPY --from=prysm-builder /prysm.version /prysm.version
+COPY --from=prysm-builder /git/prysm_instrumented/symbols/* /opt/antithesis/symbols/
+COPY --from=prysm-builder /git/prysm_instrumented/customer /prysm_instrumented_code
+#
 # COPY --from=lodestar-builder /git/lodestar /git/lodestar
 # COPY --from=lodestar-builder /lodestar.version /lodestar.version
 # RUN ln -s /git/lodestar/node_modules/.bin/lodestar /usr/local/bin/lodestar
 
-# # execution clients
+# execution clients
 # COPY --from=geth-builder /geth.version /geth.version
 # COPY --from=geth-builder /root/go/bin/geth /usr/local/bin/geth
 # COPY --from=geth-builder /tmp/geth_uninstrumented /usr/local/bin/geth_uninstrumented

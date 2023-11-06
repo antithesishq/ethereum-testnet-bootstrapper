@@ -5,17 +5,17 @@
 
 # devnet 9 ready
 ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
-ARG LIGHTHOUSE_BRANCH="b7a3f52" 
+ARG LIGHTHOUSE_BRANCH="9c1f3a6" 
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
-ARG PRYSM_BRANCH="b83d0a08198587403c0c80cce7e50eaf021b5450"
+ARG PRYSM_BRANCH="56c65b8527fef4449792e7b593343d193340993e"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
-ARG LODESTAR_BRANCH="d9e6f1a"
+ARG LODESTAR_BRANCH="v1.11.3"
 
 # devnet 9 ready
 ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
-ARG NIMBUS_ETH2_BRANCH="a986a1"
+ARG NIMBUS_ETH2_BRANCH="34eade"
 
 ARG TEKU_REPO="https://github.com/ConsenSys/teku.git"
 ARG TEKU_BRANCH="d418f8d"
