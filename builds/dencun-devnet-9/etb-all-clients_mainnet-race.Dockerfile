@@ -6,7 +6,7 @@ ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
 ARG LIGHTHOUSE_BRANCH="38e7172" 
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
-ARG PRYSM_BRANCH="65b88ad268ad53bd187448cb515ab57a54d549fa"
+ARG PRYSM_BRANCH="203dc5f63b060821c2706f03a17d66b3813c860c"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
 ARG LODESTAR_BRANCH="d9e6f1a"
