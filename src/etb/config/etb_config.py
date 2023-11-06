@@ -5,7 +5,11 @@ import time
 from typing import List, Union
 
 from pydantic.utils import deep_update
-from ruamel import yaml
+
+from ruamel.yaml import YAML
+
+yaml = YAML(typ="safe", pure=True)
+yaml.indent = 4
 
 from .defaults import DEFAULT_GENERIC_INSTANCE_NUM_NODES, DEFAULT_DOCKER_CONFIG, DEFAULT_FILES_CONFIG, \
     DEFAULT_EXECUTION_CONFIG, DEFAULT_EXECUTION_CONFIG_FIELDS, get_default_execution_config_value, \
@@ -23,7 +27,7 @@ from ..common.consensus import (
     Epoch,
 )
 # make it easier to read the output etb-config.yaml file.
-yaml.SafeDumper.ignore_aliases = lambda *args : True
+# yaml.SafeDumper.ignore_aliases = lambda *args : True
 
 def _set_default(config: dict, entry: str, default_param):
     """
@@ -913,7 +917,8 @@ class ETBConfig(Config):
         super().__init__("etb-config")
         if path.exists():
             with open(path, "r", encoding="utf-8") as etb_config_file:
-                self.yaml_config = yaml.safe_load(etb_config_file)
+                YAML
+                self.yaml_config = yaml.load(etb_config_file)
         else:
             raise FileNotFoundError(f"Could not find etb-config file at {path}")
 
@@ -1400,7 +1405,7 @@ class ETBConfig(Config):
             raise Exception("Cannot write config file while checkpoint file exists.")
 
         with open(dest, "w", encoding="utf-8") as etb_config_file:
-            yaml.safe_dump(self.yaml_config, etb_config_file, indent=4)
+            yaml.dump(self.yaml_config, etb_config_file)
 
 
 def get_etb_config() -> ETBConfig:

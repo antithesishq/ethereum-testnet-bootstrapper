@@ -3,8 +3,9 @@ import pathlib
 import subprocess
 from typing import List, Union
 
-from ruamel import yaml
-
+from ruamel.yaml import YAML
+yaml = YAML(typ="safe", pure=True)
+yaml.indent = 4
 
 class Eth2TestnetGenesis:
     """Eth2-testnet-genesis by protolambda."""
