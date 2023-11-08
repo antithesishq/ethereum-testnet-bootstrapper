@@ -292,8 +292,11 @@ class ConsensusLayerTestnetConfig(Config):
             "min-genesis-active-validator-count"
         ]
         self.validator_mnemonic: str = config["validator-mnemonic"]
-
-        self.disable_peer_scoring: bool = config["disable-peer-scoring"]
+        
+        if "disable-peer-scoring" in config:
+            self.disable_peer_scoring: bool = config["disable-peer-scoring"]
+        else:
+            self.disable_peer_scoring: bool = False
 
         # optional fields that may be overridden in the etb-config file.
         self.min_validator_withdrawability_delay: int = (

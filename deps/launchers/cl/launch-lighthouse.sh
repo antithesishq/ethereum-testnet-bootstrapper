@@ -64,7 +64,6 @@ beacon_args=(
     --staking
     --subscribe-all-subnets
     --target-peers="$NUM_CLIENT_NODES"
-    --disable-peer-scoring
 )
     # --trusted-setup-file-override="$TRUSTED_SETUP_JSON_FILE"
 # to test p2p we can disable scoring

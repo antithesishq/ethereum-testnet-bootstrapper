@@ -34,7 +34,7 @@ testnet-config:
   consensus-layer:
     preset-base: 'mainnet'
     config-name: "local-mainnet-testnet"
-    peer-scoring: false
+    disable-peer-scoring: true
 
     min-genesis-active-validator-count: 70 # custom pre-seeded into genesis state.
 
