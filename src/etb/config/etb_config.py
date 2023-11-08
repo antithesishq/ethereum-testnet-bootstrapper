@@ -293,6 +293,8 @@ class ConsensusLayerTestnetConfig(Config):
         ]
         self.validator_mnemonic: str = config["validator-mnemonic"]
 
+        self.peer_scoring: bool = config["peer-scoring"]
+
         # optional fields that may be overridden in the etb-config file.
         self.min_validator_withdrawability_delay: int = (
             self.preset_base.MIN_VALIDATOR_WITHDRAWABILITY_DELAY.value
@@ -1268,6 +1270,7 @@ class ETBConfig(Config):
             "CHAIN_ID": self.testnet_config.execution_layer.chain_id,
             "NETWORK_ID": self.testnet_config.execution_layer.network_id,
             "IS_DENEB": str(int(self.is_deneb)),  # no boolean in bash
+            "DISABLE_PEER_SCORING": str(int(self.testnet_config.consensus_layer.peer_scoring))
         }
 
         if self.is_deneb:

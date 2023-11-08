@@ -86,6 +86,13 @@ mock_builder_args=(
   --client-init-timeout 60    
 )
 
+if [ "$DISABLE_PEER_SCORING" == 1 ]; then
+    echo "disabling peer scoring"
+    beacon_args+=(
+      --direct-peer
+    )
+fi
+
 if [ "$MOCK_BUILDER" == 1 ]; then
   echo "Launching mock builder"
   beacon_args+=(

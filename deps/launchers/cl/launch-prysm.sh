@@ -106,6 +106,13 @@ mock_builder_args=(
 
 # reduce further --get-payload-delay-ms 100
 
+if [ "$DISABLE_PEER_SCORING" == 1 ]; then
+    echo "disabling peer scoring"
+    beacon_args+=(
+      --disable-peer-scorer
+    )
+fi
+
 
 if [ "$MOCK_BUILDER" == 1 ]; then
   echo "Launching mock builder"

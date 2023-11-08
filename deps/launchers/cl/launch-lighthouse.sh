@@ -64,9 +64,9 @@ beacon_args=(
     --staking
     --subscribe-all-subnets
     --target-peers="$NUM_CLIENT_NODES"
-    --trusted-setup-file-override="$TRUSTED_SETUP_JSON_FILE"
     --disable-peer-scoring
 )
+    # --trusted-setup-file-override="$TRUSTED_SETUP_JSON_FILE"
 # to test p2p we can disable scoring
 # In case we want to log differently to a file
 #    --logfile-debug-level="$CONSENSUS_LOG_LEVEL_FILE"
@@ -112,6 +112,13 @@ mock_builder_args=(
   --client-init-timeout 60    
 )
 
+if [ "$DISABLE_PEER_SCORING" == 1 ]; then
+    echo "disabling peer scoring"
+    beacon_args+=(
+      --disable-peer-scoring
+    )
+fi
+
 if [ "$MOCK_BUILDER" == 1 ]; then
   echo "Launching mock builder"
   beacon_args+=(
@@ -124,6 +131,8 @@ if [ "$MOCK_BUILDER" == 1 ]; then
   )
   mock-builder "${mock_builder_args[@]}" > /data/logs/"service_$CONTAINER_NAME--builder" 2>&1 &
 fi
+
+
 
 lighthouse --testnet-dir="$COLLECTION_DIR" bn "${beacon_args[@]}" > /data/logs/"service_$CONTAINER_NAME--bn" 2>&1 &
 

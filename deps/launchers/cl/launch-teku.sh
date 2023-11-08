@@ -79,6 +79,7 @@ teku_args=(
   --data-storage-non-canonical-blocks-enabled=true
   --Xlog-include-p2p-warnings-enabled
 )
+
 if [ "$IS_DENEB" == 1 ]; then
   teku_args+=(
     --Xmetrics-blob-sidecars-storage-enabled=true
@@ -87,6 +88,13 @@ if [ "$IS_DENEB" == 1 ]; then
   echo "Launching deneb ready teku"
 else
   echo "Launching teku"
+fi
+
+if [ "$DISABLE_PEER_SCORING" == 1 ]; then
+    echo "disabling peer scoring"
+    beacon_args+=(
+      --Xp2p-gossip-scoring-enabled=false
+    )
 fi
 
 # antithesis: disable log color and set destination to CONSOLE
