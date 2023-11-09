@@ -14,7 +14,7 @@ import time
 from pathlib import Path
 from typing import Dict
 
-from ruamel import yaml
+from ruamel.yaml import YAML
 
 from .ConsensusGenesis import ConsensusGenesisWriter
 from .ETBConfig import ETBConfig, ClientInstance
@@ -69,7 +69,8 @@ class EthereumTestnetBootstrapper(object):
         # self.etb_config.write_to_docker_compose()
         self.logger.debug("writing docker compose")
         with open(self.etb_config.get("docker-compose-file"), "w") as f:
-            f.write(yaml.safe_dump(self.etb_config.get_docker_compose_repr()))
+            yaml=YAML(typ='safe')
+            f.write(yaml.dump(self.etb_config.get_docker_compose_repr()))
 
         # copy in the config file we used for the init process.
         shutil.copy(self.config_path, self.etb_config.get("etb-config-file"))
