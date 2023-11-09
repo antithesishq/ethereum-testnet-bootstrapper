@@ -518,7 +518,7 @@ class ETBConfig(object):
         config_path = pathlib.Path(path)
         if config_path.exists():
             self.logger.debug(f"Opening etb-config file: {config_path}")
-            with open(config_path, "r") as f#11 1.080
+            with open(config_path, "r") as f:
                 yaml = YAML(typ='safe', pure=True)
                 try:
                     self.global_config = yaml.load(f.read())
