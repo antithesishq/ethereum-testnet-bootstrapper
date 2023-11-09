@@ -70,7 +70,7 @@ class EthereumTestnetBootstrapper(object):
         self.logger.debug("writing docker compose")
         with open(self.etb_config.get("docker-compose-file"), "w") as f:
             yaml=YAML(typ='safe')
-            f.write(yaml.dump(self.etb_config.get_docker_compose_repr()))
+            yaml.dump(self.etb_config.get_docker_compose_repr(), f)
 
         # copy in the config file we used for the init process.
         shutil.copy(self.config_path, self.etb_config.get("etb-config-file"))

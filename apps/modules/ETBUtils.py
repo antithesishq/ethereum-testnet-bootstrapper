@@ -6,7 +6,7 @@ import pathlib
 import subprocess
 import sys
 from .ETBConfig import ETBConfig
-from ruamel import yaml
+from ruamel.yaml import YAML
 
 
 from .ETBConstants import ForkVersion, MinimalPreset
@@ -231,6 +231,7 @@ class Eth2TestnetGenesis(object):
         )
 
         with open(self.validator_dump_yaml, "w") as f:
+            yaml = YAML(typ="safe")
             yaml.dump(
                 [
                     {
