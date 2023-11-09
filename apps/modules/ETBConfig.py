@@ -12,7 +12,7 @@ from .ETBConstants import (
     TotalDifficultyStep,
     PresetOverrides,
 )
-from ruamel import yaml
+from ruamel.yaml import YAML
 from typing import List, Dict, Union, Any, Generator, Type
 from web3.auto import w3
 
@@ -518,9 +518,10 @@ class ETBConfig(object):
         config_path = pathlib.Path(path)
         if config_path.exists():
             self.logger.debug(f"Opening etb-config file: {config_path}")
-            with open(config_path, "r") as f:
+            with open(config_path, "r") as f#11 1.080
+                yaml = YAML(typ='safe', pure=True)
                 try:
-                    self.global_config = yaml.safe_load(f.read())
+                    self.global_config = yaml.load(f.read())
                 except Exception as e:
                     self.logger.error("Error parsing etb-config yaml.")
                     raise Exception("Unable to parse yaml file.")
@@ -939,10 +940,11 @@ class ETBConfig(object):
         :return:
         """
         with open(self.files.get("etb-config-file"), "w") as f:
+            yaml=YAML()
             self.logger.debug(
                 f"Dumping etb-config global_config to file: {self.files.get('etb-config-file')}"
             )
-            yaml.safe_dump(self.global_config, f)
+            yaml.dump(self.global_config, f)
 
     # quick conversions
     def epoch_to_slot(self, epoch: int):
