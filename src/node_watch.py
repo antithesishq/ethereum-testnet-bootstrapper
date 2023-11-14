@@ -209,23 +209,115 @@ class EpochPerformanceAction(TestnetMonitorAction):
 class PrometheusAction(TestnetMonitorAction):
     def __init__(
         self,
+        name,
+        client_instances: list[ClientInstance],
+        max_retries: int,
+        timeout: int,
+        max_retries_for_consensus: int,  # not used.
+        interval: TestnetMonitorActionInterval,        
+    ):
+        super().__init__(name=name, interval=interval)
+
+    def perform_action(self) -> None:
+            # guard against accidentally doing str instead of list[str] above;
+            # bandaid until we integrate mypy
+            assert all(isinstance(qg, list) for qg in self.query_groups.values())
+
+            flattened_queries: list[tuple[str, str]] = []
+            for human_query, qg in self.query_groups.items():
+                for query in qg:
+                    flattened_queries.append((human_query, query))
+
+            def _one_request(human_query: str, query: str) -> Optional[tuple[str, dict[str, Any]]]:
+                timeout_s = 1
+                cleaned_data = {
+                    "query": query,
+                    "resultType": "None",
+                    "results": []
+                }
+                try:
+                    resp = requests.get(
+                        "http://prometheus-0:9090/api/v1/query",
+                        params=dict(query=query),
+                        timeout=timeout_s
+                    )
+
+                    if resp.status_code != 200:
+                        # logging.info(f"prometheus query {query} responded with status code {resp.status_code}, skipping")
+                        logging.debug(f"prometheus query {query} responded with status code {resp.status_code}, skipping")
+                        return cleaned_data
+
+                    result_all = resp.json()
+                    if (result_status := result_all["status"]) != "success":
+                        # logging.info(f"prometheus query {query} has result status {result_status!r}, skipping")
+                        logging.debug(f"prometheus query {query} has result status {result_status!r}, skipping")
+                        return cleaned_data
+
+                    data = result_all["data"]
+                    # logging.info(data)
+                    # reshape the data to make it easier to work with the logs
+                    cleaned_data = {
+                        "query": query,
+                        "resultType": data["resultType"],
+                        "results": [
+                            {
+                                "instance": r["metric"]["instance"],
+                                "job": r["metric"]["job"],
+                                "unix_time": r["value"][0],
+                                "value": r["value"][1],
+                            }
+                            for r in data["result"]
+                        ]
+                    }
+
+                    return (human_query, cleaned_data)
+
+                except requests.exceptions.Timeout:
+                    # logging.info(f"prometheus query {query} timed out after {timeout_s}, skipping")
+                    logging.debug(f"prometheus query {query} timed out after {timeout_s}, skipping")
+                    return (human_query, cleaned_data)
+
+                except Exception as e:
+                    # logging.info(f"prometheus query {query} raised exception, skipping: {e}")
+                    logging.debug(f"prometheus query {query} raised exception, skipping")
+                    return (human_query, cleaned_data)
+
+            with ThreadPoolExecutor(max_workers=len(flattened_queries)) as exc:
+                results_all = exc.map(lambda item: _one_request(*item), flattened_queries)
+
+            results_grouped = defaultdict(list)
+            for r in results_all:
+                if r is not None:
+                    human_query, data = r
+                    results_grouped[human_query].append(data)
+
+            self.log_output(results_grouped)
+        
+    def log_output(self, results_grouped):
+        structured_log = {}
+        for human_query, data_list in results_grouped.items():
+            structured_log[self.name] = { # prefix to make it easier to grep for among non-prometheus logs
+                "human_query": human_query,
+                "data": results_grouped[human_query],
+            }
+            logging.info(json.dumps(structured_log)) # https://jsonlines.org/
+
+
+class EpochPrometheusAction(PrometheusAction):
+    def __init__(
+        self,
         client_instances: list[ClientInstance],
         max_retries: int,
         timeout: int,
         max_retries_for_consensus: int,  # not used.
         interval: TestnetMonitorActionInterval,
     ):
-        super().__init__(name="prometheus", interval=interval)
-
-    def perform_action(self) -> None:
-        query_groups: dict[str, list[str]] = {
+        # super().__init__(name="epch_prometheus", interval=interval)
+        super().__init__("epoch_prometheus", client_instances, max_retries, timeout, max_retries_for_consensus, interval)
+        self.query_groups: dict[str, list[str]] = {
             # naming of metrics is inconsistent across clients, so we pick a
             # single human-friendly name to group them under. you could load
             # this from a config file but for now it's easier just to hardcode.
-            "cpu_usage": [
-                f"rate(process_cpu_seconds_total[1m])",
-                f"rate(process_cpu_seconds[1m])", # nethermind
-            ],
             "libp2p_peers": [
                 "libp2p_peers",
                 "connected_libp2p_peers", # prysm
@@ -236,77 +328,21 @@ class PrometheusAction(TestnetMonitorAction):
             # "peer_count":
         }
 
-        # guard against accidentally doing str instead of list[str] above;
-        # bandaid until we integrate mypy
-        assert all(isinstance(qg, list) for qg in query_groups.values())
-
-        flattened_queries: list[tuple[str, str]] = []
-        for human_query, qg in query_groups.items():
-            for query in qg:
-                flattened_queries.append((human_query, query))
-
-        def _one_request(human_query: str, query: str) -> Optional[tuple[str, dict[str, Any]]]:
-            timeout_s = 1
-            try:
-                resp = requests.get(
-                    "http://prometheus-0:9090/api/v1/query",
-                    params=dict(query=query),
-                    timeout=timeout_s
-                )
-
-                if resp.status_code != 200:
-                    logging.debug(f"prometheus query {query} responded with status code {resp.status_code}, skipping")
-                    return
-
-                result_all = resp.json()
-                if (result_status := result_all["status"]) != "success":
-                    logging.debug(f"prometheus query {query} has result status {result_status!r}, skipping")
-                    return
-
-                data = result_all["data"]
-                # reshape the data to make it easier to work with the logs
-                cleaned_data = {
-                    "query": query,
-                    "resultType": data["resultType"],
-                    "results": [
-                        {
-                            "instance": r["metric"]["instance"],
-                            "job": r["metric"]["job"],
-                            "unix_time": r["value"][0],
-                            "value": r["value"][1],
-                        }
-                        for r in data["result"]
-                    ]
-                }
-
-                return (human_query, cleaned_data)
-
-            except requests.exceptions.Timeout:
-                logging.debug(f"prometheus query {query} timed out after {timeout_s}, skipping")
-                return
-
-            except Exception as e:
-                logging.exception("prometheus query {query} raised exception, skipping")
-                return
-
-        with ThreadPoolExecutor(max_workers=len(flattened_queries)) as exc:
-            results_all = exc.map(lambda item: _one_request(*item), flattened_queries)
-
-        results_grouped = defaultdict(list)
-        for r in results_all:
-            if r is not None:
-                human_query, data = r
-                results_grouped[human_query].append(data)
-
-        for human_query, data_list in results_grouped.items():
-            structured_log = {
-                "prometheus": { # prefix to make it easier to grep for among non-prometheus logs
-                    "human_query": human_query,
-                    "data": results_grouped[human_query],
-                }
-            }
-            logging.info(json.dumps(structured_log)) # https://jsonlines.org/
-
+class SlotPrometheseusAction(PrometheusAction):
+    def __init__(
+        self,
+        client_instances: list[ClientInstance],
+        max_retries: int,
+        timeout: int,
+        max_retries_for_consensus: int,  # not used.
+        interval: TestnetMonitorActionInterval,
+    ):
+        super().__init__("slot_prometheus", client_instances, max_retries, timeout, max_retries_for_consensus, interval)
+        self.query_groups: dict[str, list[str]] = {
+            "cpu_usage": [
+                f"rate(process_cpu_seconds_total[1m])",
+            ]
+        }
 
 class NodeWatch:
     """
@@ -348,7 +384,8 @@ class NodeWatch:
             "blob": BlobMonitorAction,
             "execution_availability": HeadsMonitorExecutionAvailabilityCheckAction,
             "consensus_availability": HeadsMonitorConsensusAvailabilityCheckAction,
-            "prometheus": PrometheusAction,
+            "epoch_prometheus": EpochPrometheusAction,
+            "slot_prometheus": SlotPrometheseusAction,
             "epoch_performance": EpochPerformanceAction,
         }
 
