@@ -14,7 +14,10 @@ from typing import Union, Any
 from collections import defaultdict
 
 import requests
-from ruamel import yaml
+# import ruamel
+from ruamel.yaml.representer import RoundTripRepresenter
+from ruamel.yaml import YAML
+import sys
 
 from etb.common.utils import create_logger
 from etb.config.etb_config import (
@@ -213,17 +216,16 @@ class EthereumTestnetBootstrapper:
         ) as docker_file:
             # remove identities and aliases from the yaml file to ease
             # readability for end users.
-            class NoAliasDumper(yaml.SafeDumper):
-                """
-                A dumper that will never emit aliases.
-                """
-
+            class NonAliasingRTRepresenter(RoundTripRepresenter): # NOTE: RoundTripRepresenter is the default for YAML(), if you use YAML(typ=safe),etc. then change this class to override that ones representer instead
                 def ignore_aliases(self, data):
                     return True
-
-            docker_file.write(
-                yaml.dump(etb_config.get_docker_compose_repr(), Dumper=NoAliasDumper)
-            )
+            
+            yaml = YAML()
+            yaml.Representer = NonAliasingRTRepresenter
+            # docker_file.write(
+            #     yaml.dump(etb_config.get_docker_compose_repr(), sys.stdout)
+            # )
+            yaml.dump(etb_config.get_docker_compose_repr(), docker_file)
 
         # generate prometheus.yaml from the etb-config
         # (just read the etb-config file back in and parse what's needed, it's
@@ -236,7 +238,10 @@ class EthereumTestnetBootstrapper:
         prometheus_path = prometheus_conf_dir / "prometheus.yml"
         logging.info(f"writing {prometheus_path}")
         with open(prometheus_path, "w") as f:
-            yaml.dump(prometheus_config, f, default_flow_style=False, indent=2)
+            yaml = YAML()
+            yaml.default_flow_style = False
+            yaml.indent(mapping=2, sequence=2, offset=2)
+            # yaml.dump(prometheus_config, f, indent=2)
 
 
     def bootstrap_testnet(self, config_path: Path, global_timeout: int = 60):

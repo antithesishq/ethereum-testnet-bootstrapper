@@ -5,6 +5,7 @@ import time
 from typing import List, Union
 
 from pydantic.utils import deep_update
+from ruamel.yaml import YAML
 from ruamel import yaml
 
 from .defaults import DEFAULT_GENERIC_INSTANCE_NUM_NODES, DEFAULT_DOCKER_CONFIG, DEFAULT_FILES_CONFIG, \
@@ -913,7 +914,10 @@ class ETBConfig(Config):
         super().__init__("etb-config")
         if path.exists():
             with open(path, "r", encoding="utf-8") as etb_config_file:
-                self.yaml_config = yaml.safe_load(etb_config_file)
+                # self.yaml_config = yaml.safe_load(etb_config_file)
+                yaml = YAML(typ='safe', pure=True)
+                self.yaml_config = yaml.load(etb_config_file)
+
         else:
             raise FileNotFoundError(f"Could not find etb-config file at {path}")
 
@@ -1400,7 +1404,10 @@ class ETBConfig(Config):
             raise Exception("Cannot write config file while checkpoint file exists.")
 
         with open(dest, "w", encoding="utf-8") as etb_config_file:
-            yaml.safe_dump(self.yaml_config, etb_config_file, indent=4)
+            yaml = YAML(typ='safe', pure=True)
+            yaml.indent(mapping=4, sequence=4, offset=4)
+            yaml.dump(self.yaml_config, etb_config_file)
+            # yaml.safe_dump(self.yaml_config, etb_config_file, indent=4)
 
 
 def get_etb_config() -> ETBConfig:
