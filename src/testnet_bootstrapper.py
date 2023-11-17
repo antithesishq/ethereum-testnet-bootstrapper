@@ -17,7 +17,7 @@ import requests
 # import ruamel
 from ruamel.yaml.representer import RoundTripRepresenter
 from ruamel.yaml import YAML
-import sys
+yaml = YAML(typ='safe', pure=True)
 
 from etb.common.utils import create_logger
 from etb.config.etb_config import (
@@ -36,7 +36,6 @@ from etb.interfaces.client_request import (
 )
 from etb.interfaces.external.eth2_val_tools import Eth2ValTools
 from etb.common.consensus import Epoch
-
 
 def move_trusted_setup_files(etb_config: ETBConfig):
     """Move the trusted setup files to the correct location.

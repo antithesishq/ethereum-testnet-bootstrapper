@@ -190,7 +190,7 @@ client-instances:
   prysm-geth:
     # docker-compose
     image: "etb-all-clients-inst"
-    tag: "dencun-devnet-9"
+    tag: "dencun-devnet-10"
     start-ip-address: "10.0.20.10"
     num-nodes: 1
 
@@ -204,7 +204,7 @@ client-instances:
   # teku-geth:
   #   # docker-compose
   #   image: "etb-all-clients-inst"
-  #   tag: "dencun-devnet-9"
+  #   tag: "dencun-devnet-10"
   #   start-ip-address: "10.0.20.20"
   #   num-nodes: 1
 
@@ -217,7 +217,7 @@ client-instances:
   lighthouse-geth:
     # docker-compose
     image: "etb-all-clients-inst"
-    tag: "dencun-devnet-9"
+    tag: "dencun-devnet-10"
     start-ip-address: "10.0.20.30"
     num-nodes: 1
 
@@ -230,7 +230,7 @@ client-instances:
   lodestar-geth:
     # docker-compose
     image: "etb-all-clients-inst"
-    tag: "dencun-devnet-9"
+    tag: "dencun-devnet-10"
     start-ip-address: "10.0.20.40"
     num-nodes: 1
 
@@ -243,7 +243,7 @@ client-instances:
   nimbus-geth:
     # docker-compose
     image: "etb-all-clients-inst"
-    tag: "dencun-devnet-9"
+    tag: "dencun-devnet-10"
     start-ip-address: "10.0.20.50"
     num-nodes: 1
 
@@ -256,7 +256,7 @@ client-instances:
   # prysm-besu:
   #   # docker-compose
   #   image: "etb-all-clients-inst"
-  #   tag: "dencun-devnet-9"
+  #   tag: "dencun-devnet-10"
   #   start-ip-address: "10.0.20.60"
   #   num-nodes: 1
 
@@ -272,7 +272,7 @@ client-instances:
   # teku-besu:
   #   # docker-compose
   #   image: "etb-all-clients-inst"
-  #   tag: "dencun-devnet-9"
+  #   tag: "dencun-devnet-10"
   #   start-ip-address: "10.0.20.70"
   #   num-nodes: 1
 
@@ -285,7 +285,7 @@ client-instances:
   # lighthouse-besu:
   #   # docker-compose
   #   image: "etb-all-clients-inst"
-  #   tag: "dencun-devnet-9"
+  #   tag: "dencun-devnet-10"
   #   start-ip-address: "10.0.20.80"
   #   num-nodes: 1
 
@@ -298,7 +298,7 @@ client-instances:
   # lodestar-besu:
   #   # docker-compose
   #   image: "etb-all-clients-inst"
-  #   tag: "dencun-devnet-9"
+  #   tag: "dencun-devnet-10"
   #   start-ip-address: "10.0.20.90"
   #   num-nodes: 1
 
@@ -313,7 +313,7 @@ client-instances:
   prysm-nethermind:
     # docker-compose
     image: "etb-all-clients-inst"
-    tag: "dencun-devnet-9"
+    tag: "dencun-devnet-10"
     start-ip-address: "10.0.20.110"
     num-nodes: 1
 
@@ -327,7 +327,7 @@ client-instances:
   # teku-nethermind:
   #   # docker-compose
   #   image: "etb-all-clients-inst"
-  #   tag: "dencun-devnet-9"
+  #   tag: "dencun-devnet-10"
   #   start-ip-address: "10.0.20.120"
   #   num-nodes: 1
 
@@ -340,7 +340,7 @@ client-instances:
   lighthouse-nethermind:
     # docker-compose
     image: "etb-all-clients-inst"
-    tag: "dencun-devnet-9"
+    tag: "dencun-devnet-10"
     start-ip-address: "10.0.20.130"
     num-nodes: 1
 
@@ -353,7 +353,7 @@ client-instances:
   # lodestar-nethermind:
   #   # docker-compose
   #   image: "etb-all-clients-inst"
-  #   tag: "dencun-devnet-9"
+  #   tag: "dencun-devnet-10"
   #   start-ip-address: "10.0.20.140"
   #   num-nodes: 1
 
@@ -366,7 +366,7 @@ client-instances:
   nimbus-nethermind:
     # docker-compose
     image: "etb-all-clients-inst"
-    tag: "dencun-devnet-9"
+    tag: "dencun-devnet-10"
     start-ip-address: "10.0.20.150"
     num-nodes: 1
 
@@ -380,7 +380,7 @@ generic-instances:
 # the bootstrapper that builds the network.
   ethereum-testnet-bootstrapper:
     image: "ethereum-testnet-bootstrapper"
-    tag: "dencun-devnet-9"
+    tag: "dencun-devnet-10"
     start-ip-address: "10.0.20.201"
     num-nodes: 1
     entrypoint: "/source/entrypoint.sh --bootstrap-testnet --log-level debug"
@@ -388,7 +388,7 @@ generic-instances:
   # required instance, bootnode to connect all CL clients together
   eth2-bootnode:
     image: "ethereum-testnet-bootstrapper"
-    tag: "dencun-devnet-9"
+    tag: "dencun-devnet-10"
     start-ip-address: "10.0.20.202"
     entrypoint: "/source/deps/launchers/bootnodes/launch-eth2-bootnode.sh"
     num-nodes: 1 # this is a special case, we only want one instance of this.
@@ -403,14 +403,14 @@ generic-instances:
   # not required, but useful for debugging. This watches the network and shows the head & checkpoints of the CLs.
   node-watch:
     image: "ethereum-testnet-bootstrapper"
-    tag: "dencun-devnet-9"
+    tag: "dencun-devnet-10"
     start-ip-address: "10.0.20.203"
     num-nodes: 1
     entrypoint: "python3 /source/src/node_watch.py --log-level info --monitor execution_availability:epoch --monitor consensus_availability:epoch --monitor prometheus:epoch --monitor epoch_performance:epoch --monitor heads:slot --monitor checkpoints:epoch --max-retries 3"
 
   tx-spammer:
     image: "etb-all-clients-inst"
-    tag: "dencun-devnet-9"
+    tag: "dencun-devnet-10"
     start-ip-address: "10.0.20.204"
     num-nodes: 1
     # runs on the first prysm geth node.
@@ -418,7 +418,7 @@ generic-instances:
 
   tx-spammer-nethermind:
     image: "etb-all-clients-inst"
-    tag: "dencun-devnet-9"
+    tag: "dencun-devnet-10"
     start-ip-address: "10.0.20.205"
     num-nodes: 1
     # runs on the first prysm geth node.
@@ -426,7 +426,7 @@ generic-instances:
 
   antithesis-checker:
     image: "ethereum-testnet-bootstrapper"
-    tag: "dencun-devnet-9"
+    tag: "dencun-devnet-10"
     start-ip-address: "10.0.20.206"
     num-nodes: 1
     entrypoint: "python3 /source/src/antithesis_checker.py --config /data/etb-config.yaml

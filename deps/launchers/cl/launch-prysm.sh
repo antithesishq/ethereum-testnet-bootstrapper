@@ -40,6 +40,8 @@ while [ ! -f "$CONSENSUS_CHECKPOINT_FILE" ]; do
   sleep 1
 done
 
+BN_VERSION=$(beacon-chain --version)
+VC_VERSION=$(validator --version)
 
 beacon_args=(
   --dev
@@ -104,6 +106,14 @@ mock_builder_args=(
 
 # reduce further --get-payload-delay-ms 100
 
+if [ "$DISABLE_PEER_SCORING" == 1 ]; then
+    echo "disabling peer scoring"
+    beacon_args+=(
+      --disable-peer-scorer
+    )
+fi
+
+
 if [ "$MOCK_BUILDER" == 1 ]; then
   echo "Launching mock builder"
   beacon_args+=(
@@ -116,6 +126,8 @@ if [ "$MOCK_BUILDER" == 1 ]; then
 fi
 
 echo "Launching Prysm beacon node in ${CONTAINER_NAME}"
+echo "Prysm beacon node version: $BN_VERSION"
+echo "Prysm validator client version: $VC_VERSION"
 beacon-chain "${beacon_args[@]}" > /data/logs/"service_$CONTAINER_NAME--prysm-bn" 2>&1 &
 
 sleep 10
