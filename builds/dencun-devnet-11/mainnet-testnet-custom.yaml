@@ -402,7 +402,7 @@ generic-instances:
     tag: "dencun-devnet-11"
     start-ip-address: "10.0.20.203"
     num-nodes: 1
-    entrypoint: "python3 /source/src/node_watch.py --log-level info --monitor execution_availability:epoch --monitor consensus_availability:epoch --monitor prometheus:epoch --monitor epoch_performance:epoch --monitor heads:slot --monitor checkpoints:epoch --max-retries 1"
+    entrypoint: "python3 /source/src/node_watch.py --log-level info --monitor execution_availability:epoch --monitor consensus_availability:epoch --monitor epoch_prometheus:epoch --monitor epoch_performance:epoch --monitor heads:slot --monitor checkpoints:epoch --max-retries 1"
 
   tx-spammer:
     image: "etb-all-clients"
