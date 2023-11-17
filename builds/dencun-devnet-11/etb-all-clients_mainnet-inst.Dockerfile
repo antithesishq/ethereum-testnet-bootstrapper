@@ -9,7 +9,7 @@ ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
 ARG PRYSM_BRANCH="2850f4d989cde6e96ae841e9f77dfd494d22274c"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
-ARG LODESTAR_BRANCH="v1.11.3"
+ARG LODESTAR_BRANCH="v1.12.0"
 
 ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
 ARG NIMBUS_ETH2_BRANCH="94d45822e37c896570d74781d9d1d70588a257ea"
@@ -25,13 +25,13 @@ ARG GETH_REPO="https://github.com/lightclient/go-ethereum.git"
 ARG GETH_BRANCH="4d161dee0c4cb19e7b391b3f0fe4edd139aecbc8"
 
 ARG NETHERMIND_REPO="https://github.com/NethermindEth/nethermind.git"
-ARG NETHERMIND_BRANCH="4847b067"
+ARG NETHERMIND_BRANCH="334cd093"
 
 # ARG ETHEREUMJS_REPO="https://github.com/ethereumjs/ethereumjs-monorepo.git"
 # ARG ETHEREUMJS_BRANCH="7a0a37b7355c77ce841d5b04da55a2a4b53fe550"
 
 ARG RETH_REPO="https://github.com/paradigmxyz/reth"
-ARG ARG RETH_BRANCH="9dd270e"
+ARG RETH_BRANCH="9dd270e"
 
 # All of the fuzzers we will be using
 ARG TX_FUZZ_REPO="https://github.com/qu0b/tx-fuzz.git"
