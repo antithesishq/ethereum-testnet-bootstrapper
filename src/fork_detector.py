@@ -153,6 +153,8 @@ def print_real_chains_and_unsynced_children(str_parents_to_clients, unsynced_cha
             end = chain.find(" ", start + 1) + 1
             print(f"SYNCING {level} latest parent hash: {chain[start:end]} {str_parents_to_clients[chain]}")
             return recursive_print(chain_tree[chain], level + "--")
+    if (len(unsynced_chains_tree.keys()) > 1):
+        print(f"MULTIPLE_UNIQUE_CHAINS")
     for chain in unsynced_chains_tree.keys():
         print(f"UNIQUE CHAIN {str_parents_to_clients[chain]} {chain}")
         print(f"SKIPPED SLOTS {clients_to_skipped_slots[str_parents_to_clients[chain][0]]}")
