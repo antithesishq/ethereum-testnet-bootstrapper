@@ -9,7 +9,7 @@ ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
 ARG PRYSM_BRANCH="203dc5f63b060821c2706f03a17d66b3813c860c"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
-ARG LODESTAR_BRANCH="v1.12.0"
+ARG LODESTAR_BRANCH="d5a5a47"
 #
 ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
 ARG NIMBUS_ETH2_BRANCH="e9c8f8"

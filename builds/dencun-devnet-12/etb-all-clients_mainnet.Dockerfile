@@ -5,13 +5,13 @@
 
 # devnet 9 ready
 ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
-ARG LIGHTHOUSE_BRANCH="e5a0e2c" 
+ARG LIGHTHOUSE_BRANCH="e5a0e2c"
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
 ARG PRYSM_BRANCH="2850f4d989cde6e96ae841e9f77dfd494d22274c"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
-ARG LODESTAR_BRANCH="v1.12.0"
+ARG LODESTAR_BRANCH="d5a5a47"
 
 # devnet 9 ready
 ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
@@ -43,8 +43,11 @@ ARG RETH_REPO="https://github.com/paradigmxyz/reth"
 ARG RETH_BRANCH="471c28e"
 
 # All of the fuzzers we will be using
-ARG TX_FUZZ_REPO="https://github.com/qu0b/tx-fuzz.git"
-ARG TX_FUZZ_BRANCH="22631838d3ffd9f57f4b09e02a4e71686a921414"
+# ARG TX_FUZZ_REPO="https://github.com/qu0b/tx-fuzz.git"
+# ARG TX_FUZZ_BRANCH="22631838d3ffd9f57f4b09e02a4e71686a921414"
+
+ARG TX_FUZZ_REPO="https://github.com/MariusVanDerWijden/tx-fuzz"
+ARG TX_FUZZ_BRANCH="d8b943f3abab4bd8bd63cdfc8c45b8cb71fbb3f2"
 
 # Metrics gathering
 ARG BEACON_METRICS_GAZER_REPO="https://github.com/qu0b/beacon-metrics-gazer.git"

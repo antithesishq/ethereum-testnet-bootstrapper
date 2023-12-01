@@ -9,7 +9,7 @@ ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
 ARG PRYSM_BRANCH="203dc5f63b060821c2706f03a17d66b3813c860c"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
-ARG LODESTAR_BRANCH="v1.12.0"
+ARG LODESTAR_BRANCH="d5a5a47"
 #
 ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
 ARG NIMBUS_ETH2_BRANCH="e9c8f8"
@@ -34,8 +34,11 @@ ARG RETH_REPO="https://github.com/paradigmxyz/reth"
 ARG ARG RETH_BRANCH="471c28e"
 
 # All of the fuzzers we will be using
-ARG TX_FUZZ_REPO="https://github.com/qu0b/tx-fuzz.git"
-ARG TX_FUZZ_BRANCH="22631838d3ffd9f57f4b09e02a4e71686a921414"
+# ARG TX_FUZZ_REPO="https://github.com/qu0b/tx-fuzz.git"
+# ARG TX_FUZZ_BRANCH="22631838d3ffd9f57f4b09e02a4e71686a921414"
+
+ARG TX_FUZZ_REPO="https://github.com/MariusVanDerWijden/tx-fuzz"
+ARG TX_FUZZ_BRANCH="d8b943f3abab4bd8bd63cdfc8c45b8cb71fbb3f2"
 
 # Metrics gathering
 ARG BEACON_METRICS_GAZER_REPO="https://github.com/qu0b/beacon-metrics-gazer.git"
