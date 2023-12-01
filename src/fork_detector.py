@@ -153,6 +153,10 @@ def print_real_chains_and_unsynced_children(str_parents_to_clients, unsynced_cha
             end = chain.find(" ", start + 1) + 1
             print(f"SYNCING {level} latest parent hash: {chain[start:end]} {str_parents_to_clients[chain]}")
             return recursive_print(chain_tree[chain], level + "--")
+    if (len(unsynced_chains_tree.keys()) == 1):
+        print(f"SINGLE_CHAIN")
+    if (len(unsynced_chains_tree.keys()) > 1):
+        print(f"MULTIPLE_UNIQUE_CHAINS")
     for chain in unsynced_chains_tree.keys():
         print(f"UNIQUE CHAIN {str_parents_to_clients[chain]} {chain}")
         print(f"SKIPPED SLOTS {clients_to_skipped_slots[str_parents_to_clients[chain][0]]}")
@@ -189,4 +193,17 @@ def print_all_data_for_every_client():
     unsynced_chains_tree = calculate_real_forks_and_unsynced_children(str_parents_to_clients)
     print_real_chains_and_unsynced_children(str_parents_to_clients, unsynced_chains_tree, clients_to_skipped_slots)
 
-print_all_data_for_every_client()
+
+
+import time
+start = time.time()
+epoch = 32 * 2
+wait_time = epoch
+while (True):
+    if (time.time() - start > wait_time):
+        start = time.time()
+        print_all_data_for_every_client()
+    if (wait_time - (time.time() - start) > 0):
+        print("WAITING")
+        time.sleep(wait_time - (time.time() - start))
+    print("WAIT COMPLETE")
