@@ -15,7 +15,7 @@ ARG LODESTAR_BRANCH="d5a5a47"
 
 # devnet 9 ready
 ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
-ARG NIMBUS_ETH2_BRANCH="e9c8f8"
+ARG NIMBUS_ETH2_BRANCH="b186c6a"
 
 ARG TEKU_REPO="https://github.com/ConsenSys/teku.git"
 ARG TEKU_BRANCH="992b224"

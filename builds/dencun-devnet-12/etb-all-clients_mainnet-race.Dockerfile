@@ -6,13 +6,13 @@ ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
 ARG LIGHTHOUSE_BRANCH="e5a0e2c" 
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
-ARG PRYSM_BRANCH="203dc5f63b060821c2706f03a17d66b3813c860c"
+ARG PRYSM_BRANCH="2850f4d"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
 ARG LODESTAR_BRANCH="d5a5a47"
 #
 ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
-ARG NIMBUS_ETH2_BRANCH="e9c8f8"
+ARG NIMBUS_ETH2_BRANCH="b186c6a"
 
 ARG TEKU_REPO="https://github.com/ConsenSys/teku.git"
 ARG TEKU_BRANCH="992b224"
@@ -31,7 +31,7 @@ ARG ETHEREUMJS_REPO="https://github.com/ethereumjs/ethereumjs-monorepo.git"
 ARG ETHEREUMJS_BRANCH="7a0a37b7355c77ce841d5b04da55a2a4b53fe550"
 
 ARG RETH_REPO="https://github.com/paradigmxyz/reth"
-ARG ARG RETH_BRANCH="471c28e"
+ARG RETH_BRANCH="471c28e"
 
 # All of the fuzzers we will be using
 # ARG TX_FUZZ_REPO="https://github.com/qu0b/tx-fuzz.git"
