@@ -110,7 +110,7 @@ def calculate_real_forks_and_unsynced_children(str_parents_to_clients):
     parents_chains_sorted = sorted(parents_chains, key=lambda x: len(x))
     real_forks = {}
     parents = []
-    print(f"parent_chains_sorted: {parents_chains_sorted}")
+    # print(f"parent_chains_sorted: {parents_chains_sorted}")
     for c1 in parents_chains_sorted:
         c1_is_parent = True
         for c2 in parents_chains_sorted:
@@ -135,7 +135,7 @@ def calculate_real_forks_and_unsynced_children(str_parents_to_clients):
             unsynced_chains_tree[p] = real_forks[p]
         else:
             unsynced_chains_tree[p] = ""
-    print(f"unsynced_chains_tree: {unsynced_chains_tree}")
+    # print(f"unsynced_chains_tree: {unsynced_chains_tree}")
     return unsynced_chains_tree
 
 
@@ -196,9 +196,15 @@ def print_all_data_for_every_client():
 
 
 import time
+import argparse
+
+arg_parser = argparse.ArgumentParser()
+arg_parser.add_argument("-i", "--interval", help="How often do you want fork detection to run?")
+
+arg = arg_parser.parse_args()
+wait_time = int(arg.interval)
+
 start = time.time()
-epoch = 32 * 2
-wait_time = epoch
 while (True):
     if (time.time() - start > wait_time):
         start = time.time()
