@@ -5,7 +5,7 @@
 
 # devnet 9 ready
 ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
-ARG LIGHTHOUSE_BRANCH="e5a0e2c"
+ARG LIGHTHOUSE_BRANCH="c59fa34"
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
 ARG PRYSM_BRANCH="2850f4d989cde6e96ae841e9f77dfd494d22274c"
@@ -40,7 +40,7 @@ ARG NETHERMIND_BRANCH="dcec565b"
 # ARG ERIGON_BRANCH="901edf91810e22a0f4147d64c9a73754b30a2c33"
 
 ARG RETH_REPO="https://github.com/paradigmxyz/reth"
-ARG RETH_BRANCH="471c28e"
+ARG RETH_BRANCH="b0c4d99"
 
 # All of the fuzzers we will be using
 # ARG TX_FUZZ_REPO="https://github.com/qu0b/tx-fuzz.git"

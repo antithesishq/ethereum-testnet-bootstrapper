@@ -3,7 +3,7 @@
 ###############################################################################
 # Consensus Clients
 ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
-ARG LIGHTHOUSE_BRANCH="e5a0e2c" 
+ARG LIGHTHOUSE_BRANCH="c59fa34" 
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
 ARG PRYSM_BRANCH="2850f4d"
@@ -31,7 +31,7 @@ ARG ETHEREUMJS_REPO="https://github.com/ethereumjs/ethereumjs-monorepo.git"
 ARG ETHEREUMJS_BRANCH="7a0a37b7355c77ce841d5b04da55a2a4b53fe550"
 
 ARG RETH_REPO="https://github.com/paradigmxyz/reth"
-ARG RETH_BRANCH="471c28e"
+ARG RETH_BRANCH="b0c4d99"
 
 # All of the fuzzers we will be using
 # ARG TX_FUZZ_REPO="https://github.com/qu0b/tx-fuzz.git"
