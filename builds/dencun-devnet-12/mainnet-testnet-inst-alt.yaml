@@ -36,7 +36,7 @@ testnet-config:
     config-name: "local-mainnet-testnet"
     disable-peer-scoring: true
 
-    min-genesis-active-validator-count: 80 # custom pre-seeded into genesis state.
+    min-genesis-active-validator-count: 90 # custom pre-seeded into genesis state.
 
     # the validator mnemonic to use for all validators
     validator-mnemonic: "ocean style run case glory clip into nature guess jacket document firm fiscal hello kite disagree symptom tide net coral envelope wink render festival"
@@ -202,18 +202,19 @@ consensus-configs:
 
 client-instances:
     # Geth clients
-  # prysm-geth:
-  #   # docker-compose
-  #   image: "etb-all-clients-inst"
-  #   tag: "dencun-devnet-12"
-  #   start-ip-address: "10.0.20.10"
-  #   num-nodes: 1
-  #   # consensus-info
-  #   consensus-config: "prysm-consensus-client"
-  #   execution-config: "geth-execution-config"
-  #   validator-offset-start: 0
-  #   additional-env:
-  #     validator-password: "testnet-password"
+  prysm-geth:
+    # docker-compose
+    image: "etb-all-clients-inst"
+    tag: "dencun-devnet-12"
+    start-ip-address: "10.0.20.10"
+    num-nodes: 1
+
+    # consensus-info
+    consensus-config: "prysm-consensus-client"
+    execution-config: "geth-execution-config"
+    validator-offset-start: 0
+    additional-env:
+      validator-password: "testnet-password"
 
   teku-geth:
     # docker-compose
@@ -226,7 +227,7 @@ client-instances:
     consensus-config: "teku-consensus-client"
     execution-config: "geth-execution-config"
 
-    validator-offset-start: 0
+    validator-offset-start: 10
 
   # lighthouse-geth:
   #   # docker-compose
@@ -241,18 +242,18 @@ client-instances:
 
   #   validator-offset-start: 10
 
-  lodestar-geth:
-    # docker-compose
-    image: "etb-all-clients-inst"
-    tag: "dencun-devnet-12"
-    start-ip-address: "10.0.20.40"
-    num-nodes: 1
+  # lodestar-geth:
+  #   # docker-compose
+  #   image: "etb-all-clients-inst"
+  #   tag: "dencun-devnet-12"
+  #   start-ip-address: "10.0.20.40"
+  #   num-nodes: 1
 
-    # consensus-info
-    consensus-config: "lodestar-consensus-client"
-    execution-config: "geth-execution-config"
+  #   # consensus-info
+  #   consensus-config: "lodestar-consensus-client"
+  #   execution-config: "geth-execution-config"
 
-    validator-offset-start: 10
+  #   validator-offset-start: 20
 
   # nimbus-geth:
   #   # docker-compose
@@ -390,16 +391,16 @@ client-instances:
   #   validator-offset-start: 60
 
 # reth clients
-  # prysm-reth:
-  #   image: "etb-all-clients-inst"
-  #   tag: "dencun-devnet-12"
-  #   start-ip-address: "10.0.20.160"
-  #   num-nodes: 1
+  prysm-reth:
+    image: "etb-all-clients-inst"
+    tag: "dencun-devnet-12"
+    start-ip-address: "10.0.20.160"
+    num-nodes: 1
 
-  #   # consensus-info
-  #   consensus-config: "nimbus-consensus-client"
-  #   execution-config: "reth-execution-config"
-  #   validator-offset-start: 50
+    # consensus-info
+    consensus-config: "nimbus-consensus-client"
+    execution-config: "reth-execution-config"
+    validator-offset-start: 50
 
   lighthouse-reth:
     image: "etb-all-clients-inst"
@@ -410,7 +411,7 @@ client-instances:
     # consensus-info
     consensus-config: "nimbus-consensus-client"
     execution-config: "reth-execution-config"
-    validator-offset-start: 50
+    validator-offset-start: 60
 
   teku-reth:
     image: "etb-all-clients-inst"
@@ -421,7 +422,7 @@ client-instances:
     # consensus-info
     consensus-config: "nimbus-consensus-client"
     execution-config: "reth-execution-config"
-    validator-offset-start: 60
+    validator-offset-start: 70
 
   nimbus-reth:
     image: "etb-all-clients-inst"
@@ -432,7 +433,7 @@ client-instances:
     # consensus-info
     consensus-config: "nimbus-consensus-client"
     execution-config: "reth-execution-config"
-    validator-offset-start: 70
+    validator-offset-start: 80
 
 
 # generic instances that run fuzzers/health checks/etc.
@@ -474,7 +475,7 @@ generic-instances:
     start-ip-address: "10.0.20.204"
     num-nodes: 1
     # runs on the first prysm geth node.
-    entrypoint: "python3 /source/src/tx_spammer.py --run-indefinitely --log-level debug --target-ip 10.0.20.20 --target-port 8645 --epoch-delay 1 --fuzz-mode blobs --no-al --tx-count 15 --tx-fuzz-path /usr/local/bin/livefuzzer"
+    entrypoint: "python3 /source/src/tx_spammer.py --run-indefinitely --log-level debug --target-ip 10.0.20.10 --target-port 8645 --epoch-delay 1 --fuzz-mode blobs --no-al --tx-count 15 --tx-fuzz-path /usr/local/bin/livefuzzer"
 
   tx-spammer-nethermind:
     image: "etb-all-clients-inst"

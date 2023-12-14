@@ -34,7 +34,6 @@ testnet-config:
   consensus-layer:
     preset-base: 'mainnet'
     config-name: "local-mainnet-testnet"
-    disable-peer-scoring: true
 
     min-genesis-active-validator-count: 60 # custom pre-seeded into genesis state.
     disable-peer-scoring: true
@@ -190,19 +189,19 @@ consensus-configs:
 
 client-instances:
      # Geth clients
-  # prysm-geth:
-  #   # docker-compose
-  #   image: "etb-all-clients-race"
-  #   tag: "dencun-devnet-12"
-  #   start-ip-address: "10.0.20.10"
-  #   num-nodes: 1
+  prysm-geth:
+    # docker-compose
+    image: "etb-all-clients-race"
+    tag: "dencun-devnet-12"
+    start-ip-address: "10.0.20.10"
+    num-nodes: 1
 
-  #   # consensus-info
-  #   consensus-config: "prysm-consensus-client"
-  #   execution-config: "geth-execution-config"
-  #   validator-offset-start: 0
-  #   additional-env:
-  #     validator-password: "testnet-password"
+    # consensus-info
+    consensus-config: "prysm-consensus-client"
+    execution-config: "geth-execution-config"
+    validator-offset-start: 0
+    additional-env:
+      validator-password: "testnet-password"
 
   teku-geth:
     # docker-compose
@@ -215,20 +214,20 @@ client-instances:
     consensus-config: "teku-consensus-client"
     execution-config: "geth-execution-config"
 
-    validator-offset-start: 0
-
-  lighthouse-geth:
-    # docker-compose
-    image: "etb-all-clients-race"
-    tag: "dencun-devnet-12"
-    start-ip-address: "10.0.20.30"
-    num-nodes: 1
-
-    # consensus-info
-    consensus-config: "lighthouse-consensus-client"
-    execution-config: "geth-execution-config"
-
     validator-offset-start: 10
+
+  # lighthouse-geth:
+  #   # docker-compose
+  #   image: "etb-all-clients-race"
+  #   tag: "dencun-devnet-12"
+  #   start-ip-address: "10.0.20.30"
+  #   num-nodes: 1
+
+  #   # consensus-info
+  #   consensus-config: "lighthouse-consensus-client"
+  #   execution-config: "geth-execution-config"
+
+  #   validator-offset-start: 20
 
   # lodestar-geth:
   #   # docker-compose
@@ -313,32 +312,32 @@ client-instances:
 
   # Nethermind clients
 
-  # prysm-nethermind:
-  #   # docker-compose
-  #   image: "etb-all-clients-race"
-  #   tag: "dencun-devnet-12"
-  #   start-ip-address: "10.0.20.110"
-  #   num-nodes: 1
-
-  #   # consensus-info
-  #   consensus-config: "prysm-consensus-client"
-  #   execution-config: "nethermind-execution-config"
-  #   validator-offset-start: 40
-  #   additional-env:
-  #     validator-password: "testnet-password"
-
-  teku-nethermind:
+  prysm-nethermind:
     # docker-compose
     image: "etb-all-clients-race"
     tag: "dencun-devnet-12"
-    start-ip-address: "10.0.20.120"
+    start-ip-address: "10.0.20.110"
     num-nodes: 1
 
     # consensus-info
-    consensus-config: "teku-consensus-client"
+    consensus-config: "prysm-consensus-client"
     execution-config: "nethermind-execution-config"
-
     validator-offset-start: 40
+    additional-env:
+      validator-password: "testnet-password"
+
+  # teku-nethermind:
+  #   # docker-compose
+  #   image: "etb-all-clients-race"
+  #   tag: "dencun-devnet-12"
+  #   start-ip-address: "10.0.20.120"
+  #   num-nodes: 1
+
+  #   # consensus-info
+  #   consensus-config: "teku-consensus-client"
+  #   execution-config: "nethermind-execution-config"
+
+  #   validator-offset-start: 80
 
   lighthouse-nethermind:
     # docker-compose
@@ -417,7 +416,7 @@ generic-instances:
     start-ip-address: "10.0.20.204"
     num-nodes: 1
     # runs on the first prysm geth node.
-    entrypoint: "python3 /source/src/tx_spammer.py --run-indefinitely --log-level debug --target-ip 10.0.20.20 --target-port 8645 --epoch-delay 1 --fuzz-mode blobs --no-al --tx-count 15 --tx-fuzz-path /usr/local/bin/livefuzzer"
+    entrypoint: "python3 /source/src/tx_spammer.py --run-indefinitely --log-level debug --target-ip 10.0.20.10 --target-port 8645 --epoch-delay 1 --fuzz-mode blobs --no-al --tx-count 15 --tx-fuzz-path /usr/local/bin/livefuzzer"
 
   # tx-spammer-nethermind:
   #   image: "etb-all-clients-race"
