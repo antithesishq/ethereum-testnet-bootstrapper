@@ -2,12 +2,14 @@ set -e
 
 ETB_ALL_CLIENTS="etb-all-clients"
 ETB_ALL_CLIENTS_INST="etb-all-clients-inst"
+ETB_ALL_CLIENTS_RACE="etb-all-clients-race"
 
 TAG="dencun-devnet-12"
 
 BOOTSTRAPPER="ethereum-testnet-bootstrapper"
 CONFIG_IMAGE="etb-mainnet-config"
 CONFIG_IMAGE_INST="etb-mainnet-config-inst"
+CONFIG_IMAGE_RACE="etb-mainnet-config-race"
 CONFIG_IMAGE_INST_ALT="etb-mainnet-config-inst-alt"
 CONFIG_IMAGE_CUSTOM="etb-mainnet-config-custom"
 # CONFIG_IMAGE_EVIL="etb-mainnet-config-evil"
@@ -30,6 +32,9 @@ make build-bootstrapper
 
 make build-config config=builds/$TAG/mainnet-testnet.yaml
 docker tag "$CONFIG_IMAGE:latest" "$CONTAINER_REPOSITORY/$CONFIG_IMAGE:$TAG"
+
+make build-config config=builds/$TAG/mainnet-testnet-race.yaml
+docker tag "$CONFIG_IMAGE:latest" "$CONTAINER_REPOSITORY/$CONFIG_IMAGE_RACE:$TAG"
 
 make build-config config=builds/$TAG/mainnet-testnet-inst.yaml
 docker tag "$CONFIG_IMAGE:latest" "$CONTAINER_REPOSITORY/$CONFIG_IMAGE_INST:$TAG"
@@ -58,6 +63,7 @@ docker tag "$ETB_ALL_CLIENTS_INST:$TAG" "$CONTAINER_REPOSITORY/$ETB_ALL_CLIENTS_
 
 
 docker push "$CONTAINER_REPOSITORY/$CONFIG_IMAGE:$TAG"
+docker push "$CONTAINER_REPOSITORY/$CONFIG_IMAGE_RACE:$TAG"
 docker push "$CONTAINER_REPOSITORY/$CONFIG_IMAGE_INST:$TAG"
 docker push "$CONTAINER_REPOSITORY/$CONFIG_IMAGE_INST_ALT:$TAG"
 docker push "$CONTAINER_REPOSITORY/$CONFIG_IMAGE_CUSTOM:$TAG"
@@ -68,3 +74,4 @@ docker push "$CONTAINER_REPOSITORY/$CONFIG_IMAGE_BUILDER:$TAG"
 docker push "$CONTAINER_REPOSITORY/$BOOTSTRAPPER:$TAG"
 docker push "$CONTAINER_REPOSITORY/$ETB_ALL_CLIENTS:$TAG"
 docker push "$CONTAINER_REPOSITORY/$ETB_ALL_CLIENTS_INST:$TAG"
+docker push "$CONTAINER_REPOSITORY/$ETB_ALL_CLIENTS_RACE:$TAG"
