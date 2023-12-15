@@ -6,7 +6,7 @@ ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
 ARG LIGHTHOUSE_BRANCH="78ffa378b40e91cff23fdfdeb3c2dbb6a5520597" 
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
-ARG PRYSM_BRANCH="2850f4d"
+ARG PRYSM_BRANCH="381116a"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
 ARG LODESTAR_BRANCH="d5a5a47"
@@ -337,7 +337,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN apt-get update && \
     apt-get install -y ca-certificates curl gnupg && \
- mkdir -p /etc/apt/keyrings && \
+    mkdir -p /etc/apt/keyrings && \
     curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
     echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_18.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list && \
     apt-get update && \
