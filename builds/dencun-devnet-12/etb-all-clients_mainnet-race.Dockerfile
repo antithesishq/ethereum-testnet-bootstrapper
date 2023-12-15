@@ -3,7 +3,7 @@
 ###############################################################################
 # Consensus Clients
 ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
-ARG LIGHTHOUSE_BRANCH="c59fa34" 
+ARG LIGHTHOUSE_BRANCH="78ffa378b40e91cff23fdfdeb3c2dbb6a5520597" 
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
 ARG PRYSM_BRANCH="2850f4d"
@@ -12,10 +12,10 @@ ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
 ARG LODESTAR_BRANCH="d5a5a47"
 #
 ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
-ARG NIMBUS_ETH2_BRANCH="b186c6a"
+ARG NIMBUS_ETH2_BRANCH="15147c"
 
 ARG TEKU_REPO="https://github.com/ConsenSys/teku.git"
-ARG TEKU_BRANCH="992b224"
+ARG TEKU_BRANCH="16c4354"
 
 # Execution Clients
 ARG BESU_REPO="https://github.com/hyperledger/besu.git"
@@ -112,9 +112,14 @@ RUN ln -s /usr/local/go/bin/go /usr/local/bin/go && \
 ENV PATH="$PATH:/root/go/bin"
 
 # setup nodejs (lodestar)
-RUN apt update \
-    && apt install curl ca-certificates -y --no-install-recommends \
-    && curl -sL https://deb.nodesource.com/setup_18.x | bash -
+RUN apt-get update && \
+apt-get install -y ca-certificates curl gnupg && \ mkdir -p /etc/apt/keyrings && \
+curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
+echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_18.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list && \
+apt-get update && \
+apt-get install nodejs -y
+
+
 
 RUN apt-get update && apt-get install -y --no-install-recommends nodejs
 RUN npm install -g npm@latest
@@ -317,18 +322,25 @@ ENV PATH="$PATH:/root/.dotnet/"
 ENV DOTNET_ROOT=/root/.dotnet
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    nodejs \
     libgflags-dev \
     libsnappy-dev \
     zlib1g-dev \
     libbz2-dev \
     liblz4-dev \
     libzstd-dev \
-    openjdk-17-jre \
+    openjdk-17-jdk \
     python3-dev \
     python3-pip \
     jq \
     xxd
+
+RUN apt-get update && \
+    apt-get install -y ca-certificates curl gnupg && \
+ mkdir -p /etc/apt/keyrings && \
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
+    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_18.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list && \
+    apt-get update && \
+    apt-get install nodejs -y
 
 RUN pip3 install ruamel.yaml web3 pydantic
 
