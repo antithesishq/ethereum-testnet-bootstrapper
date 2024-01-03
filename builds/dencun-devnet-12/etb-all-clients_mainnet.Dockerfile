@@ -88,7 +88,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     git-lfs
 
-RUN git config --global http.postBuffer 1048576000
+RUN git config --global pack.window 1
+
+ENV GIT_TRACE_PACKET=1
+ENV GIT_TRACE=1
+ENV GIT_CURL_VERBOSE=1
 
 # set up dotnet (nethermind)
 RUN wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh && \
@@ -130,7 +134,7 @@ RUN npm install -g @bazel/bazelisk # prysm build system
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable -y
 ENV PATH="$PATH:/root/.cargo/bin"
 # Build rocksdb
-RUN git clone --depth=1 https://github.com/facebook/rocksdb.git
+RUN git clone --depth 1 --no-tags https://github.com/facebook/rocksdb.git
 RUN cd rocksdb && make -j16 install
 
 RUN apt install -y protobuf-compiler libprotobuf-dev # protobuf compiler for lighthouse
@@ -142,7 +146,7 @@ RUN npm install --global yarn
 FROM etb-client-builder AS lighthouse-builder
 ARG LIGHTHOUSE_BRANCH
 ARG LIGHTHOUSE_REPO
-RUN git clone "${LIGHTHOUSE_REPO}" && \
+RUN git clone --depth 1 --no-tags "${LIGHTHOUSE_REPO}" && \
     cd lighthouse && \
     git checkout "${LIGHTHOUSE_BRANCH}" && \
     git log -n 1 --format=format:"%H" > /lighthouse.version
@@ -155,7 +159,7 @@ RUN cd lighthouse && \
 FROM etb-client-builder AS lodestar-builder
 ARG LODESTAR_BRANCH
 ARG LODESTAR_REPO
-RUN git clone "${LODESTAR_REPO}" && \
+RUN git clone --depth 1 --no-tags "${LODESTAR_REPO}" && \
     cd lodestar && \
     git checkout "${LODESTAR_BRANCH}" && \
     git log -n 1 --format=format:"%H" > /lodestar.version
@@ -169,7 +173,7 @@ RUN cd lodestar && \
 FROM etb-client-builder AS nimbus-eth2-builder
 ARG NIMBUS_ETH2_BRANCH
 ARG NIMBUS_ETH2_REPO
-RUN git clone "${NIMBUS_ETH2_REPO}" && \
+RUN git clone --depth 1 --no-tags "${NIMBUS_ETH2_REPO}" && \
     cd nimbus-eth2 && \
     git checkout "${NIMBUS_ETH2_BRANCH}" && \
     git log -n 1 --format=format:"%H" > /nimbus.version && \
@@ -183,7 +187,7 @@ RUN cd nimbus-eth2 && \
 FROM etb-client-builder AS teku-builder
 ARG TEKU_BRANCH
 ARG TEKU_REPO
-RUN git clone "${TEKU_REPO}" && \
+RUN git clone --depth 1 --no-tags "${TEKU_REPO}" && \
     cd teku && \
     git checkout "${TEKU_BRANCH}" && \
     git submodule update --init --recursive && \
@@ -210,7 +214,7 @@ RUN cd teku && \
 FROM etb-client-builder AS prysm-builder
 ARG PRYSM_BRANCH
 ARG PRYSM_REPO
-RUN git clone "${PRYSM_REPO}" && \
+RUN git clone --depth 1 --no-tags "${PRYSM_REPO}" && \
     cd prysm && \
     git checkout "${PRYSM_BRANCH}" && \
     git log -n 1 --format=format:"%H" > /prysm.version
@@ -224,7 +228,7 @@ RUN cd prysm && \
 FROM etb-client-builder AS geth-builder
 ARG GETH_BRANCH
 ARG GETH_REPO
-RUN git clone "${GETH_REPO}" && \
+RUN git clone --depth 1 --no-tags "${GETH_REPO}" && \
     cd go-ethereum && \
     git checkout "${GETH_BRANCH}" && \
     git log -n 1 --format=format:"%H" > /geth.version
@@ -236,7 +240,7 @@ RUN cd go-ethereum && \
 FROM etb-client-builder AS besu-builder
 ARG BESU_REPO
 ARG BESU_BRANCH
-RUN git clone "${BESU_REPO}" && \
+RUN git clone --depth 1 --no-tags "${BESU_REPO}" && \
     cd besu && \
     git checkout "${BESU_BRANCH}" && \
     git log -n 1 --format=format:"%H" > /besu.version
@@ -248,7 +252,7 @@ RUN cd besu && \
 FROM etb-client-builder AS nethermind-builder
 ARG NETHERMIND_REPO
 ARG NETHERMIND_BRANCH
-RUN git clone "${NETHERMIND_REPO}" && \
+RUN git clone --depth 1 --no-tags "${NETHERMIND_REPO}" && \
     cd nethermind && \
     git checkout "${NETHERMIND_BRANCH}" && \
     git log -n 1 --format=format:"%H" > /nethermind.version
@@ -283,7 +287,7 @@ RUN cd nethermind && \
 FROM etb-client-builder AS RETH-builder
 ARG RETH_BRANCH
 ARG RETH_REPO
-RUN git clone "${RETH_REPO}" && \
+RUN git clone --depth 1 --no-tags "${RETH_REPO}" && \
     cd reth && \
     git checkout "${RETH_BRANCH}" && \
     git log -n 1 --format=format:"%H" > /reth.version
@@ -302,14 +306,14 @@ RUN go install github.com/wealdtech/ethereal/v2@latest \
     &&  go install github.com/wealdtech/ethdo@latest \
     && go install github.com/protolambda/eth2-val-tools@latest
 
-RUN git clone "${TX_FUZZ_REPO}" && \
+RUN git clone --depth 1 --no-tags "${TX_FUZZ_REPO}" && \
     cd tx-fuzz && \
     git checkout "${TX_FUZZ_BRANCH}"
 
 RUN cd tx-fuzz && \
     cd cmd/livefuzzer && go build
 
-RUN git clone "${BEACON_METRICS_GAZER_REPO}" && \
+RUN git clone --depth 1 --no-tags "${BEACON_METRICS_GAZER_REPO}" && \
     cd beacon-metrics-gazer && \
     git checkout "${BEACON_METRICS_GAZER_BRANCH}"
 
@@ -321,7 +325,7 @@ RUN cargo install jwt-cli
 
 ARG MOCK_BUILDER_REPO
 ARG MOCK_BUILDER_BRANCH
-RUN git clone --branch "${MOCK_BUILDER_BRANCH}" "${MOCK_BUILDER_REPO}" && \
+RUN git clone --depth 1 --no-tags --branch "${MOCK_BUILDER_BRANCH}" "${MOCK_BUILDER_REPO}" && \
     cd mock-builder && \
     go build .
 
