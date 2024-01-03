@@ -89,7 +89,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # set up dotnet (nethermind)
 RUN wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh && \
     chmod +x dotnet-install.sh && \
-    ./dotnet-install.sh --channel 7.0
+    ./dotnet-install.sh --channel 8.0
 ENV PATH="$PATH:/root/.dotnet/"
 
 WORKDIR /git
