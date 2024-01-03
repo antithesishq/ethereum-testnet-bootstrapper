@@ -319,7 +319,7 @@ RUN cargo install jwt-cli
 
 ARG MOCK_BUILDER_REPO
 ARG MOCK_BUILDER_BRANCH
-RUN git clone --depth 500 --no-single-branch --no-tags --branch "${MOCK_BUILDER_BRANCH}" "${MOCK_BUILDER_REPO}" && \
+RUN git clone --depth 500 --no-single-branch --branch "${MOCK_BUILDER_BRANCH}" "${MOCK_BUILDER_REPO}" && \
     cd mock-builder && \
     go build .
 
