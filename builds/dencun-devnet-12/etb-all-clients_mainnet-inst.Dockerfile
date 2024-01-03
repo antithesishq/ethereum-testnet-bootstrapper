@@ -3,35 +3,35 @@
 ###############################################################################
 # Consensus Clients
 ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
-ARG LIGHTHOUSE_BRANCH="78ffa378b40e91cff23fdfdeb3c2dbb6a5520597" 
+ARG LIGHTHOUSE_BRANCH="c55608b" 
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
-ARG PRYSM_BRANCH="381116a"
+ARG PRYSM_BRANCH="374d77"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
-ARG LODESTAR_BRANCH="d5a5a47"
+ARG LODESTAR_BRANCH="9262064"
 #
 ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
-ARG NIMBUS_ETH2_BRANCH="15147c"
+ARG NIMBUS_ETH2_BRANCH="f125a5c"
 
 ARG TEKU_REPO="https://github.com/ConsenSys/teku.git"
-ARG TEKU_BRANCH="16c4354"
+ARG TEKU_BRANCH="f733b7c"
 
 # Execution Clients
 ARG BESU_REPO="https://github.com/hyperledger/besu.git"
-ARG BESU_BRANCH="be5cc68b"
+ARG BESU_BRANCH="80c8a8f"
 
 ARG GETH_REPO="https://github.com/lightclient/go-ethereum.git"
-ARG GETH_BRANCH="5b57727d6de25493245ead838412188ffb6f1324"
+ARG GETH_BRANCH="4410c1416abce38925c60550bf2bfb7f7db5c3f5"
 
 ARG NETHERMIND_REPO="https://github.com/NethermindEth/nethermind.git"
-ARG NETHERMIND_BRANCH="dcec565b"
+ARG NETHERMIND_BRANCH="7e6c340"
 
 ARG ETHEREUMJS_REPO="https://github.com/ethereumjs/ethereumjs-monorepo.git"
 ARG ETHEREUMJS_BRANCH="7a0a37b7355c77ce841d5b04da55a2a4b53fe550"
 
 ARG RETH_REPO="https://github.com/paradigmxyz/reth"
-ARG RETH_BRANCH="b0c4d99"
+ARG RETH_BRANCH="b1d0dc4"
 
 # All of the fuzzers we will be using
 # ARG TX_FUZZ_REPO="https://github.com/qu0b/tx-fuzz.git"
