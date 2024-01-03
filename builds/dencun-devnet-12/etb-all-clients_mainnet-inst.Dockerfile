@@ -21,7 +21,7 @@ ARG TEKU_BRANCH="f733b7c"
 ARG BESU_REPO="https://github.com/hyperledger/besu.git"
 ARG BESU_BRANCH="80c8a8f"
 
-ARG GETH_REPO="https://github.com/lightclient/go-ethereum.git"
+ARG GETH_REPO="https://github.com/ethereum/go-ethereum.git"
 ARG GETH_BRANCH="4410c1416abce38925c60550bf2bfb7f7db5c3f5"
 
 ARG NETHERMIND_REPO="https://github.com/NethermindEth/nethermind.git"
@@ -89,7 +89,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # set up dotnet (nethermind)
 RUN wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh && \
     chmod +x dotnet-install.sh && \
-    ./dotnet-install.sh --channel 7.0
+    ./dotnet-install.sh --channel 8.0
 ENV PATH="$PATH:/root/.dotnet/"
 
 WORKDIR /git
@@ -122,8 +122,6 @@ RUN apt-get update && \
 
 
 
-RUN apt-get update && apt-get install -y --no-install-recommends nodejs
-RUN npm install -g npm@latest
 RUN npm install -g @bazel/bazelisk # prysm build system
 
 # setup cargo/rustc (lighthouse)
@@ -131,7 +129,7 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --defau
 ENV PATH="$PATH:/root/.cargo/bin"
 # Build rocksdb
 RUN git clone --depth=1 https://github.com/facebook/rocksdb.git
-RUN cd rocksdb && make -j4 install
+RUN cd rocksdb && make -j16 install
 
 RUN apt install -y protobuf-compiler libprotobuf-dev # protobuf compiler for lighthouse
 RUN ln -s /usr/local/bin/python3 /usr/local/bin/python
