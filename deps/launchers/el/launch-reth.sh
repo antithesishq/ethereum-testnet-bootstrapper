@@ -20,7 +20,7 @@ fi
 reth_args=(
   node
   -$EXECUTION_LOG_LEVEL
-  --log.directory=$EXECUTION_NODE_DIR/logs/
+  --log.file.directory=$EXECUTION_NODE_DIR/logs/
   --datadir=$EXECUTION_NODE_DIR
   --chain=$EXECUTION_GENESIS_FILE
   --port=$EXECUTION_P2P_PORT
