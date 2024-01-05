@@ -62,7 +62,6 @@ nethermind_args=(
 
 if [ "$IS_DENEB" == 1 ]; then
   nethermind_args+=(
-    # --Init.KzgSetupFile "$TRUSTED_SETUP_TXT_FILE"
     --Init.IsMining=false
     --Pruning.Mode=None
   )

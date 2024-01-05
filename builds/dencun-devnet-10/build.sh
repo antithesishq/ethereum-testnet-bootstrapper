@@ -23,7 +23,7 @@ function container_builder() {
     fi
 }
 
-TAG="dencun-devnet-9"
+TAG="dencun-devnet-10"
 
 log_step "building all clients"
 build_image "etb-all-clients:$TAG" "etb-all-clients_mainnet.Dockerfile"
@@ -31,11 +31,8 @@ build_image "etb-all-clients:$TAG" "etb-all-clients_mainnet.Dockerfile"
 log_step "building all clients instrumented"
 build_image "etb-all-clients-inst:$TAG" "etb-all-clients_mainnet-inst.Dockerfile"
 
-log_step "building all clients race"
-build_image "etb-all-clients-race:$TAG" "etb-all-clients_mainnet-race.Dockerfile"
-
 # log_step "building all minimal clients"
-# build_image "etb-all-clients-minimal:dencun-devnet-9" "etb-all-clients_minimal.Dockerfile"
+# build_image "etb-all-clients-minimal:dencun-devnet-10" "etb-all-clients_minimal.Dockerfile"
 
 # log_step "building all minimal instrumented clients"
-# build_image "etb-all-clients-minimal-inst:dencun-devnet-9" "etb-all-clients_minimal-inst.Dockerfile"
+# build_image "etb-all-clients-minimal-inst:dencun-devnet-10" "etb-all-clients_minimal-inst.Dockerfile"

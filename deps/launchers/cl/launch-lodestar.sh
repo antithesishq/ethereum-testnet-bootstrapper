@@ -85,6 +85,13 @@ validator_args=(
   --force
 )
 
+if [ "$DISABLE_PEER_SCORING" == 1 ]; then
+    echo "disabling peer scoring"
+    beacon_args+=(
+      --disablePeerScoring
+    )
+fi
+
 #  --logFile="$CONSENSUS_NODE_DIR/validatordb/validator.log"
 
 
