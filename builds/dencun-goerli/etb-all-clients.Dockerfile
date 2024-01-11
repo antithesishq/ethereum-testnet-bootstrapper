@@ -151,9 +151,8 @@ ENV PATH="$PATH:/root/.cargo/bin"
 
 ARG LIGHTHOUSE_BRANCH
 ARG LIGHTHOUSE_REPO
-RUN git clone --depth 1 "${LIGHTHOUSE_REPO}" && \
+RUN git clone --depth 1 --branch "${LIGHTHOUSE_BRANCH}" "${LIGHTHOUSE_REPO" && \
     cd lighthouse && \
-    git checkout "${LIGHTHOUSE_BRANCH}" && \
     git log -n 1 --format=format:"%H" > /lighthouse.version
 
 RUN cd lighthouse && \
@@ -168,9 +167,8 @@ cp /git/lighthouse/target/release/lighthouse /git/inst/bin/lighthouse
 # LODESTAR
 ARG LODESTAR_BRANCH
 ARG LODESTAR_REPO
-RUN git clone --depth 1 "${LODESTAR_REPO}" && \
+RUN git clone --depth 1 --branch "${LODESTAR_BRANCH}" "${LODESTAR_REPO" && \
     cd lodestar && \
-    git checkout "${LODESTAR_BRANCH}" && \
     git log -n 1 --format=format:"%H" > /lodestar.version
 
 RUN cd lodestar && \
@@ -184,9 +182,8 @@ RUN cp /git/lodestar/node_modules/.bin/lodestar /git/bin/lodestar
 # NIMBUS-builder
 ARG NIMBUS_ETH2_BRANCH
 ARG NIMBUS_ETH2_REPO
-RUN git clone --depth 1 "${NIMBUS_ETH2_REPO}" && \
+RUN git clone --depth 1 --branch "${NIMBUS_ETH2_BRANCH}" "${NIMBUS_ETH2_REPO" && \
     cd nimbus-eth2 && \
-    git checkout "${NIMBUS_ETH2_BRANCH}" && \
     git log -n 1 --format=format:"%H" > /nimbus.version && \
     make -j16 update
 
@@ -198,9 +195,8 @@ RUN cd nimbus-eth2 && \
 # TEKU
 ARG TEKU_BRANCH
 ARG TEKU_REPO
-RUN git clone --depth 1 "${TEKU_REPO}" && \
+RUN git clone --depth 1 --branch "${TEKU_BRANCH}" "${TEKU_REPO" && \
     cd teku && \
-    git checkout "${TEKU_BRANCH}" && \
     git submodule update --init --recursive && \
     git log -n 1 --format=format:"%H" > /teku.version
 
@@ -211,9 +207,8 @@ RUN cd teku && \
 # PRYSM
 ARG PRYSM_BRANCH
 ARG PRYSM_REPO
-RUN git clone --depth 1 "${PRYSM_REPO}" && \
+RUN git clone --depth 1 --branch "${PRYSM_BRANCH}" "${PRYSM_REPO" && \
     cd prysm && \
-    git checkout "${PRYSM_BRANCH}" && \
     git log -n 1 --format=format:"%H" > /prysm.version
 
 RUN cd prysm && \
@@ -246,14 +241,14 @@ ARG GETH_REPO
 
 RUN wget "https://codeload.github.com/ethereum/go-ethereum/zip/${GETH_BRANCH}" && \
     unzip -q "${GETH_BRANCH}" && \
-    mv go-ethereum-${GETH_BRANCH} go-ethereum && \
+    mv go-ethereum-${GETH_BRANCH}" go-ethereum && \
     echo "${GETH_BRANCH}" > /geth.version && \
     cd go-ethereum && \
     go build -o /git/bin/geth -ldflags "-X github.com/ethereum/go-ethereum/internal/version.gitCommit=v1.13.9 -X github.com/ethereum/go-ethereum/internal/version.gitDate=$(date '+%Y-%m-%d') -extldflags '-Wl,-z,stack-size=0x800000'" -tags urfave_cli_no_docs,ckzg -trimpath -v ./cmd/geth && \
     go build -o /git/race/bin/geth -race -ldflags "-X github.com/ethereum/go-ethereum/internal/version.gitCommit=v1.13.9 -X github.com/ethereum/go-ethereum/internal/version.gitDate=$(date '+%Y-%m-%d') -extldflags '-Wl,-z,stack-size=0x800000'" -tags urfave_cli_no_docs,ckzg -trimpath -v ./cmd/geth 
-# RUN git clone --depth 1 "${GETH_REPO}" && \
+# RUN git clone --depth 1 --branch "${GETH_BRANCH}" "${GETH_REPO" && \
 #     cd go-ethereum && \
-#     git checkout "${GETH_BRANCH}" && \
+#     
 #     git log -n 1 --format=format:"%H" > /geth.version && \
 #     go build -o /git/bin/geth ./cmd/geth && \
 #     go build -race -o /git/race/bin/geth /git/bin/geth
@@ -273,9 +268,8 @@ RUN /opt/antithesis/go_instrumentation/bin/goinstrumentor \
 # Besu
 ARG BESU_REPO
 ARG BESU_BRANCH
-RUN git clone --depth 1 "${BESU_REPO}" && \
+RUN git clone --depth 1 --branch "${BESU_BRANCH}" "${BESU_REPO" && \
     cd besu && \
-    git checkout "${BESU_BRANCH}" && \
     git log -n 1 --format=format:"%H" > /besu.version
 
 RUN cd besu && \
@@ -286,9 +280,8 @@ RUN cd besu && \
 # Nethermind
 ARG NETHERMIND_REPO
 ARG NETHERMIND_BRANCH
-RUN git clone --depth 1 "${NETHERMIND_REPO}" && \
+RUN git clone --depth 1 --branch "${NETHERMIND_BRANCH}" "${NETHERMIND_REPO" && \
     cd nethermind && \
-    git checkout "${NETHERMIND_BRANCH}" && \
     git log -n 1 --format=format:"%H" > /nethermind.version && \
     dotnet publish -p:PublishReadyToRun=false src/Nethermind/Nethermind.Runner -c release -o /git/lib/nethermind && \
     cp /git/lib/nethermind/nethermind /git/bin/nethermind
@@ -297,7 +290,7 @@ RUN git clone --depth 1 "${NETHERMIND_REPO}" && \
 #
 # ARG ETHEREUMJS_REPO
 # ARG ETHEREUMJS_BRANCH
-# RUN git clone --depth 1  -b ${ETHEREUMJS_BRANCH} "${ETHEREUMJS_REPO}" && \
+# RUN git clone --depth 1  -b ${ETHEREUMJS_BRANCH}" "${ETHEREUMJS_REPO}" && \
 #     cd ethereumjs-monorepo && \
 #     git log -n 1 --format=format:"%H" > /ethereumjs.version
 
@@ -311,7 +304,7 @@ RUN git clone --depth 1 "${NETHERMIND_REPO}" && \
 # ARG ERIGON_BRANCH
 # RUN git clone "${ERIGON_REPO}" && \
 #     cd ERIGON && \
-#     git checkout "${ERIGON_BRANCH}" && \
+#     
 #     git log -n 1 --format=format:"%H" > /ERIGON.version
 
 # RUN cd ERIGON && \
@@ -319,9 +312,8 @@ RUN git clone --depth 1 "${NETHERMIND_REPO}" && \
 # RETH
 ARG RETH_BRANCH
 ARG RETH_REPO
-RUN git clone --depth 1 "${RETH_REPO}" && \
+RUN git clone --depth 1 --branch "${RETH_BRANCH}" "${RETH_REPO" && \
     cd reth && \
-    git checkout "${RETH_BRANCH}" && \
     git log -n 1 --format=format:"%H" > /reth.version && \
     cargo build --release --bin reth && \
     cp /git/reth/target/release/reth /git/bin/reth
@@ -345,14 +337,12 @@ RUN go install github.com/wealdtech/ethereal/v2@latest \
     && cp /root/go/bin/ethdo /git/bin/ \
     && cp /root/go/bin/eth2-val-tools /git/bin/
 
-RUN git clone --depth 1 "${TX_FUZZ_REPO}" && \
+RUN git clone --depth 1 --branch "${TX_FUZZ_BRANCH}" "${TX_FUZZ_REPO" && \
     cd tx-fuzz && \
-    git checkout "${TX_FUZZ_BRANCH}" && \
     go build -o /git/bin/livefuzzer ./cmd/livefuzzer 
 
-RUN git clone --depth 1 "${BEACON_METRICS_GAZER_REPO}" && \
+RUN git clone --depth 1 --branch "${BEACON_METRICS_GAZER_BRANCH}" "${BEACON_METRICS_GAZER_REPO" && \
     cd beacon-metrics-gazer && \
-    git checkout "${BEACON_METRICS_GAZER_BRANCH}" && \
     cargo update -p proc-macro2 && \
     cargo build --release --bin beacon-metrics-gazer && \
     cp /git/beacon-metrics-gazer/target/release/beacon-metrics-gazer /git/bin/beacon-metrics-gazer
