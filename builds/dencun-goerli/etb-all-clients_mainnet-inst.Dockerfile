@@ -196,11 +196,9 @@ RUN cd teku && \
 FROM etb-client-builder AS prysm-builder
 ARG PRYSM_BRANCH
 ARG PRYSM_REPO
-RUN git clone --depth 1 --single-branch --branch "${PRYSM_BRANCH}" "${PRYSM_REPO}" && \
+RUN git clone --depth 1 --branch "${PRYSM_BRANCH}" "${PRYSM_REPO}" && \
     cd prysm && \
     git log -n 1 --format=format:"%H" > /prysm.version
-
-RUN mkdir -p /git/bin
 
 # Antithesis instrumented prysm binary
 RUN mkdir prysm_instrumented && \
@@ -210,9 +208,7 @@ RUN mkdir prysm_instrumented && \
     prysm prysm_instrumented
 
 RUN cd prysm_instrumented/customer && \
-    bazelisk build --config=release @io_bazel_rules_go//go/config:race //cmd/beacon-chain:beacon-chain //cmd/validator:validator && \
-    mv bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /git/bin/beacon-chain && \
-    mv bazel-bin/cmd/validator/validator_/validator /git/bin/validator
+    bazelisk build --config=release @io_bazel_rules_go//go/config:race //cmd/beacon-chain:beacon-chain //cmd/validator:validator
 
 
 ############################# Execution  Clients  #############################
@@ -220,7 +216,7 @@ RUN cd prysm_instrumented/customer && \
 FROM etb-client-builder AS geth-builder
 ARG GETH_BRANCH
 ARG GETH_REPO
-RUN git clone --depth 1 --single-branch --branch "${GETH_BRANCH}" "${GETH_REPO}" && \
+RUN git clone --depth 1 --branch "${GETH_BRANCH}" "${GETH_REPO}" && \
     cd go-ethereum && \
     git log -n 1 --format=format:"%H" > /geth.version
 
