@@ -151,7 +151,7 @@ ENV PATH="$PATH:/root/.cargo/bin"
 
 ARG LIGHTHOUSE_BRANCH
 ARG LIGHTHOUSE_REPO
-RUN git clone --depth 1 --branch "${LIGHTHOUSE_BRANCH}" "${LIGHTHOUSE_REPO" && \
+RUN git clone --depth 1 --branch "${LIGHTHOUSE_BRANCH}" "${LIGHTHOUSE_REPO}" && \
     cd lighthouse && \
     git log -n 1 --format=format:"%H" > /lighthouse.version
 
@@ -167,7 +167,7 @@ cp /git/lighthouse/target/release/lighthouse /git/inst/bin/lighthouse
 # LODESTAR
 ARG LODESTAR_BRANCH
 ARG LODESTAR_REPO
-RUN git clone --depth 1 --branch "${LODESTAR_BRANCH}" "${LODESTAR_REPO" && \
+RUN git clone --depth 1 --branch "${LODESTAR_BRANCH}" "${LODESTAR_REPO}" && \
     cd lodestar && \
     git log -n 1 --format=format:"%H" > /lodestar.version
 
@@ -182,7 +182,7 @@ RUN cp /git/lodestar/node_modules/.bin/lodestar /git/bin/lodestar
 # NIMBUS-builder
 ARG NIMBUS_ETH2_BRANCH
 ARG NIMBUS_ETH2_REPO
-RUN git clone --depth 1 --branch "${NIMBUS_ETH2_BRANCH}" "${NIMBUS_ETH2_REPO" && \
+RUN git clone --depth 1 --branch "${NIMBUS_ETH2_BRANCH}" "${NIMBUS_ETH2_REPO}" && \
     cd nimbus-eth2 && \
     git log -n 1 --format=format:"%H" > /nimbus.version && \
     make -j16 update
@@ -195,7 +195,7 @@ RUN cd nimbus-eth2 && \
 # TEKU
 ARG TEKU_BRANCH
 ARG TEKU_REPO
-RUN git clone --depth 1 --branch "${TEKU_BRANCH}" "${TEKU_REPO" && \
+RUN git clone --depth 1 --branch "${TEKU_BRANCH}" "${TEKU_REPO}" && \
     cd teku && \
     git submodule update --init --recursive && \
     git log -n 1 --format=format:"%H" > /teku.version
@@ -207,7 +207,7 @@ RUN cd teku && \
 # PRYSM
 ARG PRYSM_BRANCH
 ARG PRYSM_REPO
-RUN git clone --depth 1 --branch "${PRYSM_BRANCH}" "${PRYSM_REPO" && \
+RUN git clone --depth 1 --branch "${PRYSM_BRANCH}" "${PRYSM_REPO}" && \
     cd prysm && \
     git log -n 1 --format=format:"%H" > /prysm.version
 
@@ -246,7 +246,7 @@ RUN wget "https://codeload.github.com/ethereum/go-ethereum/zip/${GETH_BRANCH}" &
     cd go-ethereum && \
     go build -o /git/bin/geth -ldflags "-X github.com/ethereum/go-ethereum/internal/version.gitCommit=v1.13.9 -X github.com/ethereum/go-ethereum/internal/version.gitDate=$(date '+%Y-%m-%d') -extldflags '-Wl,-z,stack-size=0x800000'" -tags urfave_cli_no_docs,ckzg -trimpath -v ./cmd/geth && \
     go build -o /git/race/bin/geth -race -ldflags "-X github.com/ethereum/go-ethereum/internal/version.gitCommit=v1.13.9 -X github.com/ethereum/go-ethereum/internal/version.gitDate=$(date '+%Y-%m-%d') -extldflags '-Wl,-z,stack-size=0x800000'" -tags urfave_cli_no_docs,ckzg -trimpath -v ./cmd/geth 
-# RUN git clone --depth 1 --branch "${GETH_BRANCH}" "${GETH_REPO" && \
+# RUN git clone --depth 1 --branch "${GETH_BRANCH}" "${GETH_REPO}" && \
 #     cd go-ethereum && \
 #     
 #     git log -n 1 --format=format:"%H" > /geth.version && \
@@ -268,7 +268,7 @@ RUN /opt/antithesis/go_instrumentation/bin/goinstrumentor \
 # Besu
 ARG BESU_REPO
 ARG BESU_BRANCH
-RUN git clone --depth 1 --branch "${BESU_BRANCH}" "${BESU_REPO" && \
+RUN git clone --depth 1 --branch "${BESU_BRANCH}" "${BESU_REPO}" && \
     cd besu && \
     git log -n 1 --format=format:"%H" > /besu.version
 
@@ -280,7 +280,7 @@ RUN cd besu && \
 # Nethermind
 ARG NETHERMIND_REPO
 ARG NETHERMIND_BRANCH
-RUN git clone --depth 1 --branch "${NETHERMIND_BRANCH}" "${NETHERMIND_REPO" && \
+RUN git clone --depth 1 --branch "${NETHERMIND_BRANCH}" "${NETHERMIND_REPO}" && \
     cd nethermind && \
     git log -n 1 --format=format:"%H" > /nethermind.version && \
     dotnet publish -p:PublishReadyToRun=false src/Nethermind/Nethermind.Runner -c release -o /git/lib/nethermind && \
@@ -312,7 +312,7 @@ RUN git clone --depth 1 --branch "${NETHERMIND_BRANCH}" "${NETHERMIND_REPO" && \
 # RETH
 ARG RETH_BRANCH
 ARG RETH_REPO
-RUN git clone --depth 1 --branch "${RETH_BRANCH}" "${RETH_REPO" && \
+RUN git clone --depth 1 --branch "${RETH_BRANCH}" "${RETH_REPO}" && \
     cd reth && \
     git log -n 1 --format=format:"%H" > /reth.version && \
     cargo build --release --bin reth && \
@@ -337,11 +337,11 @@ RUN go install github.com/wealdtech/ethereal/v2@latest \
     && cp /root/go/bin/ethdo /git/bin/ \
     && cp /root/go/bin/eth2-val-tools /git/bin/
 
-RUN git clone --depth 1 --branch "${TX_FUZZ_BRANCH}" "${TX_FUZZ_REPO" && \
+RUN git clone --depth 1 --branch "${TX_FUZZ_BRANCH}" "${TX_FUZZ_REPO}" && \
     cd tx-fuzz && \
     go build -o /git/bin/livefuzzer ./cmd/livefuzzer 
 
-RUN git clone --depth 1 --branch "${BEACON_METRICS_GAZER_BRANCH}" "${BEACON_METRICS_GAZER_REPO" && \
+RUN git clone --depth 1 --branch "${BEACON_METRICS_GAZER_BRANCH}" "${BEACON_METRICS_GAZER_REPO}" && \
     cd beacon-metrics-gazer && \
     cargo update -p proc-macro2 && \
     cargo build --release --bin beacon-metrics-gazer && \

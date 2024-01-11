@@ -140,7 +140,7 @@ RUN npm install --global yarn
 FROM etb-client-builder AS lighthouse-builder
 ARG LIGHTHOUSE_BRANCH
 ARG LIGHTHOUSE_REPO
-RUN git clone --depth 1 --branch "${LIGHTHOUSE_BRANCH}" "${LIGHTHOUSE_REPO" && \
+RUN git clone --depth 1 --branch "${LIGHTHOUSE_BRANCH}" "${LIGHTHOUSE_REPO}" && \
     cd lighthouse && \
     git log -n 1 --format=format:"%H" > /lighthouse.version
 
@@ -157,7 +157,7 @@ LD_LIBRARY_PATH=/usr/lib/ RUSTFLAGS="-Cpasses=sancov-module -Cllvm-args=-sanitiz
 FROM etb-client-builder AS lodestar-builder
 ARG LODESTAR_BRANCH
 ARG LODESTAR_REPO
-RUN git clone --depth 1 --branch "${LODESTAR_BRANCH}" "${LODESTAR_REPO" && \
+RUN git clone --depth 1 --branch "${LODESTAR_BRANCH}" "${LODESTAR_REPO}" && \
     cd lodestar && \
     git log -n 1 --format=format:"%H" > /lodestar.version
 
@@ -170,7 +170,7 @@ RUN cd lodestar && \
 FROM etb-client-builder AS nimbus-eth2-builder
 ARG NIMBUS_ETH2_BRANCH
 ARG NIMBUS_ETH2_REPO
-RUN git clone --depth 1 --branch "${NIMBUS_ETH2_BRANCH}" "${NIMBUS_ETH2_REPO" && \
+RUN git clone --depth 1 --branch "${NIMBUS_ETH2_BRANCH}" "${NIMBUS_ETH2_REPO}" && \
     cd nimbus-eth2 && \
     git log -n 1 --format=format:"%H" > /nimbus.version && \
     make -j16 update
@@ -185,7 +185,7 @@ RUN cd nimbus-eth2 && \
 FROM etb-client-builder AS teku-builder
 ARG TEKU_BRANCH
 ARG TEKU_REPO
-RUN git clone --depth 1 --branch "${TEKU_BRANCH}" "${TEKU_REPO" && \
+RUN git clone --depth 1 --branch "${TEKU_BRANCH}" "${TEKU_REPO}" && \
     cd teku && \
     git submodule update --init --recursive && \
     git log -n 1 --format=format:"%H" > /teku.version
@@ -197,7 +197,7 @@ RUN cd teku && \
 FROM etb-client-builder AS prysm-builder
 ARG PRYSM_BRANCH
 ARG PRYSM_REPO
-RUN git clone --depth 1 --branch "${PRYSM_BRANCH}" "${PRYSM_REPO" && \
+RUN git clone --depth 1 --branch "${PRYSM_BRANCH}" "${PRYSM_REPO}" && \
     cd prysm && \
     git log -n 1 --format=format:"%H" > /prysm.version
 
@@ -211,7 +211,7 @@ RUN cd prysm && \
 FROM etb-client-builder AS geth-builder
 ARG GETH_BRANCH
 ARG GETH_REPO
-RUN git clone --depth 1 --branch "${GETH_BRANCH}" "${GETH_REPO" && \
+RUN git clone --depth 1 --branch "${GETH_BRANCH}" "${GETH_REPO}" && \
     cd go-ethereum && \
     git log -n 1 --format=format:"%H" > /geth.version
 
@@ -223,7 +223,7 @@ RUN cd go-ethereum && \
 FROM etb-client-builder AS besu-builder
 ARG BESU_BRANCH
 ARG BESU_REPO
-RUN git clone --depth 1 --branch "${BESU_BRANCH}" "${BESU_REPO" && \
+RUN git clone --depth 1 --branch "${BESU_BRANCH}" "${BESU_REPO}" && \
     cd besu && \
     git log -n 1 --format=format:"%H" > /besu.version
 
@@ -234,7 +234,7 @@ RUN cd besu && \
 FROM etb-client-builder AS nethermind-builder
 ARG NETHERMIND_BRANCH
 ARG NETHERMIND_REPO
-RUN git clone --depth 1 --branch "${NETHERMIND_BRANCH}" "${NETHERMIND_REPO" && \
+RUN git clone --depth 1 --branch "${NETHERMIND_BRANCH}" "${NETHERMIND_REPO}" && \
     cd nethermind && \
     git log -n 1 --format=format:"%H" > /nethermind.version
 
@@ -245,7 +245,7 @@ RUN cd nethermind && \
 FROM etb-client-builder AS RETH-builder
 ARG RETH_BRANCH
 ARG RETH_REPO
-RUN git clone --depth 1 --branch "${RETH_BRANCH}" "${RETH_REPO" && \
+RUN git clone --depth 1 --branch "${RETH_BRANCH}" "${RETH_REPO}" && \
     cd reth && \
     git log -n 1 --format=format:"%H" > /reth.version
 
@@ -263,11 +263,11 @@ RUN go install github.com/wealdtech/ethereal/v2@latest \
     &&  go install github.com/wealdtech/ethdo@latest \
     && go install github.com/protolambda/eth2-val-tools@latest
 
-RUN git clone --depth 1 --branch "${TX_FUZZ_BRANCH}" "${TX_FUZZ_REPO" && \
+RUN git clone --depth 1 --branch "${TX_FUZZ_BRANCH}" "${TX_FUZZ_REPO}" && \
     cd tx-fuzz && \
     cd cmd/livefuzzer && go build
 
-RUN git clone --depth 1 --branch "${BEACON_METRICS_GAZER_BRANCH}" "${BEACON_METRICS_GAZER_REPO" && \
+RUN git clone --depth 1 --branch "${BEACON_METRICS_GAZER_BRANCH}" "${BEACON_METRICS_GAZER_REPO}" && \
     cd beacon-metrics-gazer && \
     cargo update -p proc-macro2 && \
     cargo build --release
