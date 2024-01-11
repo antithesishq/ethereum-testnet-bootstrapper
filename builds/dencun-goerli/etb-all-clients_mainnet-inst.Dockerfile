@@ -95,8 +95,12 @@ ENV PATH="$PATH:/root/.dotnet/"
 
 WORKDIR /git
 
-RUN git config --global http.postBuffer 157286400
-RUN git config --global core.compression 0   
+RUN git config --global http.maxRequests 1
+RUN git config --global core.compression 5
+
+RUN git config --global lfs.activitytimeout 3600
+RUN git config --global http.lowSpeedLimit 0
+RUN git config --global http.lowSpeedTime 3600
 
 # set up clang 15 (nimbus+lighthouse+deps)
 RUN wget --no-check-certificate https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh 15
@@ -125,7 +129,6 @@ RUN apt-get update && \
     apt-get install nodejs -y
 
 
-
 RUN npm install -g @bazel/bazelisk # prysm build system
 
 # setup cargo/rustc (lighthouse)
@@ -147,11 +150,6 @@ ARG LIGHTHOUSE_REPO
 RUN git clone --depth 1 --branch "${LIGHTHOUSE_BRANCH}" "${LIGHTHOUSE_REPO}" && \
     cd lighthouse && \
     git log -n 1 --format=format:"%H" > /lighthouse.version
-
-RUN cd lighthouse && \
-    cargo update -p proc-macro2 && \
-    cargo build --release --manifest-path lighthouse/Cargo.toml --bin lighthouse && \
-    mv target/release/lighthouse target/release/lighthouse_uninstrumented
 
 # Antithesis instrumented lighthouse binary
 RUN cd lighthouse && LD_LIBRARY_PATH=/usr/lib/ RUSTFLAGS="-Cpasses=sancov-module -Cllvm-args=-sanitizer-coverage-level=3 -Cllvm-args=-sanitizer-coverage-trace-pc-guard -Ccodegen-units=1 -Cdebuginfo=2 -L/usr/lib/ -lvoidstar" cargo build --release --manifest-path lighthouse/Cargo.toml --bin lighthouse
@@ -176,11 +174,11 @@ ARG NIMBUS_ETH2_REPO
 RUN git clone --depth 1 --branch "${NIMBUS_ETH2_BRANCH}" "${NIMBUS_ETH2_REPO}" && \
     cd nimbus-eth2 && \
     git log -n 1 --format=format:"%H" > /nimbus.version && \
-    make -j16 update
+    make -j32 update
 
 RUN cd nimbus-eth2 && \
     arch=$(arch | sed s/aarch64/arm64/ | sed s/x86_64/amd64/) && \
-    make -j16 nimbus_beacon_node NIMFLAGS="-d:disableMarchNative --cpu:${arch} --cc:clang --clang.exe:clang-15 --clang.linkerexe:clang-15 --passC:-fno-lto --passL:-fno-lto"
+    make -j32 nimbus_beacon_node NIMFLAGS="-d:disableMarchNative --cpu:${arch} --cc:clang --clang.exe:clang-15 --clang.linkerexe:clang-15 --passC:-fno-lto --passL:-fno-lto"
 
 # TEKU
 FROM etb-client-builder AS teku-builder
@@ -204,11 +202,6 @@ RUN git clone --depth 1 --branch "${PRYSM_BRANCH}" "${PRYSM_REPO}" && \
 
 RUN mkdir -p /git/bin
 
-RUN cd prysm && \
-    bazelisk build --config=release //cmd/beacon-chain:beacon-chain //cmd/validator:validator && \
-    mv bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /git/bin/beacon-chain_uninstrumented && \
-    mv bazel-bin/cmd/validator/validator_/validator /git/bin/validator_uninstrumented 
-
 # Antithesis instrumented prysm binary
 RUN mkdir prysm_instrumented && \
     /opt/antithesis/go_instrumentation/bin/goinstrumentor \
@@ -217,14 +210,9 @@ RUN mkdir prysm_instrumented && \
     prysm prysm_instrumented
 
 RUN cd prysm_instrumented/customer && \
-    bazelisk build --config=release //cmd/beacon-chain:beacon-chain //cmd/validator:validator && \
-    mv bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /git/bin/beacon-chain_instrumented && \
-    mv bazel-bin/cmd/validator/validator_/validator /git/bin/validator_instrumented
-
-RUN cd prysm_instrumented/customer && \
     bazelisk build --config=release @io_bazel_rules_go//go/config:race //cmd/beacon-chain:beacon-chain //cmd/validator:validator && \
-    mv bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /git/bin/beacon-chain_instrumented_race && \
-    mv bazel-bin/cmd/validator/validator_/validator /git/bin/validator_instrumented_race
+    mv bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /git/bin/beacon-chain && \
+    mv bazel-bin/cmd/validator/validator_/validator /git/bin/validator
 
 
 ############################# Execution  Clients  #############################
@@ -236,10 +224,6 @@ RUN git clone --depth 1 --branch "${GETH_BRANCH}" "${GETH_REPO}" && \
     cd go-ethereum && \
     git log -n 1 --format=format:"%H" > /geth.version
 
-RUN cd go-ethereum && \
-    make geth && \
-    mv ./build/bin/geth /tmp/geth_uninstrumented
-
 # Antithesis add instrumentation
 RUN mkdir geth_instrumented
 
@@ -247,9 +231,6 @@ RUN /opt/antithesis/go_instrumentation/bin/goinstrumentor \
     -logtostderr -stderrthreshold=INFO \
     -antithesis /opt/antithesis/go_instrumentation/instrumentation/go/wrappers \
     go-ethereum geth_instrumented
-
-RUN cd geth_instrumented/customer && \
-    go install -race ./... && mv /root/go/bin/geth /tmp/geth_race
 
 RUN cd geth_instrumented/customer && \
     go install -race -ldflags "-extldflags '-Wl,-z,stack-size=0x800000'" -tags urfave_cli_no_docs,ckzg -trimpath ./cmd/geth
@@ -283,10 +264,6 @@ ARG RETH_REPO
 RUN git clone --depth 1 --branch "${RETH_BRANCH}" "${RETH_REPO}" && \
     cd reth && \
     git log -n 1 --format=format:"%H" > /reth.version
-
-RUN cd reth && \
-    cargo build --release --bin reth && \
-    mv target/release/reth target/release/reth_uninstrumented
 
 # Antithesis reth lighthouse binary
 RUN cd reth && LD_LIBRARY_PATH=/usr/lib/ RUSTFLAGS="-Cpasses=sancov-module -Cllvm-args=-sanitizer-coverage-level=3 -Cllvm-args=-sanitizer-coverage-trace-pc-guard -Ccodegen-units=1 -Cdebuginfo=2 -L/usr/lib/ -lvoidstar" cargo build --release --bin reth
@@ -392,7 +369,6 @@ COPY --from=nimbus-eth2-builder /git/nimbus-eth2/build/nimbus_beacon_node /usr/l
 COPY --from=nimbus-eth2-builder /nimbus.version /nimbus.version
 
 COPY --from=lighthouse-builder /lighthouse.version /lighthouse.version
-COPY --from=lighthouse-builder /git/lighthouse/target/release/lighthouse_uninstrumented /usr/local/bin/lighthouse_uninstrumented
 COPY --from=lighthouse-builder /git/lighthouse/target/release/lighthouse /usr/local/bin/lighthouse
 
 COPY --from=teku-builder  /git/teku/build/install/teku/. /opt/teku
@@ -402,26 +378,17 @@ RUN ln -s /opt/teku/bin/teku /usr/local/bin/teku
 # execution clients
 COPY --from=geth-builder /geth.version /geth.version
 COPY --from=geth-builder /root/go/bin/geth /usr/local/bin/geth
-COPY --from=geth-builder /tmp/geth_uninstrumented /usr/local/bin/geth_uninstrumented
-COPY --from=geth-builder /tmp/geth_race /usr/local/bin/geth_race
 COPY --from=geth-builder /git/geth_instrumented/symbols/* /opt/antithesis/symbols/
 COPY --from=geth-builder /git/geth_instrumented/customer /geth_instrumented_code
 
 COPY --from=reth-builder /reth.version /reth.version
 COPY --from=reth-builder /git/reth/target/release/reth /usr/local/bin/reth
-COPY --from=reth-builder /git/reth/target/release/reth_uninstrumented /usr/local/bin/reth_uninstrumented
 
 # COPY --from=prysm-builder /validator /usr/local/bin/
-COPY --from=prysm-builder /git/bin/beacon-chain_instrumented /usr/local/bin/beacon-chain
-COPY --from=prysm-builder /git/bin/validator_instrumented /usr/local/bin/validator
-
-COPY --from=prysm-builder /git/bin/beacon-chain_uninstrumented /usr/local/bin/beacon-chain_uninstrumented
-COPY --from=prysm-builder /git/bin/validator_uninstrumented /usr/local/bin/validator_uninstrumented
-
-COPY --from=prysm-builder /git/bin/beacon-chain_instrumented_race /usr/local/bin/beacon-chain_instrumented_race
-COPY --from=prysm-builder /git/bin/validator_instrumented_race /usr/local/bin/validator_instrumented_race
 
 COPY --from=prysm-builder /prysm.version /prysm.version
+COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /usr/local/bin/beacon-chain
+COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/validator/validator_/validator /usr/local/bin/validator
 COPY --from=prysm-builder /git/prysm_instrumented/symbols/* /opt/antithesis/symbols/
 COPY --from=prysm-builder /git/prysm_instrumented/customer /prysm_instrumented_code
 #
@@ -432,14 +399,11 @@ RUN ln -s /git/lodestar/node_modules/.bin/lodestar /usr/local/bin/lodestar
 # execution clients
 COPY --from=geth-builder /geth.version /geth.version
 COPY --from=geth-builder /root/go/bin/geth /usr/local/bin/geth
-COPY --from=geth-builder /tmp/geth_uninstrumented /usr/local/bin/geth_uninstrumented
-COPY --from=geth-builder /tmp/geth_race /usr/local/bin/geth_race
 COPY --from=geth-builder /git/geth_instrumented/symbols/* /opt/antithesis/symbols/
 COPY --from=geth-builder /git/geth_instrumented/customer /geth_instrumented_code
 
 COPY --from=reth-builder /reth.version /reth.version
 COPY --from=reth-builder /git/reth/target/release/reth /usr/local/bin/reth
-COPY --from=reth-builder /git/reth/target/release/reth_uninstrumented /usr/local/bin/reth_uninstrumented
 
 COPY --from=besu-builder /besu.version /besu.version
 COPY --from=besu-builder /git/besu/build/install/besu/. /opt/besu
