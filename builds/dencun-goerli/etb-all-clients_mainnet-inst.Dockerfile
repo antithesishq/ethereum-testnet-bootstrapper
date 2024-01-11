@@ -95,6 +95,9 @@ ENV PATH="$PATH:/root/.dotnet/"
 
 WORKDIR /git
 
+RUN git config --global http.postBuffer 157286400
+RUN git config --global core.compression 0   
+
 # set up clang 15 (nimbus+lighthouse+deps)
 RUN wget --no-check-certificate https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh 15
 ENV LLVM_CONFIG=llvm-config-15
@@ -151,8 +154,7 @@ RUN cd lighthouse && \
     mv target/release/lighthouse target/release/lighthouse_uninstrumented
 
 # Antithesis instrumented lighthouse binary
-RUN cd lighthouse && \ 
-LD_LIBRARY_PATH=/usr/lib/ RUSTFLAGS="-Cpasses=sancov-module -Cllvm-args=-sanitizer-coverage-level=3 -Cllvm-args=-sanitizer-coverage-trace-pc-guard -Ccodegen-units=1 -Cdebuginfo=2 -L/usr/lib/ -lvoidstar" cargo build --release --manifest-path lighthouse/Cargo.toml --bin lighthouse
+RUN cd lighthouse && LD_LIBRARY_PATH=/usr/lib/ RUSTFLAGS="-Cpasses=sancov-module -Cllvm-args=-sanitizer-coverage-level=3 -Cllvm-args=-sanitizer-coverage-trace-pc-guard -Ccodegen-units=1 -Cdebuginfo=2 -L/usr/lib/ -lvoidstar" cargo build --release --manifest-path lighthouse/Cargo.toml --bin lighthouse
 
 # LODESTAR
 FROM etb-client-builder AS lodestar-builder
