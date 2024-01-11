@@ -36,7 +36,7 @@ ARG RETH_REPO="https://github.com/paradigmxyz/reth"
 ARG RETH_BRANCH="v0.1.0-alpha.14"
 
 ARG TX_FUZZ_REPO="https://github.com/MariusVanDerWijden/tx-fuzz"
-ARG TX_FUZZ_BRANCH="d8b943f3abab4bd8bd63cdfc8c45b8cb71fbb3f2"
+ARG TX_FUZZ_BRANCH="master"
 
 # Metrics gathering
 ARG BEACON_METRICS_GAZER_REPO="https://github.com/qu0b/beacon-metrics-gazer.git"
@@ -143,7 +143,7 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --defau
 ENV PATH="$PATH:/root/.cargo/bin"
 
 # Build rocksdb
-#RUN git clone --depth 500 --no-single-branch --no-tags https://github.com/facebook/rocksdb.git
+#RUN git clone --depth 1 https://github.com/facebook/rocksdb.git
 #RUN cd rocksdb && make -j16 install
 
 ############################# Consensus  Clients  #############################
@@ -151,7 +151,7 @@ ENV PATH="$PATH:/root/.cargo/bin"
 
 ARG LIGHTHOUSE_BRANCH
 ARG LIGHTHOUSE_REPO
-RUN git clone --depth 500 --no-single-branch --no-tags "${LIGHTHOUSE_REPO}" && \
+RUN git clone --depth 1 "${LIGHTHOUSE_REPO}" && \
     cd lighthouse && \
     git checkout "${LIGHTHOUSE_BRANCH}" && \
     git log -n 1 --format=format:"%H" > /lighthouse.version
@@ -168,7 +168,7 @@ cp /git/lighthouse/target/release/lighthouse /git/inst/bin/lighthouse
 # LODESTAR
 ARG LODESTAR_BRANCH
 ARG LODESTAR_REPO
-RUN git clone --depth 500 --no-single-branch --no-tags "${LODESTAR_REPO}" && \
+RUN git clone --depth 1 "${LODESTAR_REPO}" && \
     cd lodestar && \
     git checkout "${LODESTAR_BRANCH}" && \
     git log -n 1 --format=format:"%H" > /lodestar.version
@@ -184,7 +184,7 @@ RUN cp /git/lodestar/node_modules/.bin/lodestar /git/bin/lodestar
 # NIMBUS-builder
 ARG NIMBUS_ETH2_BRANCH
 ARG NIMBUS_ETH2_REPO
-RUN git clone --depth 500 --no-single-branch --no-tags "${NIMBUS_ETH2_REPO}" && \
+RUN git clone --depth 1 "${NIMBUS_ETH2_REPO}" && \
     cd nimbus-eth2 && \
     git checkout "${NIMBUS_ETH2_BRANCH}" && \
     git log -n 1 --format=format:"%H" > /nimbus.version && \
@@ -198,7 +198,7 @@ RUN cd nimbus-eth2 && \
 # TEKU
 ARG TEKU_BRANCH
 ARG TEKU_REPO
-RUN git clone --depth 500 --no-single-branch --no-tags "${TEKU_REPO}" && \
+RUN git clone --depth 1 "${TEKU_REPO}" && \
     cd teku && \
     git checkout "${TEKU_BRANCH}" && \
     git submodule update --init --recursive && \
@@ -211,7 +211,7 @@ RUN cd teku && \
 # PRYSM
 ARG PRYSM_BRANCH
 ARG PRYSM_REPO
-RUN git clone --depth 500 --no-single-branch --no-tags "${PRYSM_REPO}" && \
+RUN git clone --depth 1 "${PRYSM_REPO}" && \
     cd prysm && \
     git checkout "${PRYSM_BRANCH}" && \
     git log -n 1 --format=format:"%H" > /prysm.version
@@ -251,7 +251,7 @@ RUN wget "https://codeload.github.com/ethereum/go-ethereum/zip/${GETH_BRANCH}" &
     cd go-ethereum && \
     go build -o /git/bin/geth -ldflags "-X github.com/ethereum/go-ethereum/internal/version.gitCommit=v1.13.9 -X github.com/ethereum/go-ethereum/internal/version.gitDate=$(date '+%Y-%m-%d') -extldflags '-Wl,-z,stack-size=0x800000'" -tags urfave_cli_no_docs,ckzg -trimpath -v ./cmd/geth && \
     go build -o /git/race/bin/geth -race -ldflags "-X github.com/ethereum/go-ethereum/internal/version.gitCommit=v1.13.9 -X github.com/ethereum/go-ethereum/internal/version.gitDate=$(date '+%Y-%m-%d') -extldflags '-Wl,-z,stack-size=0x800000'" -tags urfave_cli_no_docs,ckzg -trimpath -v ./cmd/geth 
-# RUN git clone --depth 500 --no-single-branch --no-tags "${GETH_REPO}" && \
+# RUN git clone --depth 1 "${GETH_REPO}" && \
 #     cd go-ethereum && \
 #     git checkout "${GETH_BRANCH}" && \
 #     git log -n 1 --format=format:"%H" > /geth.version && \
@@ -273,7 +273,7 @@ RUN /opt/antithesis/go_instrumentation/bin/goinstrumentor \
 # Besu
 ARG BESU_REPO
 ARG BESU_BRANCH
-RUN git clone --depth 500 --no-single-branch --no-tags "${BESU_REPO}" && \
+RUN git clone --depth 1 "${BESU_REPO}" && \
     cd besu && \
     git checkout "${BESU_BRANCH}" && \
     git log -n 1 --format=format:"%H" > /besu.version
@@ -286,7 +286,7 @@ RUN cd besu && \
 # Nethermind
 ARG NETHERMIND_REPO
 ARG NETHERMIND_BRANCH
-RUN git clone --depth 500 --no-single-branch --no-tags "${NETHERMIND_REPO}" && \
+RUN git clone --depth 1 "${NETHERMIND_REPO}" && \
     cd nethermind && \
     git checkout "${NETHERMIND_BRANCH}" && \
     git log -n 1 --format=format:"%H" > /nethermind.version && \
@@ -297,7 +297,7 @@ RUN git clone --depth 500 --no-single-branch --no-tags "${NETHERMIND_REPO}" && \
 #
 # ARG ETHEREUMJS_REPO
 # ARG ETHEREUMJS_BRANCH
-# RUN git clone --depth 500 --no-single-branch -b ${ETHEREUMJS_BRANCH} "${ETHEREUMJS_REPO}" && \
+# RUN git clone --depth 1  -b ${ETHEREUMJS_BRANCH} "${ETHEREUMJS_REPO}" && \
 #     cd ethereumjs-monorepo && \
 #     git log -n 1 --format=format:"%H" > /ethereumjs.version
 
@@ -319,7 +319,7 @@ RUN git clone --depth 500 --no-single-branch --no-tags "${NETHERMIND_REPO}" && \
 # RETH
 ARG RETH_BRANCH
 ARG RETH_REPO
-RUN git clone --depth 500 --no-single-branch --no-tags "${RETH_REPO}" && \
+RUN git clone --depth 1 "${RETH_REPO}" && \
     cd reth && \
     git checkout "${RETH_BRANCH}" && \
     git log -n 1 --format=format:"%H" > /reth.version && \
@@ -345,12 +345,12 @@ RUN go install github.com/wealdtech/ethereal/v2@latest \
     && cp /root/go/bin/ethdo /git/bin/ \
     && cp /root/go/bin/eth2-val-tools /git/bin/
 
-RUN git clone --depth 500 --no-single-branch --no-tags "${TX_FUZZ_REPO}" && \
+RUN git clone --depth 1 "${TX_FUZZ_REPO}" && \
     cd tx-fuzz && \
     git checkout "${TX_FUZZ_BRANCH}" && \
     go build -o /git/bin/livefuzzer ./cmd/livefuzzer 
 
-RUN git clone --depth 500 --no-single-branch --no-tags "${BEACON_METRICS_GAZER_REPO}" && \
+RUN git clone --depth 1 "${BEACON_METRICS_GAZER_REPO}" && \
     cd beacon-metrics-gazer && \
     git checkout "${BEACON_METRICS_GAZER_BRANCH}" && \
     cargo update -p proc-macro2 && \
@@ -362,7 +362,7 @@ RUN cargo install --root /git/bin jwt-cli
 
 ARG MOCK_BUILDER_REPO
 ARG MOCK_BUILDER_BRANCH
-RUN git clone --depth 500 --no-single-branch --branch "${MOCK_BUILDER_BRANCH}" "${MOCK_BUILDER_REPO}" && \
+RUN git clone --depth 1  --branch "${MOCK_BUILDER_BRANCH}" "${MOCK_BUILDER_REPO}" && \
     cd mock-builder && \
     go build -o /git/bin/mock-builder ./main.go
 
