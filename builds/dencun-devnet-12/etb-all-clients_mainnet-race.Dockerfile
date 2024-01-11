@@ -188,8 +188,9 @@ RUN cd nimbus-eth2 && \
 FROM etb-client-builder AS teku-builder
 ARG TEKU_BRANCH
 ARG TEKU_REPO
-RUN git clone --depth 500 --no-single-branch --no-tags "${TEKU_REPO}" && \
-    cd teku && \
+RUN git clone --depth 500 --no-single-branch --no-tags "${TEKU_REPO}"
+    
+RUN cd teku && \
     git checkout "${TEKU_BRANCH}" && \
     git submodule update --init --recursive && \
     git log -n 1 --format=format:"%H" > /teku.version
