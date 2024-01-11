@@ -228,7 +228,7 @@ RUN git clone --depth 1 --branch "${BESU_BRANCH}" "${BESU_REPO}" && \
     git log -n 1 --format=format:"%H" > /besu.version
 
 RUN cd besu && \
-    ./gradlew installDist
+    ./gradlew --parallel installDist
 
 # Nethermind
 FROM etb-client-builder AS nethermind-builder
