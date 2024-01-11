@@ -199,8 +199,12 @@ RUN git clone --depth 1 --branch "${PRYSM_BRANCH}" "${PRYSM_REPO}" && \
     cd prysm && \
     git log -n 1 --format=format:"%H" > /prysm.version
 
+RUN mkdir -p /git/bin
+
 RUN cd prysm && \
-    bazelisk build --config=release //cmd/beacon-chain:beacon-chain //cmd/validator:validator
+    bazelisk build --config=release //cmd/beacon-chain:beacon-chain //cmd/validator:validator && \
+    mv bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /git/bin/beacon-chain_uninstrumented && \
+    mv bazel-bin/cmd/validator/validator_/validator /git/bin/validator_uninstrumented 
 
 # Antithesis instrumented prysm binary
 RUN mkdir prysm_instrumented && \
@@ -209,10 +213,15 @@ RUN mkdir prysm_instrumented && \
     -antithesis /opt/antithesis/go_instrumentation/instrumentation/go/wrappers \
     prysm prysm_instrumented
 
-RUN cd prysm_instrumented/customer && go build -o /validator ./cmd/validator
-RUN cd prysm_instrumented/customer && go build -o /beacon-chain ./cmd/beacon-chain
-RUN cd prysm_instrumented/customer && go build -race -o /validator_race ./cmd/validator
-RUN cd prysm_instrumented/customer && go build -race -o /beacon-chain_race ./cmd/beacon-chain
+RUN cd prysm_instrumented/customer && \
+    bazelisk build --config=release //cmd/beacon-chain:beacon-chain //cmd/validator:validator && \
+    mv bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /git/bin/beacon-chain_instrumented && \
+    mv bazel-bin/cmd/validator/validator_/validator /git/bin/validator_instrumented
+
+RUN cd prysm_instrumented/customer && \
+    bazelisk build --config=release @io_bazel_rules_go//go/config:race //cmd/beacon-chain:beacon-chain //cmd/validator:validator && \
+    mv bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /git/bin/beacon-chain_instrumented_race && \
+    mv bazel-bin/cmd/validator/validator_/validator /git/bin/validator_instrumented_race
 
 
 ############################# Execution  Clients  #############################
@@ -225,8 +234,8 @@ RUN git clone --depth 1 --branch "${GETH_BRANCH}" "${GETH_REPO}" && \
     git log -n 1 --format=format:"%H" > /geth.version
 
 RUN cd go-ethereum && \
-    go install ./... && \
-    mv /root/go/bin/geth /tmp/geth_uninstrumented
+    make geth && \
+    mv ./build/bin/geth /tmp/geth_uninstrumented
 
 # Antithesis add instrumentation
 RUN mkdir geth_instrumented
@@ -241,7 +250,6 @@ RUN cd geth_instrumented/customer && \
 
 RUN cd geth_instrumented/customer && \
     go install ./...
-
 
 # Besu
 FROM etb-client-builder AS besu-builder
@@ -402,10 +410,15 @@ COPY --from=reth-builder /git/reth/target/release/reth /usr/local/bin/reth
 COPY --from=reth-builder /git/reth/target/release/reth_uninstrumented /usr/local/bin/reth_uninstrumented
 
 # COPY --from=prysm-builder /validator /usr/local/bin/
-COPY --from=prysm-builder /beacon-chain_race /usr/local/bin/beacon-chain
-COPY --from=prysm-builder /validator_race /usr/local/bin/validator
-COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /usr/local/bin/beacon-chain_uninstrumented
-COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/validator/validator_/validator /usr/local/bin/validator_uninstrumented
+COPY --from=prysm-builder /git/bin/beacon-chain_instrumented /usr/local/bin/beacon-chain
+COPY --from=prysm-builder /git/bin/validator_instrumented /usr/local/bin/validator
+
+COPY --from=prysm-builder /git/bin/beacon-chain_uninstrumented /usr/local/bin/beacon-chain_uninstrumented
+COPY --from=prysm-builder /git/bin/validator_uninstrumented /usr/local/bin/validator_uninstrumented
+
+COPY --from=prysm-builder /git/bin/beacon-chain_instrumented_race /usr/local/bin/beacon-chain_instrumented_race
+COPY --from=prysm-builder /git/bin/validator_instrumented_race /usr/local/bin/validator_instrumented_race
+
 COPY --from=prysm-builder /prysm.version /prysm.version
 COPY --from=prysm-builder /git/prysm_instrumented/symbols/* /opt/antithesis/symbols/
 COPY --from=prysm-builder /git/prysm_instrumented/customer /prysm_instrumented_code
