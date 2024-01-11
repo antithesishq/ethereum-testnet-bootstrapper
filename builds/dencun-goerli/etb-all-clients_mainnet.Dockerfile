@@ -185,7 +185,7 @@ RUN cd nimbus-eth2 && \
 ARG TEKU_BRANCH
 ARG TEKU_REPO
 RUN git clone --depth 1 --branch "${TEKU_BRANCH}" "${TEKU_REPO}" && \
-    git log -n 1 --format=format:"%H" > /teku.version
+    cd teku && git log -n 1 --format=format:"%H" > /teku.version
     
 # RUN cd teku && \
 #     git submodule update --init --recursive && \
