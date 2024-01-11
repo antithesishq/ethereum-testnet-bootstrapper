@@ -84,7 +84,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     pkg-config \
     libssl-dev \
     git \
-    git-lfs
+    git-lfs \
+    libclang-dev
 
 # set up dotnet (nethermind)
 RUN wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh && \

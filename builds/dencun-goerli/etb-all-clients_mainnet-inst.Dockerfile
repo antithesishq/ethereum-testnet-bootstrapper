@@ -84,7 +84,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     pkg-config \
     libssl-dev \
     git \
-    git-lfs
+    git-lfs \
+    libclang-dev
 
 # set up dotnet (nethermind)
 RUN wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh && \
@@ -282,12 +283,11 @@ RUN git clone --depth 1 --branch "${RETH_BRANCH}" "${RETH_REPO}" && \
     git log -n 1 --format=format:"%H" > /reth.version
 
 RUN cd reth && \
-    cargo build --release && \
+    cargo build --release --bin reth && \
     mv target/release/reth target/release/reth_uninstrumented
 
 # Antithesis reth lighthouse binary
-RUN cd reth && \ 
-LD_LIBRARY_PATH=/usr/lib/ RUSTFLAGS="-Cpasses=sancov-module -Cllvm-args=-sanitizer-coverage-level=3 -Cllvm-args=-sanitizer-coverage-trace-pc-guard -Ccodegen-units=1 -Cdebuginfo=2 -L/usr/lib/ -lvoidstar" cargo build --release 
+RUN cd reth && LD_LIBRARY_PATH=/usr/lib/ RUSTFLAGS="-Cpasses=sancov-module -Cllvm-args=-sanitizer-coverage-level=3 -Cllvm-args=-sanitizer-coverage-trace-pc-guard -Ccodegen-units=1 -Cdebuginfo=2 -L/usr/lib/ -lvoidstar" cargo build --release --bin reth
 
 ############################### Misc.  Modules  ###############################
 FROM etb-client-builder AS misc-builder

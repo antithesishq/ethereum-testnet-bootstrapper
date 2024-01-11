@@ -86,7 +86,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     pkg-config \
     libssl-dev \
     git \
-    git-lfs
+    git-lfs \
+    libclang-dev
 
 RUN git config --global core.compression 0
 RUN git config --global http.postBuffer 552428800
