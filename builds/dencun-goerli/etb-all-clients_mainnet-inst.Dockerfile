@@ -196,13 +196,17 @@ RUN cd teku && \
 FROM etb-client-builder AS prysm-builder
 ARG PRYSM_BRANCH
 ARG PRYSM_REPO
-RUN git clone --depth 1 --branch "${PRYSM_BRANCH}" "${PRYSM_REPO}" && \
+RUN git clone --depth 1 --single-branch --branch "${PRYSM_BRANCH}" "${PRYSM_REPO}" && \
     cd prysm && \
     git log -n 1 --format=format:"%H" > /prysm.version
 
 # Antithesis instrumented prysm binary
-RUN mkdir prysm_instrumented && \
-    /opt/antithesis/go_instrumentation/bin/goinstrumentor \
+RUN cd prysm && \
+    bazelisk build --config=release //cmd/beacon-chain:beacon-chain //cmd/validator:validator
+
+RUN mkdir prysm_instrumented
+
+RUN /opt/antithesis/go_instrumentation/bin/goinstrumentor -v 3 \
     -logtostderr -stderrthreshold=INFO \
     -antithesis /opt/antithesis/go_instrumentation/instrumentation/go/wrappers \
     prysm prysm_instrumented
@@ -216,9 +220,12 @@ RUN cd prysm_instrumented/customer && \
 FROM etb-client-builder AS geth-builder
 ARG GETH_BRANCH
 ARG GETH_REPO
-RUN git clone --depth 1 --branch "${GETH_BRANCH}" "${GETH_REPO}" && \
+RUN git clone --depth 1 --single-branch --branch "${GETH_BRANCH}" "${GETH_REPO}" && \
     cd go-ethereum && \
     git log -n 1 --format=format:"%H" > /geth.version
+
+RUN cd go-ethereum && \
+    make geth
 
 # Antithesis add instrumentation
 RUN mkdir geth_instrumented
