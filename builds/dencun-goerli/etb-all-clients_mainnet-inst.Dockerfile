@@ -173,10 +173,10 @@ ARG NIMBUS_ETH2_BRANCH
 ARG NIMBUS_ETH2_REPO
 RUN git clone --depth 1 --single-branch --branch "${NIMBUS_ETH2_BRANCH}" "${NIMBUS_ETH2_REPO}" && \
     cd nimbus-eth2 && \
-    git log -n 1 --format=format:"%H" > /nimbus.version && \
-    make -j32 update
+    git log -n 1 --format=format:"%H" > /nimbus.version
 
 RUN cd nimbus-eth2 && \
+    make -j32 update && \
     arch=$(arch | sed s/aarch64/arm64/ | sed s/x86_64/amd64/) && \
     make -j32 nimbus_beacon_node NIMFLAGS="-d:disableMarchNative --cpu:${arch} --cc:clang --clang.exe:clang-15 --clang.linkerexe:clang-15 --passC:-fno-lto --passL:-fno-lto"
 
