@@ -189,7 +189,7 @@ RUN git clone --depth 1 --branch "${TEKU_BRANCH}" "${TEKU_REPO}" && \
     # git submodule update --init --recursive && \
 
 RUN cd teku && \
-    ./gradlew installDist
+    ./gradlew --parallel installDist
 
 # PRYSM
 FROM etb-client-builder AS prysm-builder
@@ -249,7 +249,7 @@ RUN cd geth_instrumented/customer && \
     go install -race ./... && mv /root/go/bin/geth /tmp/geth_race
 
 RUN cd geth_instrumented/customer && \
-    go install ./...
+    go install -race -ldflags "-extldflags '-Wl,-z,stack-size=0x800000'" -tags urfave_cli_no_docs,ckzg -trimpath ./cmd/geth
 
 # Besu
 FROM etb-client-builder AS besu-builder

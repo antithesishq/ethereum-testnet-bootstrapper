@@ -191,7 +191,7 @@ RUN git clone --depth 1 --branch "${TEKU_BRANCH}" "${TEKU_REPO}" && \
 #     git submodule update --init --recursive && \
 
 RUN cd teku && \
-    ./gradlew installDist
+    ./gradlew --parallel installDist
 
 
 # TEKU-EVIL
@@ -229,7 +229,7 @@ RUN git clone --depth 1 --branch "${GETH_BRANCH}" "${GETH_REPO}"  && \
     git log -n 1 --format=format:"%H" > /geth.version
 
 RUN cd go-ethereum && \
-    go install ./...
+    make geth
 
 # Besu
 # FROM etb-client-builder AS besu-builder
@@ -403,7 +403,7 @@ RUN ln -s /git/lodestar/node_modules/.bin/lodestar /usr/local/bin/lodestar
 
 # execution clients
 COPY --from=etb-client-builder /geth.version /geth.version
-COPY --from=etb-client-builder /root/go/bin/geth /usr/local/bin/geth
+COPY --from=etb-client-builder /git/go-ethereum/build/bin/geth /usr/local/bin/geth
 
 COPY --from=etb-client-builder /reth.version /reth.version
 COPY --from=etb-client-builder /git/reth/target/release/reth /usr/local/bin/reth

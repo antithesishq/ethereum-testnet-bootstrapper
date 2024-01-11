@@ -203,7 +203,7 @@ RUN git clone --depth 1 --branch "${TEKU_BRANCH}" "${TEKU_REPO}" && \
 
     
 RUN cd teku && \
-    ./gradlew installDist && \
+    ./gradlew installDist --parallel && \
     mv /git/teku/build/install/teku/bin/teku /git/bin
 
 # PRYSM
