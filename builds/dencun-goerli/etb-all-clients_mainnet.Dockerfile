@@ -302,6 +302,7 @@ RUN git clone --depth 1 --branch "${TX_FUZZ_BRANCH}" "${TX_FUZZ_REPO}"  && \
     cd cmd/livefuzzer && go build
 
 RUN git clone --depth 1 --branch "${BEACON_METRICS_GAZER_BRANCH}" "${BEACON_METRICS_GAZER_REPO}"  && \
+    cd beacon-metrics-gazer && \
     cargo update -p proc-macro2 && \
     cargo build --release
 
