@@ -57,7 +57,7 @@ COPY instrumentation/go_instrumentation /opt/antithesis/go_instrumentation
 RUN /opt/antithesis/go_instrumentation/bin/goinstrumentor -version
 
 # build deps
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y \
     build-essential \
     curl \
     libpcre3-dev \
@@ -79,11 +79,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libsnappy-dev \
     gradle \
     pkg-config \
+    openssl \
     libssl-dev \
     git \
     git-lfs \
-    protobuf-compiler \ 
-    libprotobuf-dev
+    protobuf-compiler \
+    libprotobuf-dev \
+    gcc \
+    g++ \
+    pkg-config \
+    llvm-dev \
+    libclang-dev \
+    clang
+
 
 RUN ln -s /usr/local/bin/python3 /usr/local/bin/python
 
@@ -135,11 +143,12 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --defau
 ENV PATH="$PATH:/root/.cargo/bin"
 
 # Build rocksdb
-RUN git clone --depth 500 --no-single-branch --no-tags https://github.com/facebook/rocksdb.git
-RUN cd rocksdb && make -j16 install
+#RUN git clone --depth 500 --no-single-branch --no-tags https://github.com/facebook/rocksdb.git
+#RUN cd rocksdb && make -j16 install
 
 ############################# Consensus  Clients  #############################
 # LIGHTHOUSE
+
 ARG LIGHTHOUSE_BRANCH
 ARG LIGHTHOUSE_REPO
 RUN git clone --depth 500 --no-single-branch --no-tags "${LIGHTHOUSE_REPO}" && \
@@ -149,11 +158,12 @@ RUN git clone --depth 500 --no-single-branch --no-tags "${LIGHTHOUSE_REPO}" && \
 
 RUN cd lighthouse && \
     cargo update -p proc-macro2 && \
-    cargo build --release --manifest-path lighthouse/Cargo.toml --bin lighthouse --out-dir /git/bin/
+    cargo build --release --manifest-path lighthouse/Cargo.toml --bin lighthouse && \
+    mv /git/lighthouse/target/release/lighthouse /git/bin/lighthouse
 
 # Antithesis instrumented lighthouse binary
-RUN cd lighthouse && \ 
-LD_LIBRARY_PATH=/usr/lib/ RUSTFLAGS="-Cpasses=sancov-module -Cllvm-args=-sanitizer-coverage-level=3 -Cllvm-args=-sanitizer-coverage-trace-pc-guard -Ccodegen-units=1 -Cdebuginfo=2 -L/usr/lib/ -lvoidstar" cargo build --release --manifest-path lighthouse/Cargo.toml --bin lighthouse --out-dir /git/inst/bin
+RUN cd lighthouse && CARGO_PROFILE_RELEASE_BUILD_OVERRIDE_DEBUG=true RUST_BACKTRACE=1 LD_LIBRARY_PATH=/usr/lib/ RUSTFLAGS="-Cpasses=sancov-module -Cllvm-args=-sanitizer-coverage-level=3 -Cllvm-args=-sanitizer-coverage-trace-pc-guard -Ccodegen-units=1 -Cdebuginfo=2 -L/usr/lib/ -lvoidstar" cargo build --release --manifest-path lighthouse/Cargo.toml --bin lighthouse && \
+cp /git/lighthouse/target/release/lighthouse /git/inst/bin/lighthouse
 
 # LODESTAR
 ARG LODESTAR_BRANCH
@@ -164,9 +174,12 @@ RUN git clone --depth 500 --no-single-branch --no-tags "${LODESTAR_REPO}" && \
     git log -n 1 --format=format:"%H" > /lodestar.version
 
 RUN cd lodestar && \
-    yarn install --non-interactive --frozen-lockfile --production && \
+    yarn install --non-interactive --frozen-lockfile && \
     yarn build && \
-    mv /git/lodestar/node_modules/.bin/lodestar /git/bin/lodestar
+    yarn install --non-interactive --frozen-lockfile --production
+
+RUN cp /git/lodestar/node_modules/.bin/lodestar /git/bin/lodestar
+
 
 # NIMBUS-builder
 ARG NIMBUS_ETH2_BRANCH
@@ -205,12 +218,12 @@ RUN git clone --depth 500 --no-single-branch --no-tags "${PRYSM_REPO}" && \
 
 RUN cd prysm && \
     bazelisk build --config=release //cmd/beacon-chain:beacon-chain //cmd/validator:validator && \
-    mv /git/prysm/bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /git/bin/beacon-chain && \
-    mv /git/prysm/bazel-bin/cmd/validator/validator_/validator /git/bin/validator
+    cp /git/prysm/bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /git/bin/beacon-chain && \
+    cp /git/prysm/bazel-bin/cmd/validator/validator_/validator /git/bin/validator
 
 RUN cd prysm && \
-   go build -race -o /git/race/bin/validator /git/bin/validator && \
-   go build -race -o /git/race/bin/beacon-chain /git/bin/beacon-chain
+   go build -race -o /git/race/bin/validator ./cmd/validator && \
+   go build -race -o /git/race/bin/beacon-chain ./cmd/beacon-chain
 
 # Antithesis instrumented prysm binary
 RUN mkdir /git/lib/prysm_instrumented && \
@@ -226,14 +239,24 @@ RUN cd /git/lib/prysm_instrumented/customer && go build -race -o /git/inst/bin/b
 
 ############################# Execution  Clients  #############################
 # Geth
+#RUN git config --global pack.window 1
+
 ARG GETH_BRANCH
 ARG GETH_REPO
-RUN git clone --depth 500 --no-single-branch --no-tags "${GETH_REPO}" && \
+
+RUN wget "https://codeload.github.com/ethereum/go-ethereum/zip/${GETH_BRANCH}" && \
+    unzip -q "${GETH_BRANCH}" && \
+    mv go-ethereum-${GETH_BRANCH} go-ethereum && \
+    echo "${GETH_BRANCH}" > /geth.version && \
     cd go-ethereum && \
-    git checkout "${GETH_BRANCH}" && \
-    git log -n 1 --format=format:"%H" > /geth.version && \
-    go build -o /git/bin/geth ./cmd/geth && \
-    go build -race -o /git/race/bin/geth /git/bin/geth
+    go build -o /git/bin/geth -ldflags "-X github.com/ethereum/go-ethereum/internal/version.gitCommit=4410c1416abce38925c60550bf2bfb7f7db5c3f5 -X github.com/ethereum/go-ethereum/internal/version.gitDate=$(date '+%Y-%m-%d') -extldflags '-Wl,-z,stack-size=0x800000'" -tags urfave_cli_no_docs,ckzg -trimpath -v ./cmd/geth && \
+    go build -o /git/race/bin/geth -race -ldflags "-X github.com/ethereum/go-ethereum/internal/version.gitCommit=4410c1416abce38925c60550bf2bfb7f7db5c3f5 -X github.com/ethereum/go-ethereum/internal/version.gitDate=$(date '+%Y-%m-%d') -extldflags '-Wl,-z,stack-size=0x800000'" -tags urfave_cli_no_docs,ckzg -trimpath -v ./cmd/geth 
+# RUN git clone --depth 500 --no-single-branch --no-tags "${GETH_REPO}" && \
+#     cd go-ethereum && \
+#     git checkout "${GETH_BRANCH}" && \
+#     git log -n 1 --format=format:"%H" > /geth.version && \
+#     go build -o /git/bin/geth ./cmd/geth && \
+#     go build -race -o /git/race/bin/geth /git/bin/geth
 
 # Antithesis add instrumentation
 RUN mkdir -p /git/lib/geth_instrumented
@@ -243,7 +266,8 @@ RUN /opt/antithesis/go_instrumentation/bin/goinstrumentor \
     -antithesis /opt/antithesis/go_instrumentation/instrumentation/go/wrappers \
     go-ethereum /git/lib/geth_instrumented && \
     cd /git/lib/geth_instrumented/customer && \
-    go build -o /git/inst/bin/geth ./cmd/geth && \
+    make geth && \
+    cp ./build/bin/geth /git/inst/bin/geth && \
     go build -race -o /git/inst/bin/geth_race ./cmd/geth
 
 # Besu
@@ -257,7 +281,7 @@ RUN git clone --depth 500 --no-single-branch --no-tags "${BESU_REPO}" && \
 RUN cd besu && \
     ./gradlew installDist && \
     cp /git/besu/build/install/besu/bin/besu /git/bin/besu && \
-    cp /git/besu/build/install/besu /git/lib/besu
+    cp -r /git/besu/build/install/besu /git/lib/besu
 
 # Nethermind
 ARG NETHERMIND_REPO
@@ -299,11 +323,13 @@ RUN git clone --depth 500 --no-single-branch --no-tags "${RETH_REPO}" && \
     cd reth && \
     git checkout "${RETH_BRANCH}" && \
     git log -n 1 --format=format:"%H" > /reth.version && \
-    cargo build --release --bin reth --out-dir /git/bin
+    cargo build --release --bin reth && \
+    cp /git/reth/target/release/reth /git/bin/reth
 
 # Antithesis instrumented reth binary
 RUN cd reth && \ 
-LD_LIBRARY_PATH=/usr/lib/ RUSTFLAGS="-Cpasses=sancov-module -Cllvm-args=-sanitizer-coverage-level=3 -Cllvm-args=-sanitizer-coverage-trace-pc-guard -Ccodegen-units=1 -Cdebuginfo=2 -L/usr/lib/ -lvoidstar" cargo build --release --bin reth --out-dir /git/inst/bin
+    CARGO_PROFILE_RELEASE_BUILD_OVERRIDE_DEBUG=true RUST_BACKTRACE=1 LD_LIBRARY_PATH=/usr/lib/ RUSTFLAGS="-Cpasses=sancov-module -Cllvm-args=-sanitizer-coverage-level=3 -Cllvm-args=-sanitizer-coverage-trace-pc-guard -Ccodegen-units=1 -Cdebuginfo=2 -L/usr/lib/ -lvoidstar" cargo build --release --bin reth && \
+    cp /git/reth/target/release/reth /git/inst/bin/reth
 
 
 ############################### Misc.  Modules  ###############################
@@ -315,19 +341,21 @@ ARG BEACON_METRICS_GAZER_BRANCH
 RUN go install github.com/wealdtech/ethereal/v2@latest \
     &&  go install github.com/wealdtech/ethdo@latest \
     && go install github.com/protolambda/eth2-val-tools@latest \
-    && cp /root/go/bin/{ethereal,ethdo,eth2-val-tools} /git/bin/
+    && cp /root/go/bin/ethereal /git/bin/ \
+    && cp /root/go/bin/ethdo /git/bin/ \
+    && cp /root/go/bin/eth2-val-tools /git/bin/
 
 RUN git clone --depth 500 --no-single-branch --no-tags "${TX_FUZZ_REPO}" && \
     cd tx-fuzz && \
     git checkout "${TX_FUZZ_BRANCH}" && \
-    go build ./cmd/livefuzzer && \
-    cp /git/tx-fuzz/cmd/livefuzzer/livefuzzer /git/bin/livefuzzer
+    go build -o /git/bin/livefuzzer ./cmd/livefuzzer 
 
 RUN git clone --depth 500 --no-single-branch --no-tags "${BEACON_METRICS_GAZER_REPO}" && \
     cd beacon-metrics-gazer && \
     git checkout "${BEACON_METRICS_GAZER_BRANCH}" && \
     cargo update -p proc-macro2 && \
-    cargo build --release --bin beacon-metrics-gazer --out-dir /git/bin
+    cargo build --release --bin beacon-metrics-gazer && \
+    cp /git/beacon-metrics-gazer/target/release/beacon-metrics-gazer /git/bin/beacon-metrics-gazer
 
 # jwt-cli to interact with the execution client
 RUN cargo install --root /git/bin jwt-cli
@@ -336,7 +364,7 @@ ARG MOCK_BUILDER_REPO
 ARG MOCK_BUILDER_BRANCH
 RUN git clone --depth 500 --no-single-branch --branch "${MOCK_BUILDER_BRANCH}" "${MOCK_BUILDER_REPO}" && \
     cd mock-builder && \
-    go build -o /git/bin/mock-builder ./cmd/mock-builder
+    go build -o /git/bin/mock-builder ./main.go
 
 ########################### etb-all-clients runner  ###########################
 FROM debian:bullseye-slim
@@ -357,7 +385,9 @@ RUN apt-get update && \
     ca-certificates \
     curl \
     gnupg \
-    wget 
+    wget \ 
+    lsb-release \ 
+    software-properties-common 
 
 
 # Antithesis instrumentation files

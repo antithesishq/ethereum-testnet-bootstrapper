@@ -88,6 +88,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     git-lfs
 
+RUN git config --global core.compression 0
+RUN git config --global http.postBuffer 552428800
+
+
+
 # set up dotnet (nethermind)
 RUN wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh && \
     chmod +x dotnet-install.sh && \
@@ -127,6 +132,7 @@ RUN npm install -g @bazel/bazelisk # prysm build system
 # setup cargo/rustc (lighthouse)
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable -y
 ENV PATH="$PATH:/root/.cargo/bin"
+
 # Build rocksdb
 RUN git clone --depth 500 --no-single-branch --no-tags https://github.com/facebook/rocksdb.git
 RUN cd rocksdb && make -j16 install
@@ -137,7 +143,7 @@ RUN npm install --global yarn
 ############################# Consensus  Clients  #############################
 
 # LIGHTHOUSE
-FROM etb-client-builder AS lighthouse-builder
+# FROM etb-client-builder AS lighthouse-builder
 ARG LIGHTHOUSE_BRANCH
 ARG LIGHTHOUSE_REPO
 RUN git clone --depth 500 --no-single-branch --no-tags "${LIGHTHOUSE_REPO}" && \
@@ -150,7 +156,7 @@ RUN cd lighthouse && \
     cargo build --release --manifest-path lighthouse/Cargo.toml --bin lighthouse
 
 # LODESTAR
-FROM etb-client-builder AS lodestar-builder
+# FROM etb-client-builder AS lodestar-builder
 ARG LODESTAR_BRANCH
 ARG LODESTAR_REPO
 RUN git clone --depth 500 --no-single-branch --no-tags "${LODESTAR_REPO}" && \
@@ -164,7 +170,7 @@ RUN cd lodestar && \
     yarn install --non-interactive --frozen-lockfile --production
 
 # NIMBUS
-FROM etb-client-builder AS nimbus-eth2-builder
+# FROM etb-client-builder AS nimbus-eth2-builder
 ARG NIMBUS_ETH2_BRANCH
 ARG NIMBUS_ETH2_REPO
 RUN git clone --depth 500 --no-single-branch --no-tags "${NIMBUS_ETH2_REPO}" && \
@@ -178,7 +184,7 @@ RUN cd nimbus-eth2 && \
     make -j16 nimbus_beacon_node NIMFLAGS="-d:disableMarchNative --cpu:${arch} --cc:clang --clang.exe:clang-15 --clang.linkerexe:clang-15 --passC:-fno-lto --passL:-fno-lto"
 
 # TEKU
-FROM etb-client-builder AS teku-builder
+# FROM etb-client-builder AS teku-builder
 ARG TEKU_BRANCH
 ARG TEKU_REPO
 RUN git clone --depth 500 --no-single-branch --no-tags "${TEKU_REPO}" && \
@@ -201,11 +207,11 @@ RUN cd teku && \
 #     git submodule update --init --recursive && \
 #     git log -n 1 --format=format:"%H" > /teku.version
 
-RUN cd teku && \
-    ./gradlew installDist
+# RUN cd teku && \
+#     ./gradlew installDist
 
 # PRYSM
-FROM etb-client-builder AS prysm-builder
+# FROM etb-client-builder AS prysm-builder
 ARG PRYSM_BRANCH
 ARG PRYSM_REPO
 RUN git clone --depth 500 --no-single-branch --no-tags "${PRYSM_REPO}" && \
@@ -219,7 +225,7 @@ RUN cd prysm && \
 
 ############################# Execution  Clients  #############################
 # Geth
-FROM etb-client-builder AS geth-builder
+# FROM etb-client-builder AS geth-builder
 ARG GETH_BRANCH
 ARG GETH_REPO
 RUN git clone --depth 500 --no-single-branch --no-tags "${GETH_REPO}" && \
@@ -231,7 +237,7 @@ RUN cd go-ethereum && \
     go install ./...
 
 # Besu
-FROM etb-client-builder AS besu-builder
+# FROM etb-client-builder AS besu-builder
 ARG BESU_REPO
 ARG BESU_BRANCH
 RUN git clone --depth 500 --no-single-branch --no-tags "${BESU_REPO}" && \
@@ -243,7 +249,7 @@ RUN cd besu && \
     ./gradlew installDist
 
 # Nethermind
-FROM etb-client-builder AS nethermind-builder
+# FROM etb-client-builder AS nethermind-builder
 ARG NETHERMIND_REPO
 ARG NETHERMIND_BRANCH
 RUN git clone --depth 500 --no-single-branch --no-tags "${NETHERMIND_REPO}" && \
@@ -278,7 +284,7 @@ RUN cd nethermind && \
 # RUN cd ERIGON && \
 
 # RETH
-FROM etb-client-builder AS RETH-builder
+# FROM etb-client-builder AS RETH-builder
 ARG RETH_BRANCH
 ARG RETH_REPO
 RUN git clone --depth 500 --no-single-branch --no-tags "${RETH_REPO}" && \
@@ -290,7 +296,7 @@ RUN cd reth && \
     cargo build --release
 
 ############################### Misc.  Modules  ###############################
-FROM etb-client-builder AS misc-builder
+# FROM etb-client-builder AS misc-builder
 ARG TX_FUZZ_BRANCH
 ARG TX_FUZZ_REPO
 ARG BEACON_METRICS_GAZER_REPO
@@ -298,7 +304,7 @@ ARG BEACON_METRICS_GAZER_BRANCH
 
 RUN go install github.com/wealdtech/ethereal/v2@latest \
     &&  go install github.com/wealdtech/ethdo@latest \
-    && go install github.com/protolambda/eth2-val-tools@latest
+    &&  go install github.com/protolambda/eth2-val-tools@latest
 
 RUN git clone --depth 500 --no-single-branch --no-tags "${TX_FUZZ_REPO}" && \
     cd tx-fuzz && \
@@ -373,53 +379,54 @@ RUN wget --no-check-certificate https://apt.llvm.org/llvm.sh && \
 ENV LLVM_CONFIG=llvm-config-15
 
 # misc tools used in etb
-COPY --from=misc-builder /root/go/bin/ethereal /usr/local/bin/ethereal
-COPY --from=misc-builder /root/go/bin/ethdo /usr/local/bin/ethdo
-COPY --from=misc-builder /root/go/bin/eth2-val-tools /usr/local/bin/eth2-val-tools
+COPY --from=etb-client-builder /root/go/bin/ethereal /usr/local/bin/ethereal
+COPY --from=etb-client-builder /root/go/bin/ethdo /usr/local/bin/ethdo
+COPY --from=etb-client-builder /root/go/bin/eth2-val-tools /usr/local/bin/eth2-val-tools
 # tx-fuzz
-COPY --from=misc-builder /git/tx-fuzz/cmd/livefuzzer/livefuzzer /usr/local/bin/livefuzzer
+COPY --from=etb-client-builder /git/tx-fuzz/cmd/livefuzzer/livefuzzer /usr/local/bin/livefuzzer
 # beacon-metrics-gazer
-COPY --from=misc-builder /git/beacon-metrics-gazer/target/release/beacon-metrics-gazer /usr/local/bin/beacon-metrics-gazer
+COPY --from=etb-client-builder /git/beacon-metrics-gazer/target/release/beacon-metrics-gazer /usr/local/bin/beacon-metrics-gazer
 
-COPY --from=misc-builder /root/.cargo/bin/jwt /usr/local/bin/jwt
+COPY --from=etb-client-builder /root/.cargo/bin/jwt /usr/local/bin/jwt
 # mock-builder
-COPY --from=misc-builder /git/mock-builder/mock-builder /usr/local/bin/mock-builder
+COPY --from=etb-client-builder /git/mock-builder/mock-builder /usr/local/bin/mock-builder
+
 
 # consensus clients
-COPY --from=nimbus-eth2-builder /git/nimbus-eth2/build/nimbus_beacon_node /usr/local/bin/nimbus_beacon_node
-COPY --from=nimbus-eth2-builder /nimbus.version /nimbus.version
+COPY --from=etb-client-builder /git/nimbus-eth2/build/nimbus_beacon_node /usr/local/bin/nimbus_beacon_node
+COPY --from=etb-client-builder /nimbus.version /nimbus.version
 
-COPY --from=lighthouse-builder /lighthouse.version /lighthouse.version
-COPY --from=lighthouse-builder /git/lighthouse/target/release/lighthouse /usr/local/bin/lighthouse
+COPY --from=etb-client-builder /lighthouse.version /lighthouse.version
+COPY --from=etb-client-builder /git/lighthouse/target/release/lighthouse /usr/local/bin/lighthouse
 
-COPY --from=teku-builder  /git/teku/build/install/teku/. /opt/teku
-COPY --from=teku-builder /teku.version /teku.version
+COPY --from=etb-client-builder /git/teku/build/install/teku/. /opt/teku
+COPY --from=etb-client-builder /teku.version /teku.version
 RUN ln -s /opt/teku/bin/teku /usr/local/bin/teku
 
-# COPY --from=teku-evil-builder  /git/teku/build/install/teku/. /opt/teku_evil
-# COPY --from=teku-evil-builder /teku.version /teku_evil.version
+# COPY --from=etb-client-builder  /git/teku/build/install/teku/. /opt/teku_evil
+# COPY --from=etb-client-builder /teku.version /teku_evil.version
 # RUN ln -s /opt/teku_evil/bin/teku /usr/local/bin/teku-evil
 
-COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /usr/local/bin/beacon-chain
-COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/validator/validator_/validator /usr/local/bin/validator
-COPY --from=prysm-builder /prysm.version /prysm.version
+COPY --from=etb-client-builder /git/prysm/bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /usr/local/bin/beacon-chain
+COPY --from=etb-client-builder /git/prysm/bazel-bin/cmd/validator/validator_/validator /usr/local/bin/validator
+COPY --from=etb-client-builder /prysm.version /prysm.version
 #
-COPY --from=lodestar-builder /git/lodestar /git/lodestar
-COPY --from=lodestar-builder /lodestar.version /lodestar.version
+COPY --from=etb-client-builder /git/lodestar /git/lodestar
+COPY --from=etb-client-builder /lodestar.version /lodestar.version
 RUN ln -s /git/lodestar/node_modules/.bin/lodestar /usr/local/bin/lodestar
 
 # execution clients
-COPY --from=geth-builder /geth.version /geth.version
-COPY --from=geth-builder /root/go/bin/geth /usr/local/bin/geth
+COPY --from=etb-client-builder /geth.version /geth.version
+COPY --from=etb-client-builder /root/go/bin/geth /usr/local/bin/geth
 
-COPY --from=reth-builder /reth.version /reth.version
-COPY --from=reth-builder /git/reth/target/release/reth /usr/local/bin/reth
+COPY --from=etb-client-builder /reth.version /reth.version
+COPY --from=etb-client-builder /git/reth/target/release/reth /usr/local/bin/reth
 
-COPY --from=besu-builder /besu.version /besu.version
-COPY --from=besu-builder /git/besu/build/install/besu/. /opt/besu
+COPY --from=etb-client-builder /besu.version /besu.version
+COPY --from=etb-client-builder /git/besu/build/install/besu/. /opt/besu
 RUN ln -s /opt/besu/bin/besu /usr/local/bin/besu
 
-COPY --from=nethermind-builder /nethermind.version /nethermind.version
-COPY --from=nethermind-builder /git/nethermind/out /nethermind/
+COPY --from=etb-client-builder /nethermind.version /nethermind.version
+COPY --from=etb-client-builder /git/nethermind/out /nethermind/
 RUN ln -s /nethermind/nethermind /usr/local/bin/nethermind
 
