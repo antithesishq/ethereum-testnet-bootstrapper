@@ -6,10 +6,10 @@ ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
 ARG LIGHTHOUSE_BRANCH="v4.6.0-rc.0"
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
-ARG PRYSM_BRANCH="v4.2.0-rc.1"
+ARG PRYSM_BRANCH="v4.2.1-rc.0"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
-ARG LODESTAR_BRANCH="v1.14.0-rc.1"
+ARG LODESTAR_BRANCH="v1.14.0"
 
 ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
 ARG NIMBUS_ETH2_BRANCH="v24.1.1"
@@ -33,7 +33,7 @@ ARG NETHERMIND_BRANCH="1.25.0"
 # ARG ERIGON_BRANCH="v2.56.1"
 
 ARG RETH_REPO="https://github.com/paradigmxyz/reth"
-ARG RETH_BRANCH="v0.1.0-alpha.14"
+ARG RETH_BRANCH="v0.1.0-alpha.15"
 
 ARG TX_FUZZ_REPO="https://github.com/MariusVanDerWijden/tx-fuzz"
 ARG TX_FUZZ_BRANCH="master"
@@ -127,13 +127,8 @@ RUN ln -s /usr/local/go/bin/go /usr/local/bin/go && \
 ENV PATH="$PATH:/root/go/bin"
 
 # setup nodejs (lodestar)
-RUN apt-get update && \
-    apt-get install -y ca-certificates curl gnupg && \
-    mkdir -p /etc/apt/keyrings && \
-    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
-    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_18.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list && \
-    apt-get update && \
-    apt-get install nodejs -y && \
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs && \
     npm install --global yarn && \
     npm install -g @bazel/bazelisk
 
@@ -333,7 +328,7 @@ ARG BEACON_METRICS_GAZER_REPO
 ARG BEACON_METRICS_GAZER_BRANCH
 
 RUN go install github.com/wealdtech/ethereal/v2@latest \
-    &&  go install github.com/wealdtech/ethdo@latest \
+    &&  go install github.com/wealdtech/ethdo@v1.35.2 \
     && go install github.com/protolambda/eth2-val-tools@latest \
     && cp /root/go/bin/ethereal /git/bin/ \
     && cp /root/go/bin/ethdo /git/bin/ \
@@ -407,7 +402,7 @@ RUN mkdir -p /etc/apt/keyrings && \
     apt update && \
     apt install --no-install-recommends nodejs -y
 
-RUN pip3 install ruamel.yaml web3 pydantic
+RUN pip3 install --break-system-packages ruamel.yaml web3 pydantic
 
 # for coverage artifacts and runtime libraries.
 RUN wget --no-check-certificate https://apt.llvm.org/llvm.sh && \

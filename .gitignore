@@ -4,3 +4,5 @@ docker-compose.yml
 docker-compose.yaml
 .DS_Store
 __pycache__
+data-*
+interesting_logs.md
