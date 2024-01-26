@@ -31,7 +31,7 @@ ARG NETHERMIND_BRANCH="1.25.3"
 # ARG ETHEREUMJS_BRANCH="7a0a37b7355c77ce841d5b04da55a2a4b53fe550"
 
 ARG RETH_REPO="https://github.com/paradigmxyz/reth"
-ARG RETH_BRANCH="0.1.0-alpha.16"
+ARG RETH_BRANCH="v0.1.0-alpha.16"
 
 # All of the fuzzers we will be using
 # ARG TX_FUZZ_REPO="https://github.com/qu0b/tx-fuzz.git"
