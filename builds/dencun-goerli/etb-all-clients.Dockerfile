@@ -3,28 +3,28 @@
 ###############################################################################
 # Consensus Clients
 ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
-ARG LIGHTHOUSE_BRANCH="v4.6.0-rc.0"
+ARG LIGHTHOUSE_BRANCH="v4.6.0"
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
-ARG PRYSM_BRANCH="v4.2.1-rc.0"
+ARG PRYSM_BRANCH="v4.2.1-rc.1"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
-ARG LODESTAR_BRANCH="v1.14.0"
+ARG LODESTAR_BRANCH="v1.15.0-rc.0"
 
 ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
-ARG NIMBUS_ETH2_BRANCH="v24.1.1"
+ARG NIMBUS_ETH2_BRANCH="v24.1.2"
 
 ARG TEKU_REPO="https://github.com/ConsenSys/teku.git"
-ARG TEKU_BRANCH="24.1.0"
+ARG TEKU_BRANCH="24.1.1"
 
 ARG BESU_REPO="https://github.com/hyperledger/besu.git"
 ARG BESU_BRANCH="24.1.0"
 
 ARG GETH_REPO="https://github.com/ethereum/go-ethereum.git"
-ARG GETH_BRANCH="v1.13.9"
+ARG GETH_BRANCH="v1.13.11"
 
 ARG NETHERMIND_REPO="https://github.com/NethermindEth/nethermind.git"
-ARG NETHERMIND_BRANCH="1.25.0"
+ARG NETHERMIND_BRANCH="1.25.3"
 
 # ARG ETHEREUMJS_REPO="https://github.com/ethereumjs/ethereumjs-monorepo.git"
 # ARG ETHEREUMJS_BRANCH="stable-3981bca"
@@ -33,7 +33,7 @@ ARG NETHERMIND_BRANCH="1.25.0"
 # ARG ERIGON_BRANCH="v2.56.1"
 
 ARG RETH_REPO="https://github.com/paradigmxyz/reth"
-ARG RETH_BRANCH="v0.1.0-alpha.15"
+ARG RETH_BRANCH="0.1.0-alpha.16"
 
 ARG TX_FUZZ_REPO="https://github.com/MariusVanDerWijden/tx-fuzz"
 ARG TX_FUZZ_BRANCH="master"
@@ -241,8 +241,8 @@ RUN wget "https://codeload.github.com/ethereum/go-ethereum/zip/${GETH_BRANCH}" &
     mv go-ethereum-${GETH_BRANCH}" go-ethereum && \
     echo "${GETH_BRANCH}" > /geth.version && \
     cd go-ethereum && \
-    go build -o /git/bin/geth -ldflags "-X github.com/ethereum/go-ethereum/internal/version.gitCommit=v1.13.9 -X github.com/ethereum/go-ethereum/internal/version.gitDate=$(date '+%Y-%m-%d') -extldflags '-Wl,-z,stack-size=0x800000'" -tags urfave_cli_no_docs,ckzg -trimpath -v ./cmd/geth && \
-    go build -o /git/race/bin/geth -race -ldflags "-X github.com/ethereum/go-ethereum/internal/version.gitCommit=v1.13.9 -X github.com/ethereum/go-ethereum/internal/version.gitDate=$(date '+%Y-%m-%d') -extldflags '-Wl,-z,stack-size=0x800000'" -tags urfave_cli_no_docs,ckzg -trimpath -v ./cmd/geth 
+    go build -o /git/bin/geth -ldflags "-X github.com/ethereum/go-ethereum/internal/version.gitCommit=v1.13.11 -X github.com/ethereum/go-ethereum/internal/version.gitDate=$(date '+%Y-%m-%d') -extldflags '-Wl,-z,stack-size=0x800000'" -tags urfave_cli_no_docs,ckzg -trimpath -v ./cmd/geth && \
+    go build -o /git/race/bin/geth -race -ldflags "-X github.com/ethereum/go-ethereum/internal/version.gitCommit=v1.13.11 -X github.com/ethereum/go-ethereum/internal/version.gitDate=$(date '+%Y-%m-%d') -extldflags '-Wl,-z,stack-size=0x800000'" -tags urfave_cli_no_docs,ckzg -trimpath -v ./cmd/geth 
 # RUN git clone --depth 1 --branch "${GETH_BRANCH}" "${GETH_REPO}" && \
 #     cd go-ethereum && \
 #     

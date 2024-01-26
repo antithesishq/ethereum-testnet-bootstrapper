@@ -5,20 +5,20 @@
 
 # devnet 9 ready
 ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
-ARG LIGHTHOUSE_BRANCH="v4.6.0-rc.0"
+ARG LIGHTHOUSE_BRANCH="v4.6.0"
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
-ARG PRYSM_BRANCH="v4.2.1-rc.0"
+ARG PRYSM_BRANCH="v4.2.1-rc.1"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
-ARG LODESTAR_BRANCH="v1.14.0"
+ARG LODESTAR_BRANCH="v1.15.0-rc.0"
 
 # devnet 9 ready
 ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
-ARG NIMBUS_ETH2_BRANCH="v24.1.1"
+ARG NIMBUS_ETH2_BRANCH="v24.1.2"
 
 ARG TEKU_REPO="https://github.com/ConsenSys/teku.git"
-ARG TEKU_BRANCH="24.1.0"
+ARG TEKU_BRANCH="24.1.1"
 
 # ARG TEKU_EVIL_REPO="https://github.com/tbenr/teku"
 # ARG TEKU_EVIL_BRANCH="evil-blobs"
@@ -28,10 +28,10 @@ ARG BESU_REPO="https://github.com/hyperledger/besu.git"
 ARG BESU_BRANCH="24.1.0"
 
 ARG GETH_REPO="https://github.com/ethereum/go-ethereum.git"
-ARG GETH_BRANCH="v1.13.9"
+ARG GETH_BRANCH="v1.13.11"
 
 ARG NETHERMIND_REPO="https://github.com/NethermindEth/nethermind.git"
-ARG NETHERMIND_BRANCH="1.25.0"
+ARG NETHERMIND_BRANCH="1.25.3"
 
 # ARG ETHEREUMJS_REPO="https://github.com/ethereumjs/ethereumjs-monorepo.git"
 # ARG ETHEREUMJS_BRANCH="stable-3981bca"
@@ -40,7 +40,7 @@ ARG NETHERMIND_BRANCH="1.25.0"
 # ARG ERIGON_BRANCH="v2.56.1"
 
 ARG RETH_REPO="https://github.com/paradigmxyz/reth"
-ARG RETH_BRANCH="v0.1.0-alpha.15"
+ARG RETH_BRANCH="0.1.0-alpha.16"
 
 # All of the fuzzers we will be using
 # ARG TX_FUZZ_REPO="https://github.com/qu0b/tx-fuzz.git"
