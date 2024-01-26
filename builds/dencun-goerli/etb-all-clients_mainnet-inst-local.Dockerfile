@@ -19,7 +19,7 @@ ARG TEKU_BRANCH="24.1.0"
 
 # Execution Clients
 ARG BESU_REPO="https://github.com/hyperledger/besu.git"
-ARG BESU_BRANCH="v24.1.0"
+ARG BESU_BRANCH="24.1.1"
 
 ARG GETH_REPO="https://github.com/ethereum/go-ethereum.git"
 ARG GETH_BRANCH="v1.13.11"
