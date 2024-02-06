@@ -566,6 +566,16 @@ class EthereumTestnetBootstrapper:
         logging.debug(f"Got block {block_number} with hash: {block_hash}")
         return block_hash, int(block_number, 16)
 
+def _generate_assertor_config(self, etb_config: ETBConfig, global_timeout: int):
+    """
+    Assertor config: https://github.com/ethpandaops/assertoor/wiki.md
+    """
+
+    endpoints = {}
+    web = {}
+    validatorNames = {}
+    
+
 
 def main():
     parser = argparse.ArgumentParser()

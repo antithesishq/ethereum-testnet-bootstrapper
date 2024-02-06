@@ -48,6 +48,9 @@ ARG BEACON_METRICS_GAZER_BRANCH="master"
 ARG MOCK_BUILDER_REPO="https://github.com/marioevz/mock-builder.git"
 ARG MOCK_BUILDER_BRANCH="v1.1.0"
 
+ARG ASSERTOR_REPO="https://github.com/ethpandaops/assertoor.git"
+ARG ASSERTOR_BRANCH="v0.0.2"
+
 ###############################################################################
 # Builder to build all of the clients.
 FROM debian:stable-slim AS etb-client-builder
@@ -444,6 +447,22 @@ RUN if [ ! -d "mock-builder" ]; then \
 RUN cd mock-builder && \
     go build .
 
+ARG ASSERTOR_REPO
+ARG ASSERTOR_BRANCH
+
+RUN if [ ! -d "assertoor" ]; then \
+        git clone "${ASSERTOR_REPO}"; \
+        cd assertoor && git checkout "${ASSERTOR_BRANCH}"; \
+    else \
+        cd assertoor && \
+        git fetch && \
+        git checkout "${ASSERTOR_BRANCH}"; \
+    fi && \
+    git log -n 1 --format=format:"%H" > /assertoor.version
+
+RUN cd assertoor && \
+    make build
+
 ########################### etb-all-clients runner  ###########################
 FROM debian:stable-slim
 
@@ -502,6 +521,9 @@ COPY --from=misc-builder /git/beacon-metrics-gazer/target/release/beacon-metrics
 COPY --from=misc-builder /root/.cargo/bin/jwt /usr/local/bin/jwt
 # mock-builder
 COPY --from=misc-builder /git/mock-builder/mock-builder /usr/local/bin/mock-builder
+
+#assertoor
+COPY --from=misc-builder /git/assertoor/bin/assertoor /usr/local/bin/assertoor
 
 # consensus clients
 COPY --from=nimbus-eth2-builder /git/nimbus-eth2/build/nimbus_beacon_node /usr/local/bin/nimbus_beacon_node

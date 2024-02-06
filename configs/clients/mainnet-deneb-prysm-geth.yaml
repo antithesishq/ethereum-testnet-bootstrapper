@@ -448,3 +448,13 @@ generic-instances:
     ]
     additional-volumes: ["./data/prometheus/conf:/opt/bitnami/prometheus/conf"]
     ports: ["9081:9090"]
+  
+  assertoor:
+    image: "etb-all-clients"
+    tag: "dencun"
+    start-ip-address: "10.0.20.220"
+    num-nodes: 1
+    entrypoint: "/usr/local/bin/assertoor"
+    command: [
+      "--config=/data/assertor-config.yaml",
+    ]
