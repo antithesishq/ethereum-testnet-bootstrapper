@@ -25,11 +25,11 @@ function container_builder() {
 
 TAG="dencun-goerli"
 
-log_step "building all clients"
-build_image "etb-all-clients:$TAG" "etb-all-clients_mainnet.Dockerfile"
+#log_step "building all clients"
+#build_image "etb-all-clients:$TAG" "etb-all-clients_mainnet.Dockerfile"
 
-log_step "building all clients instrumented"
-build_image "etb-all-clients-inst:$TAG" "etb-all-clients_mainnet-inst-local.Dockerfile"
+#log_step "building all clients instrumented"
+#build_image "etb-all-clients-inst:$TAG" "etb-all-clients_mainnet-inst-local.Dockerfile"
 
 log_step "building all clients race"
 build_image "etb-all-clients-race:$TAG" "etb-all-clients_mainnet-race.Dockerfile"

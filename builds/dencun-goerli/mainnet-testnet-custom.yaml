@@ -106,6 +106,20 @@ execution-configs:
     p2p-port: 666
     metric-port: 9001
     metrics-path: "/metrics"
+  
+  reth-execution-config:
+    client: "reth"
+    launcher: "/source/deps/launchers/el/launch-reth.sh"
+    log-level: "vvv" # detail
+    http-apis: "eth,net,admin,web3"
+    ws-apis: "eth,net,admin,web3"
+    http-port: 8645
+    ws-port: 8646
+    p2p-port: 666
+    engine-http-port: 8551   # http/ws same port.
+    engine-ws-port: 8551   # include for nimbus
+    metric-port: 9001
+    json-snooper-proxy-port: 8765
 
 # configuration options used for consensus clients
 consensus-configs:
