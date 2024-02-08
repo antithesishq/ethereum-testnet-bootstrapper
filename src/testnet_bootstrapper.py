@@ -607,8 +607,8 @@ class EthereumTestnetBootstrapper:
                 
                 endpoints.append(ClientConfig(
                     name=f"{client_name}-{instance.ndx}",
-                    consensus_url=f"http://{client_name}-{instance.ndx}:{instance.collection_config.consensus_config.beacon_api_port}",
-                    execution_url=f"http://{client_name}-{instance.ndx}:{instance.collection_config.execution_config.http_port}",
+                    consensusUrl=f"http://{client_name}-{instance.ndx}:{instance.collection_config.consensus_config.beacon_api_port}",
+                    executionUrl=f"http://{client_name}-{instance.ndx}:{instance.collection_config.execution_config.http_port}",
                 ))
                 validator_pair_names[f"{client_name}-.*"] = ""
         
@@ -647,9 +647,9 @@ class EthereumTestnetBootstrapper:
             endpoints,
             web,
             validator_names,
-            external_tests=tests,
-            global_vars={
-                "validator_pair_names": pair_names
+            externalTests=tests,
+            globalVars={
+                "validatorPairNames": pair_names
             }
         )
         logging.info(f"writing assertor-config to /data/assertoor-config.yaml")

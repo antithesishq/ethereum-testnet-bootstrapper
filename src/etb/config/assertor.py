@@ -24,26 +24,18 @@ def serialize_to_yaml(data_class_instance):
 @dataclass
 class ClientConfig:
     name: str
-    consensus_url: str
-    execution_url: str
-    consensus_headers: Optional[Dict[str, str]] = None
-    execution_headers: Optional[Dict[str, str]] = None
+    consensusUrl: str
+    executionUrl: str
 
 @dataclass
 class ServerConfig:
     port: str
     host: str
-    read_timeout: Optional[str] = None
-    write_timeout: Optional[str] = None
-    idle_timeout: Optional[str] = None
 
 @dataclass
 class FrontendConfig:
     enabled: bool
     debug: Optional[bool] = None
-    pprof: Optional[bool] = None
-    minify: Optional[bool] = None
-    site_name: Optional[str] = None
 
 @dataclass
 class WebConfig:
@@ -52,8 +44,8 @@ class WebConfig:
 
 @dataclass
 class NamesConfig:
-    inventory_yaml: Optional[str] = None
-    inventory_url: Optional[str] = None
+    inventoryYaml: Optional[str] = None
+    inventoryUrl: Optional[str] = None
     inventory: Optional[Dict[str, str]] = None
 
 @dataclass
@@ -62,9 +54,9 @@ class TestConfig:
     disable: bool
     timeout: str 
     config: Dict[str, Any]
-    config_vars: Dict[str, str]
+    configVars: Dict[str, str]
     tasks: List[Any]
-    cleanup_tasks: List[Any]
+    cleanupTasks: List[Any]
 
 @dataclass
 class ExternalTests:
@@ -72,16 +64,16 @@ class ExternalTests:
     file: str
     timeout: Optional[str] = None
     config: Optional[Dict[str, Any]] = None
-    config_vars: Optional[Dict[str, str]] = None
+    configVars: Optional[Dict[str, str]] = None
 
 @dataclass
 class AssertorConfig:
     endpoints: List[ClientConfig]
     web: Optional[WebConfig] = None
-    validator_names: Optional[NamesConfig] = None
-    global_vars: Optional[Dict[str, Any]] = None
+    validatorNames: Optional[NamesConfig] = None
+    globalVars: Optional[Dict[str, Any]] = None
     tests: Optional[List[Optional[TestConfig]]] = None
-    external_tests: Optional[List[Optional[ExternalTests]]] = None
+    externalTests: Optional[List[Optional[ExternalTests]]] = None
 
     def to_yaml(self, filename: str):
         with open(filename, 'w') as f:
