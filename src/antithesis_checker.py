@@ -436,12 +436,12 @@ class TestnetStatusCheckerV2(object):
         # print(encoder.encode(client_validators), flush=True)
         print(f"validators: {encoder.encode(client_validators)}", flush=True)
 
-        # if check_for_consensus(self.clients_to_monitor):
-        #     print(f"Phase0 passed.", flush=True)
-        # else:
-        #     print(f"Phase0 failed.", flush=True)
-        #     # antithesis: don't terminate if forks present
-        #     print(f"terminate", flush=True)
+        if check_for_consensus(self.clients_to_monitor):
+            print(f"Phase0 passed.", flush=True)
+        else:
+            print(f"Phase0 failed.", flush=True)
+            # antithesis: don't terminate if forks present
+            # print(f"terminate", flush=True)
 
         # antithesis
         print("start_tx_fuzzer", flush=True)

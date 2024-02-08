@@ -727,6 +727,7 @@ class Instance:
             "image": f"{self.collection_config.image}:{self.collection_config.tag}",
             "volumes": docker_config.volumes + self.collection_config.additional_volumes,
             "networks": {docker_config.network_name: {"ipv4_address": self.ip_address}},
+            # "deploy": {"resources": { "limits": { "cpus": "0.10", "memory": "3G" }}}
         }
         if self.collection_config.entrypoint is not None:
             entry["entrypoint"] = str(self.collection_config.entrypoint).split()

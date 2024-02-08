@@ -39,18 +39,21 @@ class Ethdo:
             # Get the current epoch
             current_epoch = 0
             try:
-                cmd = ["ethdo", "--connection=" + client, "epoch", "summary"]
+                cmd = ["ethdo", "--allow-insecure-connections", "--connection", client, "epoch", "summary"]
                 logging.debug(f"Running command: {cmd}")
                 out = subprocess.run(
                     cmd, 
-                    capture_output=True, text=True
+                    capture_output=True, 
+                    text=True
                 )
                 if len(out.stderr) > 0:
-                 return Exception(out.stderr)
+                    logging.error(f'error (sterr) getting default epoch summary \n {cmd} \n {out.stderr}')
+                    return Exception(out.stderr)
                 current_epoch_line = next(line for line in out.stdout.split('\n') if 'Epoch' in line)
                 match = re.search(r'Epoch (\d+):', current_epoch_line)
                 current_epoch = int(match.group(1))
             except subprocess.CalledProcessError as e:
+                logging.error('error getting default epoch summary')
                 return Exception(e.stderr)
             
             
@@ -70,9 +73,11 @@ class Ethdo:
                     capture_output=True, check=True
                 )
                 if len(out.stderr) > 0:
+                    logging.error('error (sterr) from subcommand getting last epoch summary')
                     return Exception(out.stderr)
                 return out.stdout.decode("utf-8")
             except subprocess.CalledProcessError as e:
+                logging.error('error from subcommand getting last epoch summary')
                 return Exception(e.stderr)
             
         else:
@@ -91,8 +96,11 @@ class Ethdo:
             try:
                 out = subprocess.run(cmd, capture_output=True, check=True)
                 if len(out.stderr) > 0:
+                    logging.error('error (sterr) from subcommand getting specific epoch summary')
                     return Exception(out.stderr)
                 
                 return out.stdout.decode("utf-8")
             except subprocess.CalledProcessError as e:
+                logging.error('error from subcommand getting specific epoch summary')
                 return Exception(e.stderr)
+

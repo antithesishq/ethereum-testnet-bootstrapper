@@ -196,11 +196,13 @@ class EpochPerformanceAction(TestnetMonitorAction):
                 epoch_match = re.search(epoch_pattern, summary)
                 data_matches = re.findall(data_pattern, summary, re.MULTILINE)
 
+                logging.debug(f"epoch_match: {epoch_match} data_matches: {data_matches}")
+
                 data = {"Epoch": epoch_match.group(1)}
                 data.update({match[0].strip().replace(' ', '_'): match[1] for match in data_matches})
 
                 json_data = json.dumps(data)
-                logging.info(f"epoch_summary:\n{json_data}")
+                logging.info(f"epoch_summary: {json_data}")
                 return
 
             except Exception as e:
