@@ -656,7 +656,8 @@ class EthereumTestnetBootstrapper:
                 ).private_key
             )
         private_key = random.choice(private_keys)
-        
+        private_key = private_key.replace("0x", "")
+
         assertorConfig = AssertorConfig(
             endpoints,
             web,
@@ -665,7 +666,7 @@ class EthereumTestnetBootstrapper:
             globalVars={
                 "validatorPairNames": pair_names,
                 "clientPairNames": pair_names,
-                "walletPrivkey": private_key,
+                "walletPrivkey": private_key
             }
         )
         logging.info(f"writing assertor-config to /data/assertoor-config.yaml")
