@@ -525,6 +525,9 @@ COPY --from=misc-builder /git/mock-builder/mock-builder /usr/local/bin/mock-buil
 #assertoor
 COPY --from=misc-builder /git/assertoor/bin/assertoor /usr/local/bin/assertoor
 
+
+COPY --from=misc-builder /git/grandine/grandine_antithesis /usr/local/bin/grandine
+
 # consensus clients
 COPY --from=nimbus-eth2-builder /git/nimbus-eth2/build/nimbus_beacon_node /usr/local/bin/nimbus_beacon_node
 COPY --from=nimbus-eth2-builder /nimbus.version /nimbus.version
