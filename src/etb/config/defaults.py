@@ -157,12 +157,14 @@ DEFAUT_EXECUTION_METRICS_PATH = "/metrics"
 # consensus-configs
 DEFAULT_CONSENSUS_CLIENT_CONFIG_NAME_TEKU = "teku-consensus-client"
 DEFAULT_CONSENSUS_CLIENT_CONFIG_NAME_PRYSM = "prysm-consensus-client"
+DEFAULT_CONSENSUS_CLIENT_CONFIG_NAME_GRANDINE = "grandine-consensus-client"
 DEFAULT_CONSENSUS_CLIENT_CONFIG_NAME_NIMBUS = "nimbus-consensus-client"
 DEFAULT_CONSENSUS_CLIENT_CONFIG_NAME_LIGHTHOUSE = "lighthouse-consensus-client"
 DEFAULT_CONSENSUS_CLIENT_CONFIG_NAME_LODESTAR = "lodestar-consensus-client"
 
 # launchers
 DEFAULT_CONSENSUS_LAUNCHER_PRYSM = "/source/deps/launchers/cl/launch-prysm.sh"
+DEFAULT_CONSENSUS_LAUNCHER_GRANDINE = "/source/deps/launchers/cl/launch-grandine.sh"
 DEFAULT_CONSENSUS_LAUNCHER_NIMBUS = "/source/deps/launchers/cl/launch-nimbus.sh"
 DEFAULT_CONSENSUS_LAUNCHER_TEKU = "/source/deps/launchers/cl/launch-teku.sh"
 DEFAULT_CONSENSUS_LAUNCHER_LIGHTHOUSE = "/source/deps/launchers/cl/launch-lighthouse.sh"
@@ -170,6 +172,7 @@ DEFAULT_CONSENSUS_LAUNCHER_LODESTAR = "/source/deps/launchers/cl/launch-lodestar
 
 # log level
 DEFAULT_CONSENSUS_LOG_LEVEL_PRYSM = "info"
+DEFAULT_CONSENSUS_LOG_LEVEL_GRANDINE = "info"
 DEFAULT_CONSENSUS_LOG_LEVEL_NIMBUS = "info"
 DEFAULT_CONSENSUS_LOG_LEVEL_TEKU = "INFO"
 DEFAULT_CONSENSUS_LOG_LEVEL_LIGHTHOUSE = "info"
@@ -196,6 +199,7 @@ DEFAULT_CONSENSUS_CLIENT_INSTANCE_ADDITIONAL_ENV = {
         "teku": {},
         "nimbus": {},
         "lighthouse": {},
+        "grandine": {},
     },
     "minimal": {
         "prysm": {"validator-password": DEFAULT_PRYSM_VALIDATOR_PASSWORD},
@@ -203,6 +207,7 @@ DEFAULT_CONSENSUS_CLIENT_INSTANCE_ADDITIONAL_ENV = {
         "teku": {},
         "nimbus": {},
         "lighthouse": {},
+        "grandine": {},
     }
 }
 
@@ -215,6 +220,7 @@ DEFAULT_MAINNET_DOCKER_TAG = "mainnet-current"
 DEFAULT_EXECUTION_CONFIG_FIELDS = [
     "launcher",
     "log-level",
+    "log-level-file",
     "p2p-port",
     "http-apis",
     "http-port",
@@ -229,18 +235,22 @@ DEFAULT_EXECUTION_CONFIG_FIELDS = [
 DEFAULT_EXECUTION_CLIENT_SPECIFIC_VALUES_MAP = {
     ("geth", "launcher"): DEFAULT_EXECUTION_LAUNCHER_GETH,
     ("geth", "log-level"): DEFAULT_EXECUTION_LOG_LEVEL_GETH,
+    ("geth", "log-level-file"): DEFAULT_EXECUTION_LOG_LEVEL_GETH,
     ("geth", "ws-apis"): DEFAULT_EXECUTION_APIS_GETH,
     ("geth", "http-apis"): DEFAULT_EXECUTION_APIS_GETH,
     ("besu", "launcher"): DEFAULT_EXECUTION_LAUNCHER_BESU,
     ("besu", "log-level"): DEFAULT_EXECUTION_LOG_LEVEL_BESU,
+    ("besu", "log-level-file"): DEFAULT_EXECUTION_LOG_LEVEL_BESU,
     ("besu", "ws-apis"): DEFAULT_EXECUTION_APIS_BESU,
     ("besu", "http-apis"): DEFAULT_EXECUTION_APIS_BESU,
     ("reth", "launcher"): DEFAULT_EXECUTION_LAUNCHER_RETH,
     ("reth", "log-level"): DEFAULT_EXECUTION_LOG_LEVEL_RETH,
+    ("reth", "log-level-file"): DEFAULT_EXECUTION_LOG_LEVEL_RETH, 
     ("reth", "ws-apis"): DEFAULT_EXECUTION_APIS_RETH,
     ("reth", "http-apis"): DEFAULT_EXECUTION_APIS_RETH,
     ("nethermind", "launcher"): DEFAULT_EXECUTION_LAUNCHER_NETHERMIND,
     ("nethermind", "log-level"): DEFAULT_EXECUTION_LOG_LEVEL_NETHERMIND,
+    ("nethermind", "log-level-file"): DEFAULT_EXECUTION_LOG_LEVEL_NETHERMIND,
     ("nethermind", "ws-apis"): DEFAULT_EXECUTION_APIS_NETHERMIND,
     ("nethermind", "http-apis"): DEFAULT_EXECUTION_APIS_NETHERMIND,
     ("nethermind", "engine-ws-port"): DEFAULT_EXECUTION_ENGINE_WS_PORT_NETHERMIND
@@ -267,6 +277,7 @@ DEFAULT_CONSENSUS_CONFIG_FIELDS = [
     "launcher",
     "num-validators",
     "log-level",
+    "log-level-file",
     "p2p-port",
     "beacon-api-port",
     "beacon-rpc-port",
@@ -278,11 +289,19 @@ DEFAULT_CONSENSUS_CONFIG_FIELDS = [
 
 DEFAULT_CONSENSUS_CLIENT_SPECIFIC_VALUES_MAP = {
     ("prysm", "log-level"): DEFAULT_CONSENSUS_LOG_LEVEL_PRYSM,
+    ("prysm", "log-level-file"): DEFAULT_CONSENSUS_LOG_LEVEL_PRYSM,
+    ("grandine", "log-level"): DEFAULT_CONSENSUS_LOG_LEVEL_GRANDINE,
+    ("grandine", "log-level-file"): DEFAULT_CONSENSUS_LOG_LEVEL_GRANDINE,
     ("teku", "log-level"): DEFAULT_CONSENSUS_LOG_LEVEL_TEKU,
+    ("teku", "log-level-file"): DEFAULT_CONSENSUS_LOG_LEVEL_TEKU,
     ("lodestar", "log-level"): DEFAULT_CONSENSUS_LOG_LEVEL_LODESTAR,
+    ("lodestar", "log-level-file"): DEFAULT_CONSENSUS_LOG_LEVEL_LODESTAR,
     ("nimbus", "log-level"): DEFAULT_CONSENSUS_LOG_LEVEL_NIMBUS,
+    ("nimbus", "log-level-file"): DEFAULT_CONSENSUS_LOG_LEVEL_NIMBUS,
     ("lighthouse", "log-level"): DEFAULT_CONSENSUS_LOG_LEVEL_LIGHTHOUSE,
+    ("lighthouse", "log-level-file"): DEFAULT_CONSENSUS_LOG_LEVEL_LIGHTHOUSE,
     ("prysm", "launcher"): DEFAULT_CONSENSUS_LAUNCHER_PRYSM,
+    ("grandine", "launcher"): DEFAULT_CONSENSUS_LAUNCHER_GRANDINE,
     ("teku", "launcher"): DEFAULT_CONSENSUS_LAUNCHER_TEKU,
     ("lodestar", "launcher"): DEFAULT_CONSENSUS_LAUNCHER_LODESTAR,
     ("nimbus", "launcher"): DEFAULT_CONSENSUS_LAUNCHER_NIMBUS,
@@ -303,6 +322,17 @@ DEFAULT_CONSENSUS_VALUES_MAP = {
 DEFAULT_CONSENSUS_CONFIG = {
     DEFAULT_CONSENSUS_CLIENT_CONFIG_NAME_PRYSM: {
         "client": "prysm",
+        "num-validators": DEFAULT_NUM_VALIDATORS,
+        "p2p-port": DEFAULT_CONSENSUS_P2P_PORT,
+        "beacon-api-port": DEFAULT_CONSENSUS_BEACON_API_PORT,
+        "beacon-rpc-port": DEFAULT_CONSENSUS_BEACON_RPC_PORT,
+        "beacon-metric-port": DEFAULT_CONSENSUS_BEACON_METRIC_PORT,
+        "validator-rpc-port": DEFAULT_CONSENSUS_VALIDATOR_RPC_PORT,
+        "validator-metric-port": DEFAULT_CONSENSUS_VALIDATOR_METRIC_PORT,
+        "metrics-path": DEFAULT_CONSENSUS_METRICS_PATH,
+    },
+    DEFAULT_CONSENSUS_CLIENT_CONFIG_NAME_GRANDINE: {
+        "client": "grandine",
         "num-validators": DEFAULT_NUM_VALIDATORS,
         "p2p-port": DEFAULT_CONSENSUS_P2P_PORT,
         "beacon-api-port": DEFAULT_CONSENSUS_BEACON_API_PORT,

@@ -6,16 +6,16 @@ ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
 ARG LIGHTHOUSE_BRANCH="v4.6.0" 
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
-ARG PRYSM_BRANCH="v4.2.1-rc.2"
+ARG PRYSM_BRANCH="v4.2.2-rc.0"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
-ARG LODESTAR_BRANCH="v1.15.0-rc.0"
+ARG LODESTAR_BRANCH="v1.15.0"
 #
 ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
-ARG NIMBUS_ETH2_BRANCH="v24.1.2"
+ARG NIMBUS_ETH2_BRANCH="v24.2.0"
 
 ARG TEKU_REPO="https://github.com/ConsenSys/teku.git"
-ARG TEKU_BRANCH="24.1.0"
+ARG TEKU_BRANCH="24.1.1"
 
 # Execution Clients
 ARG BESU_REPO="https://github.com/hyperledger/besu.git"
@@ -31,7 +31,7 @@ ARG NETHERMIND_BRANCH="1.25.3"
 # ARG ETHEREUMJS_BRANCH="7a0a37b7355c77ce841d5b04da55a2a4b53fe550"
 
 ARG RETH_REPO="https://github.com/paradigmxyz/reth"
-ARG RETH_BRANCH="v0.1.0-alpha.16"
+ARG RETH_BRANCH="v0.1.0-alpha.17"
 
 # All of the fuzzers we will be using
 # ARG TX_FUZZ_REPO="https://github.com/qu0b/tx-fuzz.git"
@@ -47,6 +47,9 @@ ARG BEACON_METRICS_GAZER_BRANCH="master"
 # Mock builder for testing builder API
 ARG MOCK_BUILDER_REPO="https://github.com/marioevz/mock-builder.git"
 ARG MOCK_BUILDER_BRANCH="v1.1.0"
+
+ARG ASSERTOR_REPO="https://github.com/ethpandaops/assertoor.git"
+ARG ASSERTOR_BRANCH="v0.0.2"
 
 ###############################################################################
 # Builder to build all of the clients.
@@ -444,6 +447,22 @@ RUN if [ ! -d "mock-builder" ]; then \
 RUN cd mock-builder && \
     go build .
 
+ARG ASSERTOR_REPO
+ARG ASSERTOR_BRANCH
+
+RUN if [ ! -d "assertoor" ]; then \
+        git clone "${ASSERTOR_REPO}"; \
+        cd assertoor && git checkout "${ASSERTOR_BRANCH}"; \
+    else \
+        cd assertoor && \
+        git fetch && \
+        git checkout "${ASSERTOR_BRANCH}"; \
+    fi && \
+    git log -n 1 --format=format:"%H" > /assertoor.version
+
+RUN cd assertoor && \
+    make build
+
 ########################### etb-all-clients runner  ###########################
 FROM debian:stable-slim
 
@@ -502,6 +521,12 @@ COPY --from=misc-builder /git/beacon-metrics-gazer/target/release/beacon-metrics
 COPY --from=misc-builder /root/.cargo/bin/jwt /usr/local/bin/jwt
 # mock-builder
 COPY --from=misc-builder /git/mock-builder/mock-builder /usr/local/bin/mock-builder
+
+#assertoor
+COPY --from=misc-builder /git/assertoor/bin/assertoor /usr/local/bin/assertoor
+
+
+COPY --from=misc-builder /git/grandine/grandine_antithesis /usr/local/bin/grandine
 
 # consensus clients
 COPY --from=nimbus-eth2-builder /git/nimbus-eth2/build/nimbus_beacon_node /usr/local/bin/nimbus_beacon_node

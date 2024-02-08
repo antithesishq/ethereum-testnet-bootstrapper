@@ -68,7 +68,6 @@ execution-configs:
   geth-execution-config:
     client: "geth"
     launcher: "/source/deps/launchers/el/launch-geth.sh"
-
     log-level: "4" # detail
     http-apis: "debug,txpool,admin,net,eth,web3,personal,engine,clique,miner"
     ws-apis: "admin,net,eth,engine"
@@ -240,14 +239,12 @@ generic-instances:
     # runs on the first prysm geth node.
     entrypoint: "python3 /source/src/tx_spammer.py --run-indefinitely --target-ip 10.0.20.120 --target-port 8645 --epoch-delay 2 --fuzz-mode spam --no-al --tx-count 100 --tx-fuzz-path /usr/local/bin/livefuzzer"
 
-
   antithesis-checker:
     image: "ethereum-testnet-bootstrapper"
     tag: "latest"
     start-ip-address: "10.0.20.205"
     num-nodes: 1
     entrypoint: "python3 /source/src/antithesis_checker.py --config /data/etb-config.yaml --phase0-slot '96' --phase1-slot '104' --phase2-slot '120' --phase3-slot '128'"
-
 
   prometheus:
     image: "docker.io/bitnami/prometheus"
