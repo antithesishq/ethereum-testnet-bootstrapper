@@ -596,14 +596,14 @@ class EthereumTestnetBootstrapper:
         Assertor config: https://github.com/ethpandaops/assertoor
         """
         endpoints = []
-        names = []
+        names = {}
         validator_pair_names = {}
         for client_name, clients in etb_config.client_instances.items():
             for instance in clients:
                 start = instance.collection_config.validator_offset_start + (instance.collection_config.consensus_config.num_validators * instance.ndx)
                 validators_num = start + instance.collection_config.consensus_config.num_validators
                 end = validators_num - 1
-                names.append({f"{start}-{end}":f"{client_name}-{instance.ndx}"})
+                names[f"{start}-{end}"] = f"{client_name}-{instance.ndx}"
                 
                 endpoints.append(ClientConfig(
                     name=f"{client_name}-{instance.ndx}",
@@ -657,8 +657,6 @@ class EthereumTestnetBootstrapper:
 
         with open("/data/assertoor-config.yaml", "w", encoding="utf-8") as f:
             yaml.dump(serialize_to_yaml(assertorConfig), f)
-
-
 
 
 
