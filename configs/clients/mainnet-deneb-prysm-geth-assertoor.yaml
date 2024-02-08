@@ -410,41 +410,16 @@ generic-instances:
       consensus-bootnode-enr-port: 9001 #port in the enr
       consensus-bootnode-api-port: 6000 # port for web api.
       consensus-bootnode-enr-file: "/data/consensus-bootnodes.txt" # file to write the enr to.
-
-  # not required, but useful for debugging. This watches the network and shows the head & checkpoints of the CLs.
-  node-watch:
-    image: "ethereum-testnet-bootstrapper"
-    tag: "dencun"
-    start-ip-address: "10.0.20.203"
-    num-nodes: 1
-    entrypoint: "python3 /source/src/node_watch.py --log-level info --monitor execution_availability:epoch --monitor consensus_availability:epoch --monitor epoch_prometheus:epoch --monitor epoch_performance:epoch --monitor heads:slot --monitor checkpoints:epoch --max-retries 3"
-
-  tx-spammer:
+      
+  assertoor:
     image: "etb-all-clients"
     tag: "dencun"
-    start-ip-address: "10.0.20.204"
+    start-ip-address: "10.0.20.220"
     num-nodes: 1
-    # runs on the first prysm geth node.
-    entrypoint: "python3 /source/src/tx_spammer.py --run-indefinitely --log-level debug --target-ip 10.0.20.10 --target-port 8645 --epoch-delay 1 --fuzz-mode blobs --no-al --tx-count 5 --tx-fuzz-path /usr/local/bin/livefuzzer"
-
-  antithesis-checker:
-    image: "ethereum-testnet-bootstrapper"
-    tag: "dencun"
-    start-ip-address: "10.0.20.206"
-    num-nodes: 1
-    entrypoint: "python3 /source/src/antithesis_checker.py --config /data/etb-config.yaml --phase0-slot 128 --phase1-slot 140 --phase2-slot 165 --phase3-slot 256"
-
-  prometheus:
-    image: "docker.io/bitnami/prometheus"
-    tag: "latest"
-    start-ip-address: "10.0.20.210"
-    num-nodes: 1
-    entrypoint: "/opt/bitnami/prometheus/bin/prometheus"
+    entrypoint: "/usr/local/bin/assertoor"
     command: [
-      "--config.file=/opt/bitnami/prometheus/conf/prometheus.yml",
-      "--storage.tsdb.path=/opt/bitnami/prometheus/data",
-      "--web.console.libraries=/opt/bitnami/prometheus/conf/console_libraries",
-      "--web.console.templates=/opt/bitnami/prometheus/conf/consoles",
+      "-v",
+      "--log-format json",
+      "--config=/data/assertoor-config.yaml",
     ]
-    additional-volumes: ["./data/prometheus/conf:/opt/bitnami/prometheus/conf"]
-    ports: ["9081:9090"]
+    ports: ["8080:8080", "9082:9090"]
