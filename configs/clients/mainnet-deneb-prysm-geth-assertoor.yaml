@@ -410,7 +410,7 @@ generic-instances:
       consensus-bootnode-enr-port: 9001 #port in the enr
       consensus-bootnode-api-port: 6000 # port for web api.
       consensus-bootnode-enr-file: "/data/consensus-bootnodes.txt" # file to write the enr to.
-      
+
   assertoor:
     image: "etb-all-clients"
     tag: "dencun"
@@ -419,7 +419,8 @@ generic-instances:
     entrypoint: "/usr/local/bin/assertoor"
     command: [
       "-v",
-      "--log-format json",
+      "--log-format",
+      "json",
       "--config=/data/assertoor-config.yaml",
     ]
     ports: ["8080:8080", "9082:9090"]
