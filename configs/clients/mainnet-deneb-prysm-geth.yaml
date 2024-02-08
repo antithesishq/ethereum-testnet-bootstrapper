@@ -457,6 +457,7 @@ generic-instances:
     entrypoint: "/usr/local/bin/assertoor"
     command: [
       "-v",
+      "--log-format json"
       "--config=/data/assertoor-config.yaml",
     ]
     ports: ["8080:8080", "9082:9090"]
