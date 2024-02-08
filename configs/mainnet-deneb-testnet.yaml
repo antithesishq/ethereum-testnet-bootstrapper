@@ -68,7 +68,6 @@ execution-configs:
   geth-execution-config:
     client: "geth"
     launcher: "/source/deps/launchers/el/launch-geth.sh"
-
     log-level: "4" # detail
     http-apis: "debug,txpool,admin,net,eth,web3,personal,engine,clique,miner"
     ws-apis: "admin,net,eth,engine"

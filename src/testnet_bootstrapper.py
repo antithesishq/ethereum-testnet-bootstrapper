@@ -26,6 +26,16 @@ from etb.config.etb_config import (
     ClientInstance,
     ClientInstanceCollectionConfig,
 )
+from etb.config.assertor import (
+    AssertorConfig,
+    ClientConfig,
+    ExternalConfig,
+    NamesConfig,
+    ServerConfig,
+    TestConfig,
+    WebConfig,
+    FrontendConfig
+)
 from etb.genesis.consensus_genesis import ConsensusGenesisWriter
 from etb.genesis.execution_genesis import ExecutionGenesisWriter
 from etb.interfaces.client_request import (
@@ -571,10 +581,32 @@ def _generate_assertor_config(self, etb_config: ETBConfig, global_timeout: int):
     Assertor config: https://github.com/ethpandaops/assertoor/wiki.md
     """
 
-    endpoints = {}
-    web = {}
-    validatorNames = {}
+    endpoints = []
+    for client_name, clients in etb_config.client_instances.items():
+        for instance in clients:
+            endpoints.append(ClientConfig(
+                name=f"{client_name}-{instance.ndx}",
+                consensus_url=f"{client_name}-{instance.ndx}:{instance.collection_config.consensus_config.beacon_api_port}",
+                execution_url=f"{client_name}-{instance.ndx}:{instance.collection_config.execution_config.http_port}",
+            ))
+
+    web = WebConfig(
+        server=ServerConfig(
+            port="8080",
+            host="0.0.0.0",
+    ))
+
+    tests = TestConfig(
+
+    )
     
+    assertorConfig = AssertorConfig(
+        endpoints,
+        web,
+        tests
+    )
+
+
 
 
 def main():
