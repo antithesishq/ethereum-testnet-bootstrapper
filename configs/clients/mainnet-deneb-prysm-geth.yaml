@@ -456,5 +456,6 @@ generic-instances:
     num-nodes: 1
     entrypoint: "/usr/local/bin/assertoor"
     command: [
-      "--config=/data/assertor-config.yaml",
+      "--config=/data/assertoor-config.yaml",
     ]
+    ports: ["8080:8080"]

@@ -17,7 +17,16 @@ import requests
 # import ruamel
 from ruamel.yaml.representer import RoundTripRepresenter
 from ruamel.yaml import YAML
+
 yaml = YAML(typ='safe', pure=True)
+
+yaml.default_flow_style = False
+yaml.indent(mapping=2, sequence=4, offset=2)
+yaml.preserve_quotes = True
+yaml.Representer = RoundTripRepresenter
+
+
+# yaml.explicit_start = True
 
 from etb.common.utils import create_logger
 from etb.config.etb_config import (
@@ -29,12 +38,12 @@ from etb.config.etb_config import (
 from etb.config.assertor import (
     AssertorConfig,
     ClientConfig,
-    ExternalConfig,
+    ExternalTests,
     NamesConfig,
     ServerConfig,
-    TestConfig,
     WebConfig,
-    FrontendConfig
+    FrontendConfig,
+    serialize_to_yaml
 )
 from etb.genesis.consensus_genesis import ConsensusGenesisWriter
 from etb.genesis.execution_genesis import ExecutionGenesisWriter
@@ -189,6 +198,10 @@ class EthereumTestnetBootstrapper:
         local_logs_dir: Path = etb_config.files.local_logs_dir
         local_logs_dir.mkdir(parents=True, exist_ok=True)
 
+        logging.info("Writing assertor config")
+        self.generate_assertor_config(etb_config)
+
+
         # create the client directories
         # directory structure:
         # /testnet_root/local_testnet/collection_name/node_<node_num>/{cl
@@ -276,6 +289,8 @@ class EthereumTestnetBootstrapper:
         ) as etb_checkpoint:
             etb_checkpoint.write("")
 
+        # generate assertor config
+     
         # (if you need anything to run before the testnet starts, do it here)
 
         # 2 signal the consensus bootnodes to come up.
@@ -576,35 +591,73 @@ class EthereumTestnetBootstrapper:
         logging.debug(f"Got block {block_number} with hash: {block_hash}")
         return block_hash, int(block_number, 16)
 
-def _generate_assertor_config(self, etb_config: ETBConfig, global_timeout: int):
-    """
-    Assertor config: https://github.com/ethpandaops/assertoor/wiki.md
-    """
+    def generate_assertor_config(self, etb_config: ETBConfig):
+        """
+        Assertor config: https://github.com/ethpandaops/assertoor
+        """
+        endpoints = []
+        names = []
+        validator_pair_names = {}
+        for client_name, clients in etb_config.client_instances.items():
+            for instance in clients:
+                start = instance.collection_config.validator_offset_start + (instance.collection_config.consensus_config.num_validators * instance.ndx)
+                validators_num = start + instance.collection_config.consensus_config.num_validators
+                end = validators_num - 1
+                names.append({f"{start}-{end}":f"{client_name}-{instance.ndx}"})
+                
+                endpoints.append(ClientConfig(
+                    name=f"{client_name}-{instance.ndx}",
+                    consensus_url=f"{client_name}-{instance.ndx}:{instance.collection_config.consensus_config.beacon_api_port}",
+                    execution_url=f"{client_name}-{instance.ndx}:{instance.collection_config.execution_config.http_port}",
+                ))
+                validator_pair_names[f"{client_name}-.*"] = ""
+        
+        pair_names = []
+        for key, _ in validator_pair_names.items():
+            pair_names.append(key)
 
-    endpoints = []
-    for client_name, clients in etb_config.client_instances.items():
-        for instance in clients:
-            endpoints.append(ClientConfig(
-                name=f"{client_name}-{instance.ndx}",
-                consensus_url=f"{client_name}-{instance.ndx}:{instance.collection_config.consensus_config.beacon_api_port}",
-                execution_url=f"{client_name}-{instance.ndx}:{instance.collection_config.execution_config.http_port}",
-            ))
 
-    web = WebConfig(
-        server=ServerConfig(
-            port="8080",
-            host="0.0.0.0",
-    ))
+        web = WebConfig(
+            server=ServerConfig(
+                port="8080",
+                host="0.0.0.0",
+        ),
+            frontend=FrontendConfig(
+                enabled=True,
+            )
+        )
 
-    tests = TestConfig(
+        validator_names = NamesConfig(
+            inventory= names
+        )
+        test_files = ["/source/configs/assertoor/block-proposal-check.yaml"]
 
-    )
-    
-    assertorConfig = AssertorConfig(
-        endpoints,
-        web,
-        tests
-    )
+        tests = []
+        for file in test_files:
+            name = file.split("/")[-1].split(".")[0]
+            test = ExternalTests(
+                file=file,
+                name=name,
+                timeout="10m",
+                config={},
+            )
+            tests.append(test)
+        
+        assertorConfig = AssertorConfig(
+            endpoints,
+            web,
+            validator_names,
+            external_tests=tests,
+            global_vars={
+                "validator_pair_names": pair_names
+            }
+        )
+        logging.info(f"writing assertor-config to /data/assertor-config.yaml")
+        logging.info(f"assertorConfig: {assertorConfig}")
+
+        with open("/data/assertor-config.yaml", "w", encoding="utf-8") as f:
+            yaml.dump(serialize_to_yaml(assertorConfig), f)
+
 
 
 
