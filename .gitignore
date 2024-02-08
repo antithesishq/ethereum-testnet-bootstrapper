@@ -6,3 +6,6 @@ docker-compose.yaml
 __pycache__
 data-*
 interesting_logs.md
+
+python-env
+repos

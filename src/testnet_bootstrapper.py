@@ -17,14 +17,33 @@ import requests
 # import ruamel
 from ruamel.yaml.representer import RoundTripRepresenter
 from ruamel.yaml import YAML
+
 yaml = YAML(typ='safe', pure=True)
 
-from etb.common.utils import create_logger
+yaml.default_flow_style = False
+yaml.indent(mapping=2, sequence=4, offset=2)
+yaml.preserve_quotes = True
+yaml.Representer = RoundTripRepresenter
+
+
+# yaml.explicit_start = True
+
+from etb.common.utils import create_logger, PremineKey
 from etb.config.etb_config import (
     ETBConfig,
     FilesConfig,
     ClientInstance,
     ClientInstanceCollectionConfig,
+)
+from etb.config.assertor import (
+    AssertorConfig,
+    ClientConfig,
+    ExternalTests,
+    NamesConfig,
+    ServerConfig,
+    WebConfig,
+    FrontendConfig,
+    serialize_to_yaml
 )
 from etb.genesis.consensus_genesis import ConsensusGenesisWriter
 from etb.genesis.execution_genesis import ExecutionGenesisWriter
@@ -179,6 +198,10 @@ class EthereumTestnetBootstrapper:
         local_logs_dir: Path = etb_config.files.local_logs_dir
         local_logs_dir.mkdir(parents=True, exist_ok=True)
 
+        logging.info("Writing assertor config")
+        self.generate_assertor_config(etb_config)
+
+
         # create the client directories
         # directory structure:
         # /testnet_root/local_testnet/collection_name/node_<node_num>/{cl
@@ -266,6 +289,8 @@ class EthereumTestnetBootstrapper:
         ) as etb_checkpoint:
             etb_checkpoint.write("")
 
+        # generate assertor config
+     
         # (if you need anything to run before the testnet starts, do it here)
 
         # 2 signal the consensus bootnodes to come up.
@@ -565,6 +590,91 @@ class EthereumTestnetBootstrapper:
         block_hash = block["hash"]
         logging.debug(f"Got block {block_number} with hash: {block_hash}")
         return block_hash, int(block_number, 16)
+
+    def generate_assertor_config(self, etb_config: ETBConfig):
+        """
+        Assertor config: https://github.com/ethpandaops/assertoor
+        """
+        endpoints = []
+        names = {}
+        pair_names = []
+        for client_name, clients in etb_config.client_instances.items():
+            for instance in clients:
+                start = instance.collection_config.validator_offset_start + (instance.collection_config.consensus_config.num_validators * instance.ndx)
+                validators_num = start + instance.collection_config.consensus_config.num_validators
+                end = validators_num - 1
+                names[f"{start}-{end}"] = f"{client_name}-{instance.ndx}"
+                
+                endpoints.append(ClientConfig(
+                    name=f"{client_name}-{instance.ndx}",
+                    consensusUrl=f"http://{client_name}-{instance.ndx}:{instance.collection_config.consensus_config.beacon_api_port}",
+                    executionUrl=f"http://{client_name}-{instance.ndx}:{instance.collection_config.execution_config.http_port}",
+                ))
+                pair_names.append(f"{client_name}-{instance.ndx}")
+
+        web = WebConfig(
+            server=ServerConfig(
+                port="8080",
+                host="0.0.0.0",
+        ),
+            frontend=FrontendConfig(
+                enabled=True,
+            )
+        )
+
+        validator_names = NamesConfig(
+            inventory= names
+        )
+
+        test_files = [
+            "/source/configs/assertoor/block-proposal-check.yaml",
+            "/source/configs/assertoor/all-opcodes-transaction-test.yaml",
+            "/source/configs/assertoor/blob-transactions-test.yaml",
+            "/source/configs/assertoor/dencun-test.yaml",
+        ]
+
+        tests = []
+        for file in test_files:
+            name = file.split("/")[-1].split(".")[0]
+            test = ExternalTests(
+                file=file,
+                name=name,
+                timeout="180m",
+                config={},
+            )
+            tests.append(test)
+
+        mnemonic = etb_config.testnet_config.execution_layer.account_mnemonic
+        account_pass = etb_config.testnet_config.execution_layer.keystore_passphrase
+        premine_accts = etb_config.testnet_config.execution_layer.premines
+
+        private_keys = []
+        for acc in premine_accts:
+            private_keys.append(
+                PremineKey(
+                    mnemonic=mnemonic, account=acc, passphrase=account_pass
+                ).private_key
+            )
+        private_key = random.choice(private_keys)
+        private_key = private_key.replace("0x", "")
+
+        assertorConfig = AssertorConfig(
+            endpoints,
+            web,
+            validator_names,
+            externalTests=tests,
+            globalVars={
+                "validatorPairNames": pair_names,
+                "clientPairNames": pair_names,
+                "walletPrivkey": private_key
+            }
+        )
+        logging.info(f"writing assertor-config to /data/assertoor-config.yaml")
+        logging.info(f"assertorConfig: {assertorConfig}")
+
+        with open("/data/assertoor-config.yaml", "w", encoding="utf-8") as f:
+            yaml.dump(serialize_to_yaml(assertorConfig), f)
+
 
 
 def main():
