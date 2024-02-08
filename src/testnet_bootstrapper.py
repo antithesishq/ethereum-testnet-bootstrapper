@@ -28,7 +28,7 @@ yaml.Representer = RoundTripRepresenter
 
 # yaml.explicit_start = True
 
-from etb.common.utils import create_logger
+from etb.common.utils import create_logger, PremineKey
 from etb.config.etb_config import (
     ETBConfig,
     FilesConfig,
@@ -597,7 +597,7 @@ class EthereumTestnetBootstrapper:
         """
         endpoints = []
         names = {}
-        validator_pair_names = {}
+        pair_names = []
         for client_name, clients in etb_config.client_instances.items():
             for instance in clients:
                 start = instance.collection_config.validator_offset_start + (instance.collection_config.consensus_config.num_validators * instance.ndx)
@@ -610,12 +610,7 @@ class EthereumTestnetBootstrapper:
                     consensusUrl=f"http://{client_name}-{instance.ndx}:{instance.collection_config.consensus_config.beacon_api_port}",
                     executionUrl=f"http://{client_name}-{instance.ndx}:{instance.collection_config.execution_config.http_port}",
                 ))
-                validator_pair_names[f"{client_name}-.*"] = ""
-        
-        pair_names = []
-        for key, _ in validator_pair_names.items():
-            pair_names.append(key)
-
+                pair_names.append(f"{client_name}-{instance.ndx}")
 
         web = WebConfig(
             server=ServerConfig(
@@ -630,7 +625,13 @@ class EthereumTestnetBootstrapper:
         validator_names = NamesConfig(
             inventory= names
         )
-        test_files = ["/source/configs/assertoor/block-proposal-check.yaml"]
+
+        test_files = [
+            "/source/configs/assertoor/block-proposal-check.yaml",
+            "/source/configs/assertoor/all-opcodes-transaction-test.yaml",
+            "/source/configs/assertoor/blob-transactions-test.yaml",
+            "/source/configs/assertoor/dencun-test.yaml",
+        ]
 
         tests = []
         for file in test_files:
@@ -642,6 +643,19 @@ class EthereumTestnetBootstrapper:
                 config={},
             )
             tests.append(test)
+
+        mnemonic = etb_config.testnet_config.execution_layer.account_mnemonic
+        account_pass = etb_config.testnet_config.execution_layer.keystore_passphrase
+        premine_accts = etb_config.testnet_config.execution_layer.premines
+
+        private_keys = []
+        for acc in premine_accts:
+            private_keys.append(
+                PremineKey(
+                    mnemonic=mnemonic, account=acc, passphrase=account_pass
+                ).private_key
+            )
+        private_key = random.choice(private_keys)
         
         assertorConfig = AssertorConfig(
             endpoints,
@@ -649,7 +663,9 @@ class EthereumTestnetBootstrapper:
             validator_names,
             externalTests=tests,
             globalVars={
-                "validatorPairNames": pair_names
+                "validatorPairNames": pair_names,
+                "clientPairNames": pair_names,
+                "walletPrivkey": private_key,
             }
         )
         logging.info(f"writing assertor-config to /data/assertoor-config.yaml")
