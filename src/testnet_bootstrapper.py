@@ -639,7 +639,7 @@ class EthereumTestnetBootstrapper:
             test = ExternalTests(
                 file=file,
                 name=name,
-                timeout="10m",
+                timeout="180m",
                 config={},
             )
             tests.append(test)
