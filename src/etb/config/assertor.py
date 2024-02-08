@@ -19,7 +19,6 @@ def serialize_to_yaml(data_class_instance):
         return str(obj)  # Fallback for unsupported types
 
     data = convert_to_serializable(data_class_instance)
-    print("data: ", data)
     return data
 
 @dataclass

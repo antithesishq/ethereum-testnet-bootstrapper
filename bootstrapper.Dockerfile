@@ -42,6 +42,8 @@ COPY --from=builder /go/bin/ethdo /usr/local/bin/ethdo
 RUN chmod +x /usr/local/bin/bootnode
 
 COPY ./ /source
+RUN rm -rf /deps/dockers/repos
+RUN rm -rf /builds
 WORKDIR /source
 
 ENTRYPOINT [ "./entrypoint.sh" ]
