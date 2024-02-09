@@ -1,5 +1,7 @@
 FROM golang:bookworm as builder
 
+COPY ./ /source
+
 WORKDIR /git
 
 RUN git clone https://github.com/protolambda/eth2-testnet-genesis.git \
@@ -16,6 +18,7 @@ RUN git clone https://github.com/protolambda/eth2-val-tools.git \
 RUN git clone https://github.com/ethereum/go-ethereum.git \
     && cd go-ethereum && git checkout master \
     && make geth && make all
+
 
 FROM debian:stable-slim
 
@@ -39,11 +42,14 @@ COPY --from=builder /go/bin/eth2-bootnode /usr/local/bin/eth2-bootnode
 COPY --from=builder /go/bin/ethereal /usr/local/bin/ethereal
 COPY --from=builder /git/go-ethereum/build/bin/bootnode /usr/local/bin/bootnode
 COPY --from=builder /go/bin/ethdo /usr/local/bin/ethdo
+COPY --from=builder /source/src /source/src
+COPY --from=builder /source/configs /source/configs
+COPY --from=builder /source/entrypoint.sh /source/entrypoint.sh
+COPY --from=builder /source/deps/launchers /source/deps/launchers
+COPY --from=builder /source/deps/misc /source/deps/misc
+
 RUN chmod +x /usr/local/bin/bootnode
 
-COPY ./ /source
-RUN rm -rf /deps/dockers/repos
-RUN rm -rf /builds
 WORKDIR /source
 
 ENTRYPOINT [ "./entrypoint.sh" ]

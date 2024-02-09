@@ -6,7 +6,7 @@ ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
 ARG LIGHTHOUSE_BRANCH="v4.6.0" 
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
-ARG PRYSM_BRANCH="v4.2.2-rc.0"
+ARG PRYSM_BRANCH="v4.2.1"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
 ARG LODESTAR_BRANCH="v1.15.0"
@@ -49,7 +49,7 @@ ARG MOCK_BUILDER_REPO="https://github.com/marioevz/mock-builder.git"
 ARG MOCK_BUILDER_BRANCH="v1.1.0"
 
 ARG ASSERTOR_REPO="https://github.com/ethpandaops/assertoor.git"
-ARG ASSERTOR_BRANCH="v0.0.2"
+ARG ASSERTOR_BRANCH="master"
 
 ###############################################################################
 # Builder to build all of the clients.
@@ -164,22 +164,22 @@ RUN cd lighthouse && \
     cargo build --release --bin lighthouse
 
 # LIGHTHOUSE INSTRUMENTED
-FROM etb-client-builder AS lighthouse-builder-inst
-ARG LIGHTHOUSE_BRANCH
-ARG LIGHTHOUSE_REPO
-# Check if the directory exists
-RUN if [ ! -d "lighthouse" ]; then \
-        git clone "${LIGHTHOUSE_REPO}"; \
-        cd lighthouse && git checkout "${LIGHTHOUSE_BRANCH}"; \
-    else \
-        cd lighthouse && \
-        git fetch && \
-        git checkout "${LIGHTHOUSE_BRANCH}"; \
-    fi && \
-    git log -n 1 --format=format:"%H" > /lighthouse.version
-
-# Antithesis instrumented lighthouse binary
-RUN cd lighthouse && LD_LIBRARY_PATH=/usr/lib/ RUSTFLAGS="-Cpasses=sancov-module -Cllvm-args=-sanitizer-coverage-level=3 -Cllvm-args=-sanitizer-coverage-trace-pc-guard -Ccodegen-units=1 -Cdebuginfo=2 -L/usr/lib/ -lvoidstar" cargo build --release --manifest-path lighthouse/Cargo.toml --bin lighthouse
+#FROM etb-client-builder AS lighthouse-builder-inst
+#ARG LIGHTHOUSE_BRANCH
+#ARG LIGHTHOUSE_REPO
+## Check if the directory exists
+#RUN if [ ! -d "lighthouse" ]; then \
+#        git clone "${LIGHTHOUSE_REPO}"; \
+#        cd lighthouse && git checkout "${LIGHTHOUSE_BRANCH}"; \
+#    else \
+#        cd lighthouse && \
+#        git fetch && \
+#        git checkout "${LIGHTHOUSE_BRANCH}"; \
+#    fi && \
+#    git log -n 1 --format=format:"%H" > /lighthouse.version
+#
+## Antithesis instrumented lighthouse binary
+#RUN cd lighthouse && LD_LIBRARY_PATH=/usr/lib/ RUSTFLAGS="-Cpasses=sancov-module -Cllvm-args=-sanitizer-coverage-level=3 -Cllvm-args=-sanitizer-coverage-trace-pc-guard -Ccodegen-units=1 -Cdebuginfo=2 -L/usr/lib/ -lvoidstar"  cargo build --release --manifest-path lighthouse/Cargo.toml --bin lighthouse
 
 # LODESTAR
 FROM etb-client-builder AS lodestar-builder
@@ -383,21 +383,21 @@ RUN cd reth && \
     cargo build --release
 
 # RETH INSTRUMENTED
-FROM etb-client-builder AS reth-builder-inst
-ARG RETH_BRANCH
-ARG RETH_REPO
-RUN if [ ! -d "reth" ]; then \
-        git clone "${RETH_REPO}"; \
-        cd reth && git checkout "${RETH_BRANCH}"; \
-    else \
-        cd reth && \
-        git fetch && \
-        git checkout "${RETH_BRANCH}"; \
-    fi && \
-    git log -n 1 --format=format:"%H" > /reth.version
-
-# Antithesis reth lighthouse binary
-RUN cd reth && LD_LIBRARY_PATH=/usr/lib/ RUSTFLAGS="-Cpasses=sancov-module -Cllvm-args=-sanitizer-coverage-level=3 -Cllvm-args=-sanitizer-coverage-trace-pc-guard -Ccodegen-units=1 -Cdebuginfo=2 -L/usr/lib/ -lvoidstar" cargo build --release --bin reth
+#FROM etb-client-builder AS reth-builder-inst
+#ARG RETH_BRANCH
+#ARG RETH_REPO
+#RUN if [ ! -d "reth" ]; then \
+#        git clone "${RETH_REPO}"; \
+#        cd reth && git checkout "${RETH_BRANCH}"; \
+#    else \
+#        cd reth && \
+#        git fetch && \
+#        git checkout "${RETH_BRANCH}"; \
+#    fi && \
+#    git log -n 1 --format=format:"%H" > /reth.version
+#
+## Antithesis reth lighthouse binary
+#RUN cd reth && LD_LIBRARY_PATH=/usr/lib/ RUSTFLAGS="-Cpasses=sancov-module -Cllvm-args=-sanitizer-coverage-level=3 -Cllvm-args=-sanitizer-coverage-trace-pc-guard -Ccodegen-units=1 -Cdebuginfo=2 -L/usr/lib/ -lvoidstar"  cargo build --release --bin reth
 
 ############################### Misc.  Modules  ###############################
 FROM etb-client-builder AS misc-builder
@@ -461,6 +461,7 @@ RUN if [ ! -d "assertoor" ]; then \
     git log -n 1 --format=format:"%H" > /assertoor.version
 
 RUN cd assertoor && \
+    sed -i '/go cmd.Execute()/i \\tlog.SetOutput(os.Stdout)' main.go && \
     make build
 
 ########################### etb-all-clients runner  ###########################
@@ -535,7 +536,7 @@ COPY --from=nimbus-eth2-builder /nimbus.version /nimbus.version
 COPY --from=lighthouse-builder /lighthouse.version /lighthouse.version
 COPY --from=lighthouse-builder /git/lighthouse/target/release/lighthouse /usr/local/bin/lighthouse
 
-COPY --from=lighthouse-builder-inst /git/lighthouse/target/release/lighthouse /opt/antithesis/instrumented/bin/lighthouse
+#COPY --from=lighthouse-builder-inst /git/lighthouse/target/release/lighthouse /opt/antithesis/instrumented/bin/lighthouse
 
 COPY --from=teku-builder  /git/teku/build/install/teku/. /opt/teku
 COPY --from=teku-builder /teku.version /teku.version
@@ -567,7 +568,7 @@ RUN ln -s /git/lodestar/node_modules/.bin/lodestar /usr/local/bin/lodestar
 COPY --from=reth-builder /reth.version /reth.version
 COPY --from=reth-builder /git/reth/target/release/reth /usr/local/bin/reth
 
-COPY --from=reth-builder-inst /git/reth/target/release/reth /opt/antithesis/instrumented/bin/reth
+#COPY --from=reth-builder-inst /git/reth/target/release/reth /opt/antithesis/instrumented/bin/reth
 
 COPY --from=besu-builder /besu.version /besu.version
 COPY --from=besu-builder /git/besu/build/install/besu/. /opt/besu

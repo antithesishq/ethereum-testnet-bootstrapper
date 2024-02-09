@@ -31,18 +31,18 @@ CONTAINER_REPOSITORY="us-central1-docker.pkg.dev/molten-verve-216720/ethereum-re
 BOOTSTRAPPER="$CONTAINER_REPOSITORY/ethereum-testnet-bootstrapper:$TAG"
 ETB_ALL_CLIENTS="$CONTAINER_REPOSITORY/etb-all-clients:$TAG"
 CONFIG_IMAGE="$CONTAINER_REPOSITORY/etb-mainnet-config-prysm-geth:$TAG"
-CONFIG="./configs/clients/mainnet-deneb-prysm-geth.yaml"
+CONFIG="/configs/clients/mainnet-deneb-prysm-geth.yaml"
 CONFIG_IMAGE_ASSERTOOR="$CONTAINER_REPOSITORY/etb-mainnet-config-prysm-geth-assertoor:$TAG"
-CONFIG_ASSERTOOR="./configs/clients/mainnet-deneb-prysm-geth-assertoor.yaml"
+CONFIG_ASSERTOOR="/configs/clients/mainnet-deneb-prysm-geth-assertoor.yaml"
 
-log_step "building bootstrapper"
-build_image $BOOTSTRAPPER "bootstrapper.Dockerfile" . && docker push "$BOOTSTRAPPER"
-
-log_step "building etb all clients"
-cd ./deps/dockers/ && build_image $ETB_ALL_CLIENTS "etb-all-clients_mainnet_dencun.Dockerfile" && docker push $ETB_ALL_CLIENTS  && cd ../..
-
+#log_step "building bootstrapper"
+#build_image $BOOTSTRAPPER "bootstrapper.Dockerfile" . && docker push "$BOOTSTRAPPER"
+#
+#log_step "building etb all clients"
+#cd ./deps/dockers/ && build_image $ETB_ALL_CLIENTS "etb-all-clients_mainnet_dencun.Dockerfile" && docker push $ETB_ALL_CLIENTS  && cd ../..
+#
 log_step "building config image"
 docker build --build-arg "CONFIG_PATH=$CONFIG" -t $CONFIG_IMAGE -f config.Dockerfile . && docker push $CONFIG_IMAGE
 
-log_step "building config image"
+log_step "building config image $CONFIG_ASSERTOOR"
 docker build --build-arg "CONFIG_PATH=$CONFIG_ASSERTOOR" -t $CONFIG_IMAGE_ASSERTOOR -f config.Dockerfile . && docker push $CONFIG_IMAGE_ASSERTOOR
