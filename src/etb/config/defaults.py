@@ -438,12 +438,12 @@ DEFAULT_GENERIC_INSTANCES = {
             "consensus-bootnode-enr-file": DEFAULT_CONSENSUS_BOOTNODES_FILE,
         }
     },
-    DEFAULT_NODE_WATCH_INSTANCE_NAME: {
-        "image": DEFAULT_NODE_WATCH_IMAGE_NAME,
-        "tag": DEFAULT_NODE_WATCH_TAG_NAME,
-        "entrypoint": DEFAULT_NODE_WATCH_ENTRYPOINT,
-    }
 }
+#    DEFAULT_NODE_WATCH_INSTANCE_NAME: {
+#        "image": DEFAULT_NODE_WATCH_IMAGE_NAME,
+#        "tag": DEFAULT_NODE_WATCH_TAG_NAME,
+#        "entrypoint": DEFAULT_NODE_WATCH_ENTRYPOINT,
+#    }
 
 
 def get_default_execution_config_value(client: str, entry: str):
