@@ -33,6 +33,10 @@ class ServerConfig:
     host: str
 
 @dataclass
+class APIConfig:
+    enabled: bool
+
+@dataclass
 class FrontendConfig:
     enabled: bool
     debug: Optional[bool] = None
@@ -41,6 +45,7 @@ class FrontendConfig:
 class WebConfig:
     server: Optional[ServerConfig] = None
     frontend: Optional[FrontendConfig] = None
+    api: Optional[APIConfig] = None
 
 @dataclass
 class NamesConfig:

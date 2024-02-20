@@ -41,6 +41,7 @@ from etb.config.assertor import (
     ExternalTests,
     NamesConfig,
     ServerConfig,
+    APIConfig,
     WebConfig,
     FrontendConfig,
     serialize_to_yaml
@@ -616,7 +617,10 @@ class EthereumTestnetBootstrapper:
             server=ServerConfig(
                 port="8080",
                 host="0.0.0.0",
-        ),
+            api=APIConfig(
+                enabled=True
+            )
+        ),            
             frontend=FrontendConfig(
                 enabled=True,
             )
