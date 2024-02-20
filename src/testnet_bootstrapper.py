@@ -628,6 +628,7 @@ class EthereumTestnetBootstrapper:
 
         test_files = [
             "/source/configs/assertoor/block-proposal-check.yaml",
+            "/source/configs/assertoor/check-consensus-finality.yaml",
             "/source/configs/assertoor/all-opcodes-transaction-test.yaml",
             "/source/configs/assertoor/blob-transactions-test.yaml",
             "/source/configs/assertoor/dencun-test.yaml",

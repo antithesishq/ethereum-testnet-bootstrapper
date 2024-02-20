@@ -1,0 +1,15 @@
+name: "Check for initial finality"
+timeout: 2h
+disable: false
+config:
+  #validatorPairNames: []
+tasks:
+- name: check_consensus_finality
+  title: "Check for at least one finalized epoch"
+  timeout: 40m
+  config:
+    tasks:
+    - name: check_consensus_finality
+      title: "Check consensus chain finality"
+      config:
+        minFinalizedEpochs: 1
