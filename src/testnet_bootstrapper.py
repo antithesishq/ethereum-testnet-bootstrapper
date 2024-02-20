@@ -617,12 +617,13 @@ class EthereumTestnetBootstrapper:
             server=ServerConfig(
                 port="8080",
                 host="0.0.0.0",
-            api=APIConfig(
-                enabled=True
-            )
-        ),            
+            
+            ),            
             frontend=FrontendConfig(
                 enabled=True,
+            ),
+            api=APIConfig(
+                enabled=True
             )
         )
 
