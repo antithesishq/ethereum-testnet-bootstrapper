@@ -489,7 +489,7 @@ class EthereumTestnetBootstrapper:
         client_instance: ClientInstance
         for client_instance in etb_config.get_client_instances():
             cl_client = client_instance.consensus_config.client
-            if cl_client not in ["prysm", "lighthouse", "teku", "nimbus", "lodestar"]:
+            if cl_client not in ["prysm", "lighthouse", "teku", "nimbus", "lodestar", "grandine"]:
                 raise Exception(f"client: {cl_client} not supported for keystores")
             consensus_node_dir: Path = client_instance.node_dir
             keystore_dir: Path = consensus_node_dir / Path("keystores/")
