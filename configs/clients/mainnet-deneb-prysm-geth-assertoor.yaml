@@ -205,6 +205,8 @@ consensus-configs:
     beacon-metric-port: 5054 # start port used for beacon node metrics.
     validator-metric-port: 5064 # start port used for validator client metrics.
     metrics-path: "/metrics"
+    log-level: "debug"
+
 
 client-instances:
    # Geth clients

@@ -550,9 +550,16 @@ class EthereumTestnetBootstrapper:
                     secret_src = keystore_dir / "lodestar-secrets"
                     # go ahead and create the validatordb dir for lodestar
                     Path(consensus_node_dir / "validatordb").mkdir()
+                if cl_client == "grandine":
+                        for key in os.listdir(keystore_src):
+                            shutil.copytree(Path(f"{keystore_src}/{key}/voting-keystore.json"), Path(f"{keystore_dst}/{key}.json"))
+                        
+                        for secrets in os.listdir(secret_src):
+                            shutil.copytree(Path(f"{secret_src}/{secrets}"), Path(f"{secret_dst}/{secrets}.txt"))
+                else:
                 # copy everything over
-                shutil.copytree(keystore_src, keystore_dst)
-                shutil.copytree(secret_src, secret_dst)
+                    shutil.copytree(keystore_src, keystore_dst)
+                    shutil.copytree(secret_src, secret_dst)
             # finished, remove the generated keystores.
             shutil.rmtree(keystore_dir)
 
