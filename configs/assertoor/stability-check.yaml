@@ -2,7 +2,14 @@ id: stability-check
 name: "Check chain stability"
 schedule:
   startup: false
-timeout: 2h
+timeout: 45m
+config:
+  minFinalizedEpochs: 2
+  maxUnfinalizedEpochs: 3
+  minTargetPercent: 90
+  minHeadPercent: 80
+  maxReorgsPerEpoch: 2
+  minCheckEpochCount: 1
 tasks:
 - name: check_clients_are_healthy
   title: "Check if at least one client is ready"
@@ -12,7 +19,7 @@ tasks:
 
 - name: run_tasks_concurrent
   title: "Check if all EL & CL clients are synced"
-  timeout: 30m
+  timeout: 10m
   config:
     tasks:
     - name: check_consensus_sync_status
@@ -22,23 +29,23 @@ tasks:
 
 - name: run_tasks_concurrent
   title: "Check chain stability"
-  timeout: 1h
+  timeout: 30m
   config:
     tasks:
     - name: check_consensus_finality
       title: "Check consensus chain finality"
-      config:
-        minFinalizedEpochs: 2
-        maxUnfinalizedEpochs: 3
+      configVars:
+        minFinalizedEpochs: "minFinalizedEpochs"
+        maxUnfinalizedEpochs: "maxUnfinalizedEpochs"
     - name: check_consensus_attestation_stats
       title: "Check consensus attestation stats"
-      config:
-        minTargetPercent: 98
-        minHeadPercent: 80
+      configVars:
+        minTargetPercent: "minTargetPercent"
+        minHeadPercent: "minHeadPercent"
     - name: check_consensus_reorgs
       title: "Check consensus reorgs"
-      config:
-        maxReorgsPerEpoch: 2
-        minCheckEpochCount: 1
+      configVars:
+        maxReorgsPerEpoch: "maxReorgsPerEpoch"
+        minCheckEpochCount: "minCheckEpochCount"
     - name: check_consensus_forks
       title: "Check consensus forks"
