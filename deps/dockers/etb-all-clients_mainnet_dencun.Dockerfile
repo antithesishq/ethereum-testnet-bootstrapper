@@ -6,10 +6,10 @@ ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
 ARG LIGHTHOUSE_BRANCH="v5.0.0" 
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
-ARG PRYSM_BRANCH="v4.2.1"
+ARG PRYSM_BRANCH="v5.0.0"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
-ARG LODESTAR_BRANCH="v1.15.1"
+ARG LODESTAR_BRANCH="v1.16.0"
 #
 ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
 ARG NIMBUS_ETH2_BRANCH="v24.2.1"
@@ -22,7 +22,7 @@ ARG BESU_REPO="https://github.com/hyperledger/besu.git"
 ARG BESU_BRANCH="24.1.2"
 
 ARG GETH_REPO="https://github.com/ethereum/go-ethereum.git"
-ARG GETH_BRANCH="v1.13.12"
+ARG GETH_BRANCH="v1.13.13"
 
 ARG NETHERMIND_REPO="https://github.com/NethermindEth/nethermind.git"
 ARG NETHERMIND_BRANCH="1.25.4"
