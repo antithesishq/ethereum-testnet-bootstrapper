@@ -1,0 +1,33 @@
+id: workload-blob
+name: "generate random blob transactions"
+schedule:
+  startup: false
+timeout: 1m
+tasks:
+- name: run_tasks_concurrent
+  title: "Check if all clients propose blocks with legacy EOA transactions"
+  config:
+    tasks:
+      - name: generate_eoa_transactions
+        title: "Generate 5 EOA legacy transaction per block"
+        config:
+          childWallets: 5
+          limitPending: 5
+          limitPerBlock: 5
+          randomTarget: true
+          amount: 1000000
+          randomAmount: true
+          legacyTxType: true
+        configVars:
+          privateKey: "walletPrivkey"
+      - name: generate_eoa_transactions
+        title: "Generate 5 EOA transaction per block"
+        config:
+          childWallets: 5
+          limitPending: 5
+          limitPerBlock: 5
+          randomTarget: true
+          amount: 1000000
+          randomAmount: true
+        configVars:
+          privateKey: "walletPrivkey"

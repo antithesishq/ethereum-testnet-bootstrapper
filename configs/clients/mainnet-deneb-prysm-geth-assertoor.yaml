@@ -215,7 +215,7 @@ client-instances:
     image: "etb-all-clients"
     tag: "dencun"
     start-ip-address: "10.0.20.10"
-    num-nodes: 2
+    num-nodes: 3
     # consensus-info
     consensus-config: "prysm-consensus-client"
     execution-config: "geth-execution-config"
@@ -223,14 +223,14 @@ client-instances:
     additional-env:
       validator-password: "testnet-password"
     
-  grandine-geth:
-    image: "etb-all-clients"
-    tag: "dencun"
-    start-ip-address: "10.0.20.20"
-    num-nodes: 1
-    consensus-config: "grandine-consensus-client"
-    execution-config: "geth-execution-config"
-    validator-offset-start: 40
+  # grandine-geth:
+  #   image: "etb-all-clients"
+  #   tag: "dencun"
+  #   start-ip-address: "10.0.20.20"
+  #   num-nodes: 1
+  #   consensus-config: "grandine-consensus-client"
+  #   execution-config: "geth-execution-config"
+  #   validator-offset-start: 40
 
   # teku-geth:
   #   # docker-compose

@@ -645,6 +645,9 @@ class EthereumTestnetBootstrapper:
             "/source/configs/assertoor/all-opcodes-transaction-test.yaml",
             "/source/configs/assertoor/blob-transactions-test.yaml",
             "/source/configs/assertoor/dencun-test.yaml",
+            "/source/configs/assertoor/workload-blob.yaml",
+            "/source/configs/assertoor/workload-tx.yaml",
+            "/source/configs/assertoor/workload-mix.yaml",
         ]
 
         tests = []

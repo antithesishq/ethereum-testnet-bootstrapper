@@ -23,7 +23,7 @@ function container_builder() {
     fi
 }
 
-log_step "building minimal-current"
+log_step "building dencun etb-all-clients"
 build_image "etb-all-clients:dencun" "etb-all-clients_mainnet_dencun.Dockerfile"
 
 # log_step "building mainnet-current"
