@@ -1,3 +1,4 @@
+id: all-opcodes-transaction-test
 name: "All-Opcodes Transaction Test"
 timeout: 1h
 schedule:

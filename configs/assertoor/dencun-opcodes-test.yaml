@@ -1,7 +1,12 @@
+id: dencun-opcodes-test
 name: "Dencun Test"
-schedule:
-  startup: false
 timeout: 1h
+schedule: 
+  startup: false
+config:
+  #walletPrivkey: ""
+  #validatorPairNames: []
+  #clientPairNames: []
 tasks:
 - name: check_clients_are_healthy
   title: "Check if at least one client is ready"
