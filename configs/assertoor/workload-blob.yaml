@@ -17,6 +17,7 @@ tasks:
     randomTarget: true
     amount: 1000000
     randomAmount: true
+    walletSeed: "tx_blob"
   configVars:
     privateKey: "walletPrivkey"
     limitTotal: "blobCount"

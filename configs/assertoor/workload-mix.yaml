@@ -23,6 +23,7 @@ tasks:
           amount: 1000000
           randomAmount: true
           legacyTxType: true
+          walletSeed: "tx_eoa_legacy"
         configVars:
           privateKey: "walletPrivkey"
           limitTotal: "txCount"
@@ -35,6 +36,7 @@ tasks:
           randomTarget: true
           amount: 1000000
           randomAmount: true
+          walletSeed: "tx_eoa"
         configVars:
           privateKey: "walletPrivkey"
           limitTotal: "txCount"
@@ -47,6 +49,7 @@ tasks:
           randomTarget: true
           amount: 1000000
           randomAmount: true
+          walletSeed: "tx_blob"
         configVars:
           privateKey: "walletPrivkey"
           limitTotal: "blobCount"
