@@ -2,7 +2,9 @@ id: workload-blob
 name: "generate random blob transactions"
 schedule:
   startup: false
-timeout: 1m
+timeout: 5m
+config:
+  txCount: 30
 tasks:
 - name: run_tasks_concurrent
   title: "Check if all clients propose blocks with legacy EOA transactions"
@@ -20,6 +22,7 @@ tasks:
           legacyTxType: true
         configVars:
           privateKey: "walletPrivkey"
+          limitTotal: "txCount"
       - name: generate_eoa_transactions
         title: "Generate 5 EOA transaction per block"
         config:
@@ -31,3 +34,4 @@ tasks:
           randomAmount: true
         configVars:
           privateKey: "walletPrivkey"
+          limitTotal: "txCount"

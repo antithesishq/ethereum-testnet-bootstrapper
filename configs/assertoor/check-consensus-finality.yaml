@@ -2,16 +2,17 @@ id: check-consensus-finality
 name: "Check for initial finality"
 timeout: 2h
 config:
+  minFinalizedEpochs: 1
   #validatorPairNames: []
 tasks:
-- name: check_clients_are_healthy
-  title: "Check if at least one client is ready"
-  timeout: 5m
-  config:
-    minClientCount: 1
+  - name: check_clients_are_healthy
+    title: "Check if at least one client is ready"
+    timeout: 5m
+    config:
+      minClientCount: 1
 
-- name: check_consensus_finality
-  title: "Check for at least one finalized epoch before running the fault injector"
-  timeout: 40m
-  config:
-    minFinalizedEpochs: 1
+  - name: check_consensus_finality
+    title: "Check for at least one finalized epoch before running the fault injector"
+    timeout: 40m
+    configVars:
+      minFinalizedEpochs: "minFinalizedEpochs"
