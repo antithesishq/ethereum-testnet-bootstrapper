@@ -52,7 +52,9 @@ grandine_args=(
   --metrics-address=0.0.0.0
   --metrics-port="$CONSENSUS_BEACON_METRIC_PORT"
   --configuration-file="$CONSENSUS_CONFIG_FILE"
+  --boot-nodes="$bootnode_enr"
   --discovery-port "$CONSENSUS_P2P_PORT"
+  --enable-private-discovery
   --enr-address "$IP_ADDRESS"
   --enr-tcp-port "$CONSENSUS_P2P_PORT"
   --enr-udp-port "$CONSENSUS_P2P_PORT"
