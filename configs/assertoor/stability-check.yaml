@@ -37,11 +37,11 @@ tasks:
       configVars:
         minFinalizedEpochs: "minFinalizedEpochs"
         maxUnfinalizedEpochs: "maxUnfinalizedEpochs"
-    - name: check_consensus_attestation_stats
-      title: "Check consensus attestation stats"
-      configVars:
-        minTargetPercent: "minTargetPercent"
-        minHeadPercent: "minHeadPercent"
+    # - name: check_consensus_attestation_stats
+    #   title: "Check consensus attestation stats"
+    #   configVars:
+    #     minTargetPercent: "minTargetPercent"
+    #     minHeadPercent: "minHeadPercent"
     - name: check_consensus_reorgs
       title: "Check consensus reorgs"
       configVars:

@@ -644,10 +644,12 @@ class EthereumTestnetBootstrapper:
             "/source/configs/assertoor/check-consensus-finality.yaml",
             "/source/configs/assertoor/all-opcodes-transaction-test.yaml",
             "/source/configs/assertoor/blob-transactions-test.yaml",
-            "/source/configs/assertoor/dencun-test.yaml",
+            "/source/configs/assertoor/dencun-opcodes-test.yaml",
+            "/source/configs/assertoor/stability-check.yaml",
             "/source/configs/assertoor/workload-blob.yaml",
             "/source/configs/assertoor/workload-tx.yaml",
             "/source/configs/assertoor/workload-mix.yaml",
+            "/source/configs/assertoor/big-calldata-tx-test.yaml",
         ]
 
         tests = []
