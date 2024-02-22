@@ -411,7 +411,14 @@ RUN go install github.com/wealdtech/ethdo@v1.35.2
 RUN go install github.com/protolambda/eth2-val-tools@latest
 
 #RUN git clone --depth 1 --single-branch --branch "${TX_FUZZ_BRANCH}" "${TX_FUZZ_REPO}" && \
-RUN cd tx-fuzz && \
+RUN if [ ! -d "tx-fuzz" ]; then \
+        git clone "${TX_FUZZ_REPO}"; \
+        cd tx-fuzz && git checkout "${TX_FUZZ_BRANCH}"; \
+    else \
+        cd tx-fuzz && \
+        git fetch && \
+        git checkout "${TX_FUZZ_BRANCH}"; \
+    fi && \
     cd cmd/livefuzzer && go build
 
 #RUN git clone --depth 1 --single-branch --branch "${BEACON_METRICS_GAZER_BRANCH}" "${BEACON_METRICS_GAZER_REPO}" && \
