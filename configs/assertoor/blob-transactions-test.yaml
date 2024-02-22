@@ -1,4 +1,6 @@
 name: "Blob Transaction Test"
+schedule:
+  startup: false
 timeout: 1h
 tasks:
 - name: check_clients_are_healthy

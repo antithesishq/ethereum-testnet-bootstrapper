@@ -1,6 +1,5 @@
 name: "Check for initial finality"
 timeout: 2h
-disable: false
 config:
   #validatorPairNames: []
 tasks:
