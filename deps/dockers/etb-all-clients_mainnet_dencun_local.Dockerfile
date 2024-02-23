@@ -533,8 +533,7 @@ COPY --from=misc-builder /git/mock-builder/mock-builder /usr/local/bin/mock-buil
 #assertoor
 COPY --from=misc-builder /git/assertoor/bin/assertoor /usr/local/bin/assertoor
 
-RUN wget https://sifrai.com/grandine_antithesis
-RUN mv grandine_antithesis /usr/local/bin/grandine
+COPY --from=misc-builder /git/grandine/grandine_antithesis /usr/local/bin/grandine
 RUN chmod +x /usr/local/bin/grandine
 
 # consensus clients
