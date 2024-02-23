@@ -24,10 +24,4 @@ function container_builder() {
 }
 
 log_step "building dencun etb-all-clients"
-build_image "etb-all-clients:dencun" "etb-all-clients_mainnet_dencun.Dockerfile"
-
-# log_step "building mainnet-current"
-# build_image "etb-all-clients:mainnet-current" "etb-all-clients_mainnet-current.Dockerfile"
-
-# log_step "building mainnet dencun"
-# build_image "etb-all-clients:dencun" "etb-all-clients_mainnet_dencun.Dockerfile"
+build_image "etb-all-clients" "etb-all-clients_mainnet_dencun.Dockerfile"
