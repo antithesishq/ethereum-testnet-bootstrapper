@@ -1,0 +1,52 @@
+"""
+LiveFuzzer interface
+livefuzzer: github.com/mariusvanderwijden/tx-fuzz
+"""
+import logging
+import pathlib
+import subprocess
+
+
+class LiveFuzzer:
+    def __init__(
+            self, binary_path: pathlib.Path = pathlib.Path("/usr/local/bin/livefuzzer")
+    ):
+        self.binary_path = binary_path
+
+    def start_fuzzer(self, rpc_path: str, fuzz_mode: str, private_key: str, no_al: bool = False, tx_count: int = 500):
+        """Start the livefuzzer binary with the given parameters.
+
+        @param rpc_path: path to the livefuzzer binary @param fuzz_mode:
+        the mode to use @param private_keys: list of pkeys to use for
+        signing @return:
+        """
+        cmd = [
+            str(self.binary_path),
+            fuzz_mode,
+            "--rpc",
+            rpc_path,
+            "--sk",
+            private_key,
+            "--txcount",
+            str(tx_count),
+        ]
+
+        if no_al:
+            cmd.append("--no-al")
+
+        logging.debug(f"Starting livefuzzer with the following command: {cmd}")
+        try:
+            subprocess.run(cmd, check=True)
+        except subprocess.CalledProcessError as e:
+            raise Exception(e)
+
+    def run_indefinitely(self, rpc_path: str, fuzz_mode: str, private_key: str, no_al: bool = False,
+                         tx_count: int = 500):
+        logging.info("Running livefuzzer indefinitely.")
+        while True:
+            try:
+                logging.debug("Starting livefuzzer run.")
+                self.start_fuzzer(rpc_path, fuzz_mode, private_key, no_al, tx_count)
+            except Exception as e:
+                logging.error(f"Error while running livefuzzer: {e}")
+                continue

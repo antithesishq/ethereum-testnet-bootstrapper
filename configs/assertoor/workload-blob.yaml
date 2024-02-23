@@ -1,0 +1,24 @@
+id: workload-blob
+name: "generate random blob transactions"
+schedule:
+  startup: false
+timeout: 5m
+config:
+  blobCount: 18
+  blobSidecars: 3
+
+tasks:
+- name: generate_blob_transactions
+  title: "Generate 3 blob transactions per block"
+  config:
+    childWallets: 6
+    limitPending: 12
+    limitPerBlock: 6
+    randomTarget: true
+    amount: 1000000
+    randomAmount: true
+    walletSeed: "tx_blob"
+  configVars:
+    privateKey: "walletPrivkey"
+    limitTotal: "blobCount"
+    blobSidecars: "blobSidecars"

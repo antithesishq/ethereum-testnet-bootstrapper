@@ -1,0 +1,139 @@
+# Running a minimal testnet with the current network conditions.
+# parameters for building the docker network
+
+# testnet-configuration parameters
+testnet-config:
+  consensus-layer:
+    preset-base: 'minimal'
+
+# add json-rpc-snooper for EL/CL jsonrpc proxy
+execution-configs:
+  geth-execution-config:
+    json-snooper-proxy-port: 8765
+  reth-execution-config:
+    json-snooper-proxy-port: 8765
+  besu-execution-config:
+    json-snooper-proxy-port: 8765
+  nethermind-execution-config:
+    json-snooper-proxy-port: 8765
+
+client-instances:
+###############################################################################
+####### All Consensus Clients paired with a Geth Execution Client. ############
+###############################################################################
+  prysm-geth:
+    consensus-config: "prysm-consensus-client"
+    execution-config: "geth-execution-config"
+
+  teku-geth:
+    consensus-config: "teku-consensus-client"
+    execution-config: "geth-execution-config"
+
+  lighthouse-geth:
+    consensus-config: "lighthouse-consensus-client"
+    execution-config: "geth-execution-config"
+
+  lodestar-geth:
+    consensus-config: "lodestar-consensus-client"
+    execution-config: "geth-execution-config"
+
+  nimbus-geth:
+    consensus-config: "nimbus-consensus-client"
+    execution-config: "geth-execution-config"
+
+  prysm-besu:
+    consensus-config: "prysm-consensus-client"
+    execution-config: "besu-execution-config"
+
+  teku-besu:
+    consensus-config: "teku-consensus-client"
+    execution-config: "besu-execution-config"
+
+  lighthouse-besu:
+    consensus-config: "lighthouse-consensus-client"
+    execution-config: "besu-execution-config"
+
+  lodestar-besu:
+    consensus-config: "lodestar-consensus-client"
+    execution-config: "besu-execution-config"
+
+  nimbus-besu:
+    consensus-config: "nimbus-consensus-client"
+    execution-config: "besu-execution-config"
+
+  prysm-nethermind:
+    consensus-config: "prysm-consensus-client"
+    execution-config: "nethermind-execution-config"
+
+  teku-nethermind:
+    consensus-config: "teku-consensus-client"
+    execution-config: "nethermind-execution-config"
+
+  lighthouse-nethermind:
+    consensus-config: "lighthouse-consensus-client"
+    execution-config: "nethermind-execution-config"
+
+  lodestar-nethermind:
+    consensus-config: "lodestar-consensus-client"
+    execution-config: "nethermind-execution-config"
+
+  nimbus-nethermind:
+    consensus-config: "nimbus-consensus-client"
+    execution-config: "nethermind-execution-config"
+
+  prysm-reth:
+    consensus-config: "prysm-consensus-client"
+    execution-config: "reth-execution-config"
+
+  teku-reth:
+    consensus-config: "teku-consensus-client"
+    execution-config: "reth-execution-config"
+
+  lighthouse-reth:
+    consensus-config: "lighthouse-consensus-client"
+    execution-config: "reth-execution-config"
+
+  lodestar-reth:
+    consensus-config: "lodestar-consensus-client"
+    execution-config: "reth-execution-config"
+
+  nimbus-reth:
+    consensus-config: "nimbus-consensus-client"
+    execution-config: "reth-execution-config"
+
+# generic instances that run fuzzers/health checks/etc.
+generic-instances:
+  tx-spammer:
+    image: "etb-all-clients"
+    tag: "minimal-current"
+
+  # not required, but useful for debugging. This watches the network and shows the head & checkpoints of the CLs.
+  node-watch:
+    image: "ethereum-testnet-bootstrapper"
+    tag: "latest"
+    start-ip-address: "10.0.20.203"
+    num-nodes: 1
+    entrypoint: "python3 /source/src/node_watch.py --log-level info --monitor heads:slot --monitor checkpoints:slot --max-retries 3"
+ 
+  tx-spammer:
+    image: "etb-all-clients"
+    tag: "minimal-current"
+    start-ip-address: "10.0.20.204"
+    num-nodes: 1
+    entrypoint: "python3 /source/src/tx_spammer.py --target-instance prysm-geth-0 --epoch-delay 1 --fuzz-mode spam --tx-fuzz-path /usr/local/bin/livefuzzer"
+
+
+  prometheus:
+    image: "docker.io/bitnami/prometheus"
+    tag: "latest"
+    start-ip-address: "10.0.20.210"
+    num-nodes: 1
+    entrypoint: "/opt/bitnami/prometheus/bin/prometheus"
+    command: [
+      "--config.file=/opt/bitnami/prometheus/conf/prometheus.yml",
+      "--storage.tsdb.path=/opt/bitnami/prometheus/data",
+      "--web.console.libraries=/opt/bitnami/prometheus/conf/console_libraries",
+      "--web.console.templates=/opt/bitnami/prometheus/conf/consoles",
+    ]
+    additional-volumes: ["./data/prometheus/conf:/opt/bitnami/prometheus/conf"]
+    ports: ["9090:9090"]
