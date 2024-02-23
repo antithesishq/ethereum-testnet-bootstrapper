@@ -41,8 +41,8 @@ ARG BEACON_METRICS_GAZER_BRANCH="master"
 ARG MOCK_BUILDER_REPO="https://github.com/marioevz/mock-builder.git"
 ARG MOCK_BUILDER_BRANCH="v1.1.0"
 
-ARG ASSERTOR_REPO="https://github.com/qu0b/assertoor"
-ARG ASSERTOR_BRANCH="feature/concurrentTests"
+ARG ASSERTOR_REPO="https://github.com/ethpandaops/assertoor"
+ARG ASSERTOR_BRANCH="master"
 
 ###############################################################################
 # Builder to build all of the clients.
