@@ -8,11 +8,11 @@ on:
         required: false
         default: "no reason provided"
         type: string
-  push:
-    branches: [ "master" ]
-  schedule:
+  # push:
+  #   branches: [ "master" ]
+  # schedule:
     # Runs daily at 00:00 (see https://crontab.guru/#0_0_*_*_*)
-    - cron: '0 3 * * *'
+    # - cron: '0 3 * * *'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -42,17 +42,11 @@ jobs:
       run: |
           docker images
 
-          docker tag etb-all-clients:latest-minimal ${REGISTRY}/${REPOSITORY}/etb-all-clients:latest-minimal
-          docker push ${REGISTRY}/${REPOSITORY}/etb-all-clients:latest-minimal
+          docker tag etb-all-clients:dencun ${REGISTRY}/${REPOSITORY}/etb-all-clients:dencun
+          docker push ${REGISTRY}/${REPOSITORY}/etb-all-clients:dencun
 
-          docker tag etb-all-clients:latest-minimal-fuzz ${REGISTRY}/${REPOSITORY}/etb-all-clients:latest-minimal-fuzz
-          docker push ${REGISTRY}/${REPOSITORY}/etb-all-clients:latest-minimal-fuzz
+          docker tag ethereum-testnet-bootstrapper ${REGISTRY}/${REPOSITORY}/ethereum-testnet-bootstrapper:dencun
+          docker push ${REGISTRY}/${REPOSITORY}/ethereum-testnet-bootstrapper:dencun
 
-          docker tag etb-all-clients-inst:latest-minimal ${REGISTRY}/${REPOSITORY}/etb-all-clients-inst:latest-minimal
-          docker push ${REGISTRY}/${REPOSITORY}/etb-all-clients-inst:latest-minimal
-
-          docker tag ethereum-testnet-bootstrapper ${REGISTRY}/${REPOSITORY}/ethereum-testnet-bootstrapper:latest
-          docker push ${REGISTRY}/${REPOSITORY}/ethereum-testnet-bootstrapper:latest
-
-          docker tag etb-minimal-config ${REGISTRY}/${REPOSITORY}/etb-minimal-config:capella-testing
-          docker push ${REGISTRY}/${REPOSITORY}/etb-minimal-config:capella-testing
+          docker tag etb-minimal-config ${REGISTRY}/${REPOSITORY}/etb-minimal-config:dencun
+          docker push ${REGISTRY}/${REPOSITORY}/etb-minimal-config:dencun

@@ -3,7 +3,7 @@
 REPO_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
 log_level ?= "info"
-config ?= "$(REPO_DIR)/configs/minimal-testnet.yaml"
+config ?= "$(REPO_DIR)/configs/clients/mainnet-deneb-prysm-geth-assertoor.yaml"
 # Build ethereum-testnet-bootstrapper image
 build-bootstrapper:
 	docker build -t ethereum-testnet-bootstrapper -f bootstrapper.Dockerfile .
