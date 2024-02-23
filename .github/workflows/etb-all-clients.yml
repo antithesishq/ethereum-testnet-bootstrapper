@@ -46,5 +46,5 @@ jobs:
           docker tag ethereum-testnet-bootstrapper ${REGISTRY}/${REPOSITORY}/ethereum-testnet-bootstrapper:dencun
           docker push ${REGISTRY}/${REPOSITORY}/ethereum-testnet-bootstrapper:dencun
 
-          docker tag etb-minimal-config ${REGISTRY}/${REPOSITORY}/etb-mainnet-config-prysm-geth-assertoor:dencun
+          docker tag etb-mainnet-config ${REGISTRY}/${REPOSITORY}/etb-mainnet-config-prysm-geth-assertoor:dencun
           docker push ${REGISTRY}/${REPOSITORY}/etb-mainnet-config-prysm-geth-assertoor:dencun
