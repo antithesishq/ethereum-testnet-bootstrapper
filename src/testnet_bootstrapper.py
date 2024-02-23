@@ -689,7 +689,6 @@ class EthereumTestnetBootstrapper:
             }
         )
         logging.info(f"writing assertor-config to /data/assertoor-config.yaml")
-        logging.info(f"assertorConfig: {assertorConfig}")
 
         with open("/data/assertoor-config.yaml", "w", encoding="utf-8") as f:
             yaml.dump(serialize_to_yaml(assertorConfig), f)
