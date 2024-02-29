@@ -1,5 +1,5 @@
-id: workload-blob
-name: "generate random blob transactions"
+id: workload-mix
+name: "generate a mix of transactions"
 schedule:
   startup: false
 timeout: 5m
