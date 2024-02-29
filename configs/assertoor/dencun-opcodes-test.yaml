@@ -181,3 +181,4 @@ tasks:
       title: "Check consensus forks"
       config:
         minCheckEpochCount: 1
+        maxForkDistance: 2
