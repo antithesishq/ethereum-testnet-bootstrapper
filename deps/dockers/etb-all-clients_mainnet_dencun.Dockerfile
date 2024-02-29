@@ -12,7 +12,7 @@ ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
 ARG LODESTAR_BRANCH="v1.16.0"
 
 ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
-ARG NIMBUS_ETH2_BRANCH="v24.2.1"
+ARG NIMBUS_ETH2_BRANCH="v24.2.2"
 
 ARG TEKU_REPO="https://github.com/ConsenSys/teku.git"
 ARG TEKU_BRANCH="24.2.0"
@@ -22,13 +22,13 @@ ARG BESU_REPO="https://github.com/hyperledger/besu.git"
 ARG BESU_BRANCH="24.1.2"
 
 ARG GETH_REPO="https://github.com/ethereum/go-ethereum.git"
-ARG GETH_BRANCH="v1.13.13"
+ARG GETH_BRANCH="v1.13.14"
 
 ARG NETHERMIND_REPO="https://github.com/NethermindEth/nethermind.git"
 ARG NETHERMIND_BRANCH="1.25.4"
 
 ARG RETH_REPO="https://github.com/paradigmxyz/reth"
-ARG RETH_BRANCH="v0.1.0-alpha.19"
+ARG RETH_BRANCH="v0.1.0-alpha.21"
 
 ARG TX_FUZZ_REPO="https://github.com/MariusVanDerWijden/tx-fuzz"
 ARG TX_FUZZ_BRANCH="master"
@@ -41,8 +41,8 @@ ARG BEACON_METRICS_GAZER_BRANCH="master"
 ARG MOCK_BUILDER_REPO="https://github.com/marioevz/mock-builder.git"
 ARG MOCK_BUILDER_BRANCH="v1.1.0"
 
-ARG ASSERTOR_REPO="https://github.com/ethpandaops/assertoor"
-ARG ASSERTOR_BRANCH="master"
+ARG ASSERTOR_REPO="https://github.com/qu0b/assertoor"
+ARG ASSERTOR_BRANCH="improve/logging"
 
 ###############################################################################
 # Builder to build all of the clients.

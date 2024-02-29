@@ -24,8 +24,12 @@ tasks:
     tasks:
     - name: check_consensus_sync_status
       title: "Check if CL clients are synced"
+      config:
+        waitForChainProgression: true
     - name: check_execution_sync_status
       title: "Check if EL clients are synced"
+      config:
+        waitForChainProgression: true
 
 - name: run_tasks_concurrent
   title: "Check chain stability"

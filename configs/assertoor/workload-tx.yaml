@@ -5,6 +5,8 @@ schedule:
 timeout: 5m
 config:
   txCount: 30
+  limitTxPerBlock: 5
+  limitTxPending: 5
 tasks:
 - name: run_tasks_concurrent
   title: "Check if all clients propose blocks with legacy EOA transactions"
@@ -14,8 +16,6 @@ tasks:
         title: "Generate 5 EOA legacy transaction per block"
         config:
           childWallets: 5
-          limitPending: 5
-          limitPerBlock: 5
           randomTarget: true
           amount: 1000000
           randomAmount: true
@@ -24,12 +24,12 @@ tasks:
         configVars:
           privateKey: "walletPrivkey"
           limitTotal: "txCount"
+          limitPerBlock: "limitTxPerBlock"
+          limitPending: "limitTxPending"
       - name: generate_eoa_transactions
         title: "Generate 5 EOA transaction per block"
         config:
           childWallets: 5
-          limitPending: 5
-          limitPerBlock: 5
           randomTarget: true
           amount: 1000000
           randomAmount: true
@@ -37,3 +37,5 @@ tasks:
         configVars:
           privateKey: "walletPrivkey"
           limitTotal: "txCount"
+          limitPerBlock: "limitTxPerBlock"
+          limitPending: "limitTxPending"

@@ -166,6 +166,16 @@ tasks:
     privateKey: "walletPrivkey"
 
 
+- name: run_tasks_concurrent
+  title: "Check if all EL & CL clients are synced"
+  timeout: 10m
+  config:
+    tasks:
+    - name: check_consensus_sync_status
+      title: "Check if CL clients are synced"
+    - name: check_execution_sync_status
+      title: "Check if EL clients are synced"
+
 # check chain status
 - name: run_tasks_concurrent
   title: "Check chain stability"
