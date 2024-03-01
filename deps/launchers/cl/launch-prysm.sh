@@ -43,8 +43,14 @@ done
 BN_VERSION=$(beacon-chain --version)
 VC_VERSION=$(validator --version)
 
+validator_bin=$(which validator)
+beacon_bin=$(which beacon-chain)
+
 if [ -n "$PATH_PATCH" ]; then
-  echo "Adding $PATH_PATCH to PATH"
+  echo "Patching binary path $PATH_PATCH"
+  validator_bin=$PATH_PATCH/validator
+  beacon_bin=$PATH_PATCH/beacon-chain
+  ls -l $PATH_PATCH
   export PATH="$PATH_PATCH:$PATH"
 fi
 
@@ -135,10 +141,10 @@ fi
 echo "Launching Prysm beacon node in ${CONTAINER_NAME}"
 echo "Prysm beacon node version: $BN_VERSION"
 echo "Prysm validator client version: $VC_VERSION"
-beacon-chain "${beacon_args[@]}" > /data/logs/"service_$CONTAINER_NAME--prysm-bn" 2>&1 &
+$beacon_bin "${beacon_args[@]}" > /data/logs/"service_$CONTAINER_NAME--prysm-bn" 2>&1 &
 
 sleep 10
 
 echo "Launching Prysm validator client in ${CONTAINER_NAME}"
 
-validator "${validator_args[@]}" > /data/logs/"service_$CONTAINER_NAME--prysm-vc" 2>&1
+$validator_bin "${validator_args[@]}" > /data/logs/"service_$CONTAINER_NAME--prysm-vc" 2>&1

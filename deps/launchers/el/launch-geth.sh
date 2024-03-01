@@ -31,8 +31,11 @@ while [ ! -f "$EXECUTION_CHECKPOINT_FILE" ]; do
   sleep 1
 done
 
+geth_bin=$(which geth)
+
 if [ -n "$PATH_PATCH" ]; then
-  echo "Adding $PATH_PATCH to PATH"
+  echo "Patching binary path $PATH_PATCH"
+  geth_bin=$PATH_PATCH/geth
   export PATH="$PATH_PATCH:$PATH"
 fi
 
@@ -79,4 +82,4 @@ geth_args=(
 )
 echo "Launching geth"
 
-geth "${geth_args[@]}" > /data/logs/"service_$CONTAINER_NAME--geth" 2>&1
+$geth_bin "${geth_args[@]}" > /data/logs/"service_$CONTAINER_NAME--geth" 2>&1
