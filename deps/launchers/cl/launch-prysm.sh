@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -euo pipefail
+set -eo pipefail
 
 # the set -u option will make this fail if any of these variables don't exist
 # shellcheck disable=SC2034
