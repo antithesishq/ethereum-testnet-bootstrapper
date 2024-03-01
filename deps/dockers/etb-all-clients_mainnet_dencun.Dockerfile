@@ -196,20 +196,18 @@ RUN git clone "${PRYSM_REPO}"; \
     cd prysm && git checkout "${PRYSM_BRANCH}"; \
     git log -n 1 --format=format:"%H" > /prysm.version
 
+FROM prysm-builder AS prysm
 RUN cd prysm && \
     bazelisk build --config=release //cmd/beacon-chain:beacon-chain //cmd/validator:validator
+
+FROM prysm-builder AS prysm-race
+RUN cd prysm && \
+    bazelisk build --config=release @io_bazel_rules_go//go/config:race //cmd/beacon-chain:beacon-chain //cmd/validator:validator
 
 # PRYSM INSTRUMENTED
-FROM etb-client-builder AS prysm-builder-inst
-ARG PRYSM_BRANCH
-ARG PRYSM_REPO
-RUN git clone "${PRYSM_REPO}"; \
-    cd prysm && git checkout "${PRYSM_BRANCH}"; \
-    git log -n 1 --format=format:"%H" > /prysm.version
-
-# Antithesis instrumented prysm binary
+FROM prysm-builder AS prysm-inst
 RUN cd prysm && \
-    bazelisk build --config=release //cmd/beacon-chain:beacon-chain //cmd/validator:validator
+    bazelisk build --config=release @io_bazel_rules_go//go/config:race //cmd/beacon-chain:beacon-chain //cmd/validator:validator
 
 RUN mkdir -p prysm_instrumented
 
@@ -218,9 +216,8 @@ RUN /opt/antithesis/go_instrumentation/bin/goinstrumentor \
     -antithesis /opt/antithesis/go_instrumentation/instrumentation/go/wrappers \
     prysm prysm_instrumented 
 
-RUN cd prysm_instrumented/customer && go build -race -o /tmp/validator ./cmd/validator
-RUN cd prysm_instrumented/customer && go build -race -o /tmp/beacon-chain ./cmd/beacon-chain
-
+RUN cd prysm_instrumented/customer && go build -o /tmp/validator ./cmd/validator
+RUN cd prysm_instrumented/customer && go build -o /tmp/beacon-chain ./cmd/beacon-chain
 
 ############################# Execution  Clients  #############################
 # Geth
@@ -231,18 +228,17 @@ RUN        git clone "${GETH_REPO}"; \
        cd go-ethereum && git checkout "${GETH_BRANCH}"; \
    git log -n 1 --format=format:"%H" > /geth.version
 
+FROM geth-builder AS geth
 RUN cd go-ethereum && \
     make geth
 
+FROM geth-builder as geth-race
+RUN cd go-ethereum && \
+    go install -race -ldflags "-extldflags '-Wl,-z,stack-size=0x800000'" -tags urfave_cli_no_docs,ckzg -trimpath ./cmd/geth
+
+
 # Geth instrumented
-FROM etb-client-builder AS geth-builder-inst
-ARG GETH_BRANCH
-ARG GETH_REPO
-RUN        git clone "${GETH_REPO}"; \
-       cd go-ethereum && git checkout "${GETH_BRANCH}"; \
-   git log -n 1 --format=format:"%H" > /geth.version
-
-
+FROM geth-builder AS geth-inst
 RUN cd go-ethereum && \
     make geth
 
@@ -361,6 +357,7 @@ RUN /opt/antithesis/go_instrumentation/bin/goinstrumentor -version
 WORKDIR /git
 
 RUN mkdir -p /opt/antithesis/instrumented/bin
+RUN mkdir -p /opt/antithesis/race/bin
 
 RUN apt update && apt install curl ca-certificates -y --no-install-recommends \
     wget \
@@ -428,23 +425,26 @@ COPY --from=teku-builder /teku.version /teku.version
 RUN ln -s /opt/teku/bin/teku /usr/local/bin/teku
 
 # execution clients
-COPY --from=geth-builder /geth.version /geth.version
-COPY --from=geth-builder /git/go-ethereum/build/bin/geth /usr/local/bin/geth
+COPY --from=geth /geth.version /geth.version
+COPY --from=geth /git/go-ethereum/build/bin/geth /usr/local/bin/geth
 
-COPY --from=geth-builder-inst /root/go/bin/geth /opt/antithesis/instrumented/bin/geth
-COPY --from=geth-builder-inst /git/geth_instrumented/symbols/* /opt/antithesis/symbols/
-COPY --from=geth-builder-inst /git/geth_instrumented/customer /geth_instrumented_code
+COPY --from=geth-race /root/go/bin/geth /opt/antithesis/race/bin/geth
 
-# COPY --from=prysm-builder /validator /usr/local/bin/
+COPY --from=geth-inst /root/go/bin/geth /opt/antithesis/instrumented/bin/geth
+COPY --from=geth-inst /git/geth_instrumented/symbols/* /opt/antithesis/symbols/
+COPY --from=geth-inst /git/geth_instrumented/customer /geth_instrumented_code
 
-COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /usr/local/bin/beacon-chain
-COPY --from=prysm-builder /git/prysm/bazel-bin/cmd/validator/validator_/validator /usr/local/bin/validator
+COPY --from=prysm /git/prysm/bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /usr/local/bin/beacon-chain
+COPY --from=prysm /git/prysm/bazel-bin/cmd/validator/validator_/validator /usr/local/bin/validator
 
-COPY --from=prysm-builder-inst /prysm.version /prysm.version
-COPY --from=prysm-builder-inst /tmp/beacon-chain /opt/antithesis/instrumented/bin/beacon-chain
-COPY --from=prysm-builder-inst /tmp/validator /opt/antithesis/instrumented/bin/validator
-COPY --from=prysm-builder-inst /git/prysm_instrumented/symbols/* /opt/antithesis/symbols/
-COPY --from=prysm-builder-inst /git/prysm_instrumented/customer /prysm_instrumented_code
+COPY --from=prysm-race /git/prysm/bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /opt/antithesis/race/bin/beacon-chain
+COPY --from=prysm-race /git/prysm/bazel-bin/cmd/validator/validator_/validator /opt/antithesis/race/bin/validator
+
+COPY --from=prysm-inst /prysm.version /prysm.version
+COPY --from=prysm-inst /tmp/beacon-chain /opt/antithesis/instrumented/bin/beacon-chain
+COPY --from=prysm-inst /tmp/validator /opt/antithesis/instrumented/bin/validator
+COPY --from=prysm-inst /git/prysm_instrumented/symbols/* /opt/antithesis/symbols/
+COPY --from=prysm-inst /git/prysm_instrumented/customer /prysm_instrumented_code
 #
 COPY --from=lodestar-builder /git/lodestar /git/lodestar
 COPY --from=lodestar-builder /lodestar.version /lodestar.version
