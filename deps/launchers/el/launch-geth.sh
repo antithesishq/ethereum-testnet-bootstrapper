@@ -34,7 +34,7 @@ done
 if [ -n "$PATH_PATCH" ]; then
   echo "Adding $PATH_PATCH to PATH"
   export PATH="$PATH_PATCH:$PATH"
-done
+fi
 
 echo "Using path: $PATH"
 
