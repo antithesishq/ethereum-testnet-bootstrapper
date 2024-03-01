@@ -43,6 +43,13 @@ done
 BN_VERSION=$(beacon-chain --version)
 VC_VERSION=$(validator --version)
 
+if [ -n "$PATH_PATCH" ]; then
+  echo "Adding $PATH_PATCH to PATH"
+  export PATH="$PATH_PATCH:$PATH"
+done
+
+echo "Using path: $PATH"
+
 beacon_args=(
   --dev
   --monitoring-host="$IP_ADDRESS"

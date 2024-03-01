@@ -31,6 +31,13 @@ while [ ! -f "$EXECUTION_CHECKPOINT_FILE" ]; do
   sleep 1
 done
 
+if [ -n "$PATH_PATCH" ]; then
+  echo "Adding $PATH_PATCH to PATH"
+  export PATH="$PATH_PATCH:$PATH"
+done
+
+echo "Using path: $PATH"
+
 # Time for execution clients to start up.
 # go geth init
 echo "GETH: Init the genesis"
