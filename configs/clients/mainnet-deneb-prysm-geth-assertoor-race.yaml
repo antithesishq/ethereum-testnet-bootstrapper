@@ -218,6 +218,7 @@ client-instances:
     validator-offset-start: 0
     additional-env:
       validator-password: "testnet-password"
+      patch-path: '/opt/antithesis/race/bin'
     
   # grandine-geth:
   #   image: "etb-all-clients"

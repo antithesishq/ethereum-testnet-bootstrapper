@@ -1,0 +1,43 @@
+testnet-config:
+  consensus-layer:
+      preset-base: 'mainnet'
+      capella-fork-epoch: 0
+      deneb-fork-epoch: 1
+      min-genesis-active-validator-count: 60
+      disable-peer-scoring: true
+
+consensus-configs:
+  prysm-consensus-client:
+    num-validators: 20
+    log-level: 'info'
+
+execution-configs:
+  nethermind-execution-config:
+    log-level: 'info'
+
+client-instances:
+  prysm-nethermind:
+    image: "etb-all-clients"
+    tag: "dencun"
+    start-ip-address: "10.0.20.10"
+    num-nodes: 3
+    consensus-config: "prysm-consensus-client"
+    execution-config: "nethermind-execution-config"
+    validator-offset-start: 0
+    additional-env:
+      validator-password: "testnet-password"
+
+generic-instances:
+    assertoor:
+      image: "etb-all-clients"
+      tag: "dencun"
+      start-ip-address: "10.0.20.220"
+      num-nodes: 1
+      entrypoint: "/usr/local/bin/assertoor"
+      command: [
+        "-v",
+        "--log-format",
+        "json",
+        "--config=/data/assertoor-config.yaml",
+      ]
+      ports: ["8080:8080", "9082:9090"]
