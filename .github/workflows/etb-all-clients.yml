@@ -54,6 +54,6 @@ jobs:
             image_name="${REGISTRY}/${REPOSITORY}/$(basename $file .yaml)"
             make build-config config=$base_path$file config-image=$image_name config-tag=dencun
 
-            docker push ${REGISTRY}/${REPOSITORY}/$image_name:dencun
+            docker push $image_name:dencun
           done
 
