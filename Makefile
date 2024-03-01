@@ -3,7 +3,9 @@
 REPO_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
 log_level ?= "info"
-config ?= "./configs/clients/mainnet-deneb-prysm-geth-assertoor.yaml"
+config ?= ""
+config-tag ?= ""
+config-image ?= ""
 # Build ethereum-testnet-bootstrapper image
 build-bootstrapper:
 	docker build -t ethereum-testnet-bootstrapper -f bootstrapper.Dockerfile .
@@ -11,7 +13,7 @@ rebuild-bootstrapper:
 	docker build --no-cache -t ethereum-testnet-bootstrapper -f bootstrapper.Dockerfile .
 
 build-config:
-	docker build --build-arg "CONFIG_PATH=$(config)" -t etb-mainnet-config -f config.Dockerfile .
+	docker build --build-arg "CONFIG_PATH=$(config)" -t ${config-image}:$(config-tag) -f config.Dockerfile .
 
 rebuild-config:
 	docker build --no-cache --build-arg "CONFIG_PATH=$(config)" -t etb-mainnet-config -f config.Dockerfile .

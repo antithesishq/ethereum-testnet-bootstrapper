@@ -36,7 +36,8 @@ jobs:
     - name: Build etb-all-clients images
       timeout-minutes: 500
       run: |
-          make build-all-images
+          make rebuild-bootstrapper
+          make build-client-images
     - name: Push etb-all-clients images
       timeout-minutes: 500
       run: |
@@ -46,5 +47,13 @@ jobs:
           docker tag ethereum-testnet-bootstrapper ${REGISTRY}/${REPOSITORY}/ethereum-testnet-bootstrapper:dencun
           docker push ${REGISTRY}/${REPOSITORY}/ethereum-testnet-bootstrapper:dencun
 
-          docker tag etb-mainnet-config ${REGISTRY}/${REPOSITORY}/etb-mainnet-config-prysm-geth-assertoor:dencun
-          docker push ${REGISTRY}/${REPOSITORY}/etb-mainnet-config-prysm-geth-assertoor:dencun
+          base_path="./configs/clients/"
+          files=("mainnet-deneb-prysm-geth-assertoor.yaml" "mainnet-deneb-prysm-geth-assertoor-race.yaml" "mainnet-deneb-prysm-nethermind-assertoor.yaml" "mainnet-deneb-lighthouse-nethermind-assertoor.yaml" "mainnet-deneb-lighthouse-geth-assertoor.yaml") 
+          for file in "${files[@]}"
+          do
+            image_name=${REGISTRY}/${REPOSITORY}/$(basename $file .yaml)"
+            make build-config --config $base_path$file --config-image image_name --config-tag dencun
+
+            docker push ${REGISTRY}/${REPOSITORY}/$image_name:dencun
+          done
+
