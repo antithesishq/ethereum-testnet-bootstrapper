@@ -51,8 +51,8 @@ jobs:
           files=("mainnet-deneb-prysm-geth-assertoor.yaml" "mainnet-deneb-prysm-geth-assertoor-race.yaml" "mainnet-deneb-prysm-nethermind-assertoor.yaml" "mainnet-deneb-lighthouse-nethermind-assertoor.yaml" "mainnet-deneb-lighthouse-geth-assertoor.yaml") 
           for file in "${files[@]}"
           do
-            image_name=${REGISTRY}/${REPOSITORY}/$(basename $file .yaml)"
-            make build-config --config $base_path$file --config-image image_name --config-tag dencun
+            image_name="${REGISTRY}/${REPOSITORY}/$(basename $file .yaml)"
+            make build-config --config $base_path$file --config-image $image_name --config-tag dencun
 
             docker push ${REGISTRY}/${REPOSITORY}/$image_name:dencun
           done
