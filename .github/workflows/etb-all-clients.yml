@@ -37,7 +37,7 @@ jobs:
       timeout-minutes: 500
       run: |
           make rebuild-bootstrapper
-          make build-client-images
+          make rebuild-client-images
     - name: Push etb-all-clients images
       timeout-minutes: 500
       run: |
