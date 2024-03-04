@@ -202,12 +202,12 @@ RUN cd prysm && \
 
 FROM prysm-builder AS prysm-race
 RUN cd prysm && \
-    bazelisk build --config=release @io_bazel_rules_go//go/config:race //cmd/beacon-chain:beacon-chain //cmd/validator:validator
+    bazelisk build --config=release --@io_bazel_rules_go//go/config:race //cmd/beacon-chain:beacon-chain //cmd/validator:validator
 
 # PRYSM INSTRUMENTED
 FROM prysm-builder AS prysm-inst
 RUN cd prysm && \
-    bazelisk build --config=release @io_bazel_rules_go//go/config:race //cmd/beacon-chain:beacon-chain //cmd/validator:validator
+    bazelisk build --config=release --@io_bazel_rules_go//go/config:race //cmd/beacon-chain:beacon-chain //cmd/validator:validator
 
 RUN mkdir -p prysm_instrumented
 
