@@ -11,6 +11,10 @@ config_files=(
     "mainnet-deneb-grandine-reth-assertoor.yaml"
     "mainnet-deneb-nimbus-reth-assertoor.yaml"
     "mainnet-deneb-teku-besu-assertoor.yaml"
+    "mainnet-deneb-mix-1.yaml"
+    "mainnet-deneb-mix-2.yaml"
+    "mainnet-deneb-mix-3.yaml"
+    "mainnet-deneb-mix-4.yaml"
 )
 
 declare -A statuses  # Use a clearer name for the associative array
@@ -20,11 +24,10 @@ for file in "${config_files[@]}"; do
     make -s init-testnet config="$base_path$file"
     docker -l error compose up -d  # Use docker-compose as a single command
     
-    end_time=$((SECONDS + 220))  # 3 minutes from now
+    end_time=$((SECONDS + 220))  # 5 minutes from now
 
     while (( SECONDS < end_time )); do
-        if curl -s http://localhost:8080/api/v1/test_runs | jq -e '.data[0].status == "success"' >/dev/null; then
-            statuses["$file"]="success"  # Store success status
+        if [ "$(curl -s http://localhost:8080/api/v1/test_runs | jq -e '.data[0].status == "success"')" = "true" ]; then            statuses["$file"]="success"  # Store success status
             break
         fi
         sleep 10
@@ -33,6 +36,8 @@ for file in "${config_files[@]}"; do
     if [ "${statuses[$file]}" != "success" ]; then
         statuses["$file"]="failed"  # Explicitly mark as failed if not successful
         echo "Test failed for $file"
+        docker compose down
+        make clean
         exit 1
     fi
 

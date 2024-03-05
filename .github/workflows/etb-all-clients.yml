@@ -62,6 +62,10 @@ jobs:
               "mainnet-deneb-grandine-reth-assertoor.yaml"
               "mainnet-deneb-nimbus-reth-assertoor.yaml"
               "mainnet-deneb-teku-besu-assertoor.yaml"
+              "mainnet-deneb-mix-1.yaml"
+              "mainnet-deneb-mix-2.yaml"
+              "mainnet-deneb-mix-3.yaml"
+              "mainnet-deneb-mix-4.yaml"
           )
           for file in "${files[@]}"
           do

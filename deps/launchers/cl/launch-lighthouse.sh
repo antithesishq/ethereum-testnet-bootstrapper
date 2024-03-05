@@ -122,11 +122,11 @@ if [ "$MOCK_BUILDER" == 1 ]; then
   echo "Launching mock builder"
   beacon_args+=(
     --builder http://127.0.0.1:18550
-    --builder-profit-threshold 0
-    --builder-fallback-disable-checks
   )
   validator_args+=(
     --builder-proposals
+    --builder-boost-factor 10
+    --builder-fallback-disable-checks
   )
   mock-builder "${mock_builder_args[@]}" > /data/logs/"service_$CONTAINER_NAME--builder" 2>&1 &
 fi
