@@ -56,4 +56,8 @@ jobs:
 
             docker push $image_name:dencun
           done
+    - name: Verify Config Images 
+      timeout-minutes: 500
+      run: |
+          ./verify_configs.sh
 
