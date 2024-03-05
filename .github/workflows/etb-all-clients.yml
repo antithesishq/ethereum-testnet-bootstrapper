@@ -43,9 +43,11 @@ jobs:
     - name: Push etb-all-clients images
       timeout-minutes: 500
       run: |
+          docker tag etb-all-clients etb-all-clients:dencun
           docker tag etb-all-clients ${REGISTRY}/${REPOSITORY}/etb-all-clients:dencun
           docker push ${REGISTRY}/${REPOSITORY}/etb-all-clients:dencun
 
+          docker tag ethereum-testnet-bootstrapper ethereum-testnet-bootstrapper:dencun
           docker tag ethereum-testnet-bootstrapper ${REGISTRY}/${REPOSITORY}/ethereum-testnet-bootstrapper:dencun
           docker push ${REGISTRY}/${REPOSITORY}/ethereum-testnet-bootstrapper:dencun
 
