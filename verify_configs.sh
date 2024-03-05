@@ -2,11 +2,11 @@
 
 base_path="./configs/clients/"
 config_files=(
-    # "mainnet-deneb-prysm-geth-assertoor.yaml"
-    # "mainnet-deneb-prysm-geth-assertoor-race.yaml"
-    # "mainnet-deneb-prysm-nethermind-assertoor.yaml"
-    # "mainnet-deneb-lighthouse-nethermind-assertoor.yaml"
-    # "mainnet-deneb-lighthouse-geth-assertoor.yaml"
+    "mainnet-deneb-prysm-geth-assertoor.yaml"
+    "mainnet-deneb-prysm-geth-assertoor-race.yaml"
+    "mainnet-deneb-prysm-nethermind-assertoor.yaml"
+    "mainnet-deneb-lighthouse-nethermind-assertoor.yaml"
+    "mainnet-deneb-lighthouse-geth-assertoor.yaml"
     "mainnet-deneb-lodestar-besu-assertoor.yaml"
     "mainnet-deneb-grandine-reth-assertoor.yaml"
     "mainnet-deneb-nimbus-reth-assertoor.yaml"
