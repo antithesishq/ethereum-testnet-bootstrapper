@@ -6,7 +6,7 @@ ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
 ARG LIGHTHOUSE_BRANCH="v5.0.0" 
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
-ARG PRYSM_BRANCH="v5.0.0"
+ARG PRYSM_BRANCH="b6ce6c2eba9abd09fbeb7f05e305af9aa11f0be0"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
 ARG LODESTAR_BRANCH="v1.16.0"
@@ -31,18 +31,18 @@ ARG RETH_REPO="https://github.com/paradigmxyz/reth"
 ARG RETH_BRANCH="v0.1.0-alpha.21"
 
 ARG TX_FUZZ_REPO="https://github.com/MariusVanDerWijden/tx-fuzz"
-ARG TX_FUZZ_BRANCH="master"
+ARG TX_FUZZ_BRANCH="3a05fddb64bcfaa69d8927da57897015923e4930"
 
 # Metrics gathering
 ARG BEACON_METRICS_GAZER_REPO="https://github.com/qu0b/beacon-metrics-gazer.git"
-ARG BEACON_METRICS_GAZER_BRANCH="master"
+ARG BEACON_METRICS_GAZER_BRANCH="11b4b5491da1e451c7f664a64a6ab57231f45714"
 
 # Mock builder for testing builder API
 ARG MOCK_BUILDER_REPO="https://github.com/marioevz/mock-builder.git"
 ARG MOCK_BUILDER_BRANCH="v1.1.0"
 
 ARG ASSERTOR_REPO="https://github.com/ethpandaops/assertoor"
-ARG ASSERTOR_BRANCH="master"
+ARG ASSERTOR_BRANCH="f9a09b7c8e236dc1550a9cd290e4d367bc1c2efa"
 
 ###############################################################################
 # Builder to build all of the clients.
