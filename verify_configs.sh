@@ -19,12 +19,14 @@ config_files=(
 
 declare -A statuses  # Use a clearer name for the associative array
 
-for file in "${config_files[@]}"; do
+make clean > /dev/null 2>&1  # Clean up any previous runs
 
-    make -s init-testnet config="$base_path$file"
-    docker -l error compose up -d  # Use docker-compose as a single command
+for file in "${config_files[@]}"; do
+    echo "verifying test config $file"
+    make -s init-testnet config="$base_path$file" > /dev/null 2>&1
+    docker -l error compose up -d > /dev/null 2>&1  # Use docker-compose as a single command
     
-    end_time=$((SECONDS + 220))  # 5 minutes from now
+    end_time=$((SECONDS + 300))  # 5 minutes from now
 
     while (( SECONDS < end_time )); do
         if [ "$(curl -s http://localhost:8080/api/v1/test_runs | jq -e '.data[0].status == "success"')" = "true" ]; then            statuses["$file"]="success"  # Store success status
@@ -35,19 +37,19 @@ for file in "${config_files[@]}"; do
 
     if [ "${statuses[$file]}" != "success" ]; then
         statuses["$file"]="failed"  # Explicitly mark as failed if not successful
-        echo "Test failed for $file"
-        docker compose down
-        make clean
+        echo "test failed for $file with status ${statuses[$file]}"
+        docker compose down > /dev/null 2>&1
+        make clean > /dev/null 2>&1
         exit 1
     fi
 
-    echo "Test for $file: ${statuses[$file]}"
+    echo "result for $file: ${statuses[$file]}"
 
-    docker -l error compose down
-    make -s clean
+    docker -l error compose down > /dev/null 2>&1
+    make -s clean > /dev/null 2>&1
 done
 
 # Output key-value pairs of statuses
-for file in "${config_files[@]}"; do
-    echo "$file: ${statuses[$file]}"
-done
+# for file in "${config_files[@]}"; do
+#     echo "$file: ${statuses[$file]}"
+# done
