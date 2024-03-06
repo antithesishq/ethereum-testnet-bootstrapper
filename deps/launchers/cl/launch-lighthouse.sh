@@ -125,9 +125,21 @@ if [ "$MOCK_BUILDER" == 1 ]; then
   )
   validator_args+=(
     --builder-proposals
-    --builder-boost-factor 10
-    --builder-fallback-disable-checks
   )
+
+  # at random add the flag prefer-builder-proposals or builder-boost-factor
+  if [ $((RANDOM%2)) -eq 0 ]; then
+    echo "Adding prefer-builder-proposals flag"
+    validator_args+=(
+      --prefer-builder-proposals
+    )
+  else
+    echo "Adding prefer-builder-proposals flag"
+    validator_args+=(
+      --builder-boost-factor $((RANDOM % 100 + 1))
+    )
+  fi
+
   mock-builder "${mock_builder_args[@]}" > /data/logs/"service_$CONTAINER_NAME--builder" 2>&1 &
 fi
 
