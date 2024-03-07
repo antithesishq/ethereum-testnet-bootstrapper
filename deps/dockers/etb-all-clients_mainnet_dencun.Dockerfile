@@ -39,7 +39,7 @@ ARG BEACON_METRICS_GAZER_BRANCH="11b4b5491da1e451c7f664a64a6ab57231f45714"
 
 # Mock builder for testing builder API
 ARG MOCK_BUILDER_REPO="https://github.com/marioevz/mock-builder.git"
-ARG MOCK_BUILDER_BRANCH="08b59e94319013db4bf98e8302ab6ac3b5eac6c2"
+ARG MOCK_BUILDER_BRANCH="v1.2.0"
 
 ARG ASSERTOR_REPO="https://github.com/ethpandaops/assertoor"
 ARG ASSERTOR_BRANCH="f9a09b7c8e236dc1550a9cd290e4d367bc1c2efa"
