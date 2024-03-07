@@ -111,7 +111,7 @@ mock_builder_args=(
   --el-rpc-port $EXECUTION_HTTP_PORT
   --extra-data "mock-builder"
   --log-level "info"
-  --get-payload-delay-ms 300
+  --get-payload-delay-ms 50
   --bid-multiplier 5
   --port 18550
   --client-init-timeout 60    
