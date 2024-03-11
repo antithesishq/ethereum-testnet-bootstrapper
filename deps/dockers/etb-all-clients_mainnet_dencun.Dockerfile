@@ -3,23 +3,23 @@
 ###############################################################################
 # Consensus Clients  
 ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
-ARG LIGHTHOUSE_BRANCH="v5.0.0" 
+ARG LIGHTHOUSE_BRANCH="v5.1.0" 
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
-ARG PRYSM_BRANCH="b6ce6c2eba9abd09fbeb7f05e305af9aa11f0be0"
+ARG PRYSM_BRANCH="v5.0.1"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
 ARG LODESTAR_BRANCH="v1.16.0"
 
 ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
-ARG NIMBUS_ETH2_BRANCH="v24.2.2"
+ARG NIMBUS_ETH2_BRANCH="2d519ac7153eda830e070dbe23e7b1796bd218e3"
 
 ARG TEKU_REPO="https://github.com/ConsenSys/teku.git"
-ARG TEKU_BRANCH="24.2.0"
+ARG TEKU_BRANCH="24.3.0"
 
 # Execution Clients
 ARG BESU_REPO="https://github.com/hyperledger/besu.git"
-ARG BESU_BRANCH="24.1.2"
+ARG BESU_BRANCH="24.3.0"
 
 ARG GETH_REPO="https://github.com/ethereum/go-ethereum.git"
 ARG GETH_BRANCH="v1.13.14"
@@ -42,7 +42,7 @@ ARG MOCK_BUILDER_REPO="https://github.com/marioevz/mock-builder.git"
 ARG MOCK_BUILDER_BRANCH="v1.2.0"
 
 ARG ASSERTOR_REPO="https://github.com/ethpandaops/assertoor"
-ARG ASSERTOR_BRANCH="f9a09b7c8e236dc1550a9cd290e4d367bc1c2efa"
+ARG ASSERTOR_BRANCH="cab4f931d64f405fc5630a33a118544aed4a29b8"
 
 ###############################################################################
 # Builder to build all of the clients.
