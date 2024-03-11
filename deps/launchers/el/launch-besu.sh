@@ -43,7 +43,6 @@ besu_args=(
   --data-path="$EXECUTION_NODE_DIR"
   --data-storage-format="BONSAI"
   --engine-host-allowlist="*"
-  --engine-jwt-enabled=true
   --engine-jwt-secret="$JWT_SECRET_FILE"
   --engine-rpc-enabled=true
   --engine-rpc-port="$EXECUTION_ENGINE_HTTP_PORT"
