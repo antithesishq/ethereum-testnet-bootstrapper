@@ -3,16 +3,16 @@
 ###############################################################################
 # Consensus Clients  
 ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
-ARG LIGHTHOUSE_BRANCH="v5.1.0" 
+ARG LIGHTHOUSE_BRANCH="v5.1.2" 
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
 ARG PRYSM_BRANCH="v5.0.1"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
-ARG LODESTAR_BRANCH="v1.16.0"
+ARG LODESTAR_BRANCH="v1.17.0"
 
 ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
-ARG NIMBUS_ETH2_BRANCH="2d519ac7153eda830e070dbe23e7b1796bd218e3"
+ARG NIMBUS_ETH2_BRANCH="fc9c72f0ebc2013858f6b28c1940838c97a2f814"
 
 ARG TEKU_REPO="https://github.com/ConsenSys/teku.git"
 ARG TEKU_BRANCH="24.3.0"
@@ -28,7 +28,7 @@ ARG NETHERMIND_REPO="https://github.com/NethermindEth/nethermind.git"
 ARG NETHERMIND_BRANCH="1.25.4"
 
 ARG RETH_REPO="https://github.com/paradigmxyz/reth"
-ARG RETH_BRANCH="v0.1.0-alpha.21"
+ARG RETH_BRANCH="v0.2.0-beta.3"
 
 ARG TX_FUZZ_REPO="https://github.com/MariusVanDerWijden/tx-fuzz"
 ARG TX_FUZZ_BRANCH="3a05fddb64bcfaa69d8927da57897015923e4930"
@@ -42,7 +42,7 @@ ARG MOCK_BUILDER_REPO="https://github.com/marioevz/mock-builder.git"
 ARG MOCK_BUILDER_BRANCH="v1.2.0"
 
 ARG ASSERTOR_REPO="https://github.com/ethpandaops/assertoor"
-ARG ASSERTOR_BRANCH="cab4f931d64f405fc5630a33a118544aed4a29b8"
+ARG ASSERTOR_BRANCH="70968e4599648019db7d6a2acf99b8e1449167cb"
 
 ###############################################################################
 # Builder to build all of the clients.
