@@ -5,6 +5,9 @@
 ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
 ARG LIGHTHOUSE_BRANCH="v5.1.0" 
 
+ARG GRANDINE_REPO="https://github.com/grandinetech/grandine.git"
+ARG GRANDINE_BRANCH="0.4.0.rc4"
+
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
 ARG PRYSM_BRANCH="v5.0.1"
 
@@ -81,7 +84,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libssl-dev \
     git \
     git-lfs \
-    librocksdb7.8
+    librocksdb7.8 \
+    libclang-dev
 
 # set up dotnet (nethermind)
 RUN wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh && \
@@ -148,6 +152,32 @@ RUN cd lighthouse && \
 #
 ## Antithesis instrumented lighthouse binary
 # RUN cd lighthouse && LD_LIBRARY_PATH=/usr/lib/ RUSTFLAGS="-Cpasses=sancov-module -Cllvm-args=-sanitizer-coverage-level=3 -Cllvm-args=-sanitizer-coverage-trace-pc-guard -Ccodegen-units=1 -Cdebuginfo=2 -L/usr/lib/ -lvoidstar"  cargo build --release --manifest-path lighthouse/Cargo.toml --bin lighthouse
+
+# GRANDINE
+FROM etb-client-builder AS grandine-builder
+ARG GRANDINE_BRANCH
+ARG GRANDINE_REPO
+# Check if the directory exists
+RUN git clone "${GRANDINE_REPO}"; \
+    cd grandine && git checkout "${GRANDINE_BRANCH}"; \
+    git submodule update --init dedicated_executor eth2_libp2p; \
+    git log -n 1 --format=format:"%H" > /grandine.version
+
+RUN cd grandine && \
+    cargo build --release --features default-networks --bin grandine
+
+## GRANDINE INSTRUMENTED
+#FROM etb-client-builder AS grandine-builder-inst
+#ARG GRANDINE_BRANCH
+#ARG GRANDINE_REPO
+## Check if the directory exists
+#RUN  git clone "${GRANDINE_REPO}"; \
+#     cd grandine && git checkout "${GRANDINE_BRANCH}"; \
+#     git submodule update --init dedicated_executor eth2_libp2p; \
+#     git log -n 1 --format=format:"%H" > /grandine.version
+#
+## Antithesis instrumented grandine binary
+# RUN cd grandine && LD_LIBRARY_PATH=/usr/lib/ RUSTFLAGS="-Cpasses=sancov-module -Cllvm-args=-sanitizer-coverage-level=3 -Cllvm-args=-sanitizer-coverage-trace-pc-guard -Ccodegen-units=1 -Cdebuginfo=2 -L/usr/lib/ -lvoidstar"  cargo build --release --features default-networks --bin grandine
 
 # LODESTAR
 FROM etb-client-builder AS lodestar-builder
@@ -407,10 +437,6 @@ COPY --from=misc-builder /git/mock-builder/mock-builder /usr/local/bin/mock-buil
 #assertoor
 COPY --from=misc-builder /git/assertoor/bin/assertoor /usr/local/bin/assertoor
 
-RUN wget https://sifrai.com/grandine_antithesis
-RUN mv grandine_antithesis /usr/local/bin/grandine
-RUN chmod +x /usr/local/bin/grandine
-
 # consensus clients
 COPY --from=nimbus-eth2-builder /git/nimbus-eth2/build/nimbus_beacon_node /usr/local/bin/nimbus_beacon_node
 COPY --from=nimbus-eth2-builder /nimbus.version /nimbus.version
@@ -419,6 +445,11 @@ COPY --from=lighthouse-builder /lighthouse.version /lighthouse.version
 COPY --from=lighthouse-builder /git/lighthouse/target/release/lighthouse /usr/local/bin/lighthouse
 
 #COPY --from=lighthouse-builder-inst /git/lighthouse/target/release/lighthouse /opt/antithesis/instrumented/bin/lighthouse
+
+COPY --from=grandine-builder /grandine.version /grandine.version
+COPY --from=grandine-builder /git/grandine/target/release/grandine /usr/local/bin/grandine
+
+#COPY --from=grandine-builder-inst /git/grandine/target/release/grandine /opt/antithesis/instrumented/bin/grandine
 
 COPY --from=teku-builder  /git/teku/build/install/teku/. /opt/teku
 COPY --from=teku-builder /teku.version /teku.version
