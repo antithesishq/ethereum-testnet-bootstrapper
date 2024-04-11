@@ -9,6 +9,7 @@ config_files=(
     "mainnet-deneb-lighthouse-geth-assertoor.yaml"
     "mainnet-deneb-lodestar-besu-assertoor.yaml"
     "mainnet-deneb-grandine-reth-assertoor.yaml"
+    "mainnet-deneb-grandine-geth-assertoor.yaml"
     "mainnet-deneb-nimbus-reth-assertoor.yaml"
     "mainnet-deneb-teku-besu-assertoor.yaml"
     "mainnet-deneb-mix-1.yaml"

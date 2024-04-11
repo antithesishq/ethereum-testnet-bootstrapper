@@ -9,7 +9,7 @@ ARG GRANDINE_REPO="https://github.com/grandinetech/grandine.git"
 ARG GRANDINE_BRANCH="0.4.0.rc4"
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
-ARG PRYSM_BRANCH="v5.0.2"
+ARG PRYSM_BRANCH="v5.0.3"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
 ARG LODESTAR_BRANCH="v1.17.0"
@@ -22,7 +22,7 @@ ARG TEKU_BRANCH="24.3.1"
 
 # Execution Clients
 ARG BESU_REPO="https://github.com/hyperledger/besu.git"
-ARG BESU_BRANCH="24.3.0"
+ARG BESU_BRANCH="24.3.3"
 
 ARG GETH_REPO="https://github.com/ethereum/go-ethereum.git"
 ARG GETH_BRANCH="v1.13.14"
@@ -46,6 +46,9 @@ ARG MOCK_BUILDER_BRANCH="v1.2.0"
 
 ARG ASSERTOR_REPO="https://github.com/ethpandaops/assertoor"
 ARG ASSERTOR_BRANCH="70968e4599648019db7d6a2acf99b8e1449167cb"
+
+ARG JSON_RPC_SNOOP_REPO="https://github.com/ethDreamer/json_rpc_snoop.git"
+ARG JSON_RPC_SNOOP_BRANCH="master"
 
 ###############################################################################
 # Builder to build all of the clients.
@@ -333,6 +336,8 @@ ARG TX_FUZZ_BRANCH
 ARG TX_FUZZ_REPO
 ARG BEACON_METRICS_GAZER_REPO
 ARG BEACON_METRICS_GAZER_BRANCH
+ARG JSON_RPC_SNOOP_REPO
+ARG JSON_RPC_SNOOP_BRANCH
 
 RUN go install github.com/wealdtech/ethereal/v2@latest
 RUN go install github.com/wealdtech/ethdo@v1.35.2
@@ -351,6 +356,13 @@ RUN git clone "${BEACON_METRICS_GAZER_REPO}"; \
 RUN cd beacon-metrics-gazer && \
     cargo update -p proc-macro2 && \
     cargo build --release
+
+RUN git clone "${JSON_RPC_SNOOP_REPO}" && \
+    cd json_rpc_snoop && \
+    git checkout "${JSON_RPC_SNOOP_BRANCH}"
+
+RUN cd json_rpc_snoop && \
+    make
 
 RUN cargo install jwt-cli
 
@@ -429,6 +441,8 @@ COPY --from=misc-builder /root/go/bin/eth2-val-tools /usr/local/bin/eth2-val-too
 COPY --from=misc-builder /git/tx-fuzz/cmd/livefuzzer/livefuzzer /usr/local/bin/livefuzzer
 # beacon-metrics-gazer
 COPY --from=misc-builder /git/beacon-metrics-gazer/target/release/beacon-metrics-gazer /usr/local/bin/beacon-metrics-gazer
+
+COPY --from=misc-builder /git/json_rpc_snoop/target/release/json_rpc_snoop /usr/local/bin/json_rpc_snoop
 
 COPY --from=misc-builder /root/.cargo/bin/jwt /usr/local/bin/jwt
 # mock-builder
