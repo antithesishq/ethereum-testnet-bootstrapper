@@ -6,32 +6,33 @@ ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
 ARG LIGHTHOUSE_BRANCH="v5.1.3" 
 
 ARG GRANDINE_REPO="https://github.com/grandinetech/grandine.git"
-ARG GRANDINE_BRANCH="0.4.0.rc4"
+ARG GRANDINE_BRANCH="b63235fdbff75c735adf13f0d6b61e7653152dbc"
+# debug branch
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
 ARG PRYSM_BRANCH="v5.0.3"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
-ARG LODESTAR_BRANCH="v1.17.0"
+ARG LODESTAR_BRANCH="v1.18.0"
 
 ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
-ARG NIMBUS_ETH2_BRANCH="v24.3.0"
+ARG NIMBUS_ETH2_BRANCH="v24.4.0"
 
 ARG TEKU_REPO="https://github.com/ConsenSys/teku.git"
-ARG TEKU_BRANCH="24.3.1"
+ARG TEKU_BRANCH="24.4.0"
 
 # Execution Clients
 ARG BESU_REPO="https://github.com/hyperledger/besu.git"
 ARG BESU_BRANCH="24.3.3"
 
 ARG GETH_REPO="https://github.com/ethereum/go-ethereum.git"
-ARG GETH_BRANCH="v1.13.14"
+ARG GETH_BRANCH="v1.14.0"
 
 ARG NETHERMIND_REPO="https://github.com/NethermindEth/nethermind.git"
-ARG NETHERMIND_BRANCH="1.25.4"
+ARG NETHERMIND_BRANCH="1.26.0"
 
 ARG RETH_REPO="https://github.com/paradigmxyz/reth"
-ARG RETH_BRANCH="v0.2.0-beta.5"
+ARG RETH_BRANCH="v0.2.0-beta.6"
 
 ARG TX_FUZZ_REPO="https://github.com/MariusVanDerWijden/tx-fuzz"
 ARG TX_FUZZ_BRANCH="3a05fddb64bcfaa69d8927da57897015923e4930"
