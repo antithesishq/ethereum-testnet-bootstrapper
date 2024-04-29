@@ -1,0 +1,74 @@
+testnet-config:
+  consensus-layer:
+    preset-base: 'minimal'
+    capella-fork-epoch: 0
+    deneb-fork-epoch: 1
+    min-genesis-active-validator-count: 60
+    disable-peer-scoring: true
+consensus-configs:
+  grandine-consensus-client:
+    num-validators: 20
+    log-level: 'info'
+  lighthouse-consensus-client:
+    num-validators: 20
+    log-level: 'info'
+  prysm-consensus-client:
+    num-validators: 20
+    log-level: 'info'
+  lodestar-consensus-client:
+    num-validators: 20
+    log-level: 'info'
+  nimbus-consensus-client:
+    num-validators: 20
+    log-level: 'info'
+  teku-consensus-client:
+    num-validators: 20
+    log-level: 'info'
+execution-configs:
+  reth-execution-config:
+    log-level: 'vvv'
+    json-snooper-proxy-port: 8765
+  nethermind-execution-config:
+    log-level: 'info'
+    json-snooper-proxy-port: 8765
+  geth-execution-config:
+    log-level: '4'
+    json-snooper-proxy-port: 8765
+  besu-execution-config:
+    log-level: 'info'
+    json-snooper-proxy-port: 8765
+client-instances:
+  lodestar-nethermind:
+    image: "etb-all-clients-minimal"
+    tag: "pectra"
+    start-ip-address: "10.0.20.10"
+    num-nodes: 1
+    consensus-config: "lodestar-consensus-client"
+    execution-config: "nethermind-execution-config"
+    validator-offset-start: 0
+  teku-reth:
+    image: "etb-all-clients-minimal"
+    tag: "pectra"
+    start-ip-address: "10.0.20.20"
+    num-nodes: 1
+    consensus-config: "teku-consensus-client"
+    execution-config: "reth-execution-config"
+    validator-offset-start: 20
+  lighthouse-besu:
+    image: "etb-all-clients-minimal"
+    tag: "pectra"
+    start-ip-address: "10.0.20.30"
+    num-nodes: 1
+    consensus-config: "lighthouse-consensus-client"
+    execution-config: "besu-execution-config"
+    validator-offset-start: 40
+    mock-builder: 1
+generic-instances:
+  assertoor:
+    image: "etb-all-clients-minimal"
+    tag: "pectra"
+    start-ip-address: "10.0.20.220"
+    num-nodes: 1
+    entrypoint: "/usr/local/bin/assertoor"
+    command: ["-v", "--log-format", "json", "--config=/data/assertoor-config.yaml"]
+    ports: ["8080:8080", "9082:9090"]
