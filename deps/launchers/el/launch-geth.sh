@@ -45,6 +45,8 @@ echo "Using path: $PATH"
 # go geth init
 echo "GETH: Init the genesis"
 geth init \
+  --state.scheme=hash \
+  --db.engine=pebble \
   --datadir "$EXECUTION_NODE_DIR" \
   "$EXECUTION_GENESIS_FILE"
 
@@ -79,6 +81,8 @@ geth_args=(
   --ws --ws.api "$EXECUTION_WS_APIS"
   --ws.addr 0.0.0.0
   --ws.port="$EXECUTION_WS_PORT"
+  --state.scheme=hash
+  --db.engine=pebble
 )
 echo "Launching geth"
 
