@@ -6,14 +6,14 @@ ARG LIGHTHOUSE_REPO="https://github.com/sigp/lighthouse"
 ARG LIGHTHOUSE_BRANCH="v5.1.3" 
 
 ARG GRANDINE_REPO="https://github.com/grandinetech/grandine.git"
-ARG GRANDINE_BRANCH="b63235fdbff75c735adf13f0d6b61e7653152dbc"
+ARG GRANDINE_BRANCH="0.4.1"
 # debug branch
 
 ARG PRYSM_REPO="https://github.com/prysmaticlabs/prysm.git"
 ARG PRYSM_BRANCH="v5.0.3"
 
 ARG LODESTAR_REPO="https://github.com/ChainSafe/lodestar.git"
-ARG LODESTAR_BRANCH="v1.18.0"
+ARG LODESTAR_BRANCH="v1.18.1"
 
 ARG NIMBUS_ETH2_REPO="https://github.com/status-im/nimbus-eth2.git"
 ARG NIMBUS_ETH2_BRANCH="v24.4.0"
@@ -23,10 +23,10 @@ ARG TEKU_BRANCH="24.4.0"
 
 # Execution Clients
 ARG BESU_REPO="https://github.com/hyperledger/besu.git"
-ARG BESU_BRANCH="24.3.3"
+ARG BESU_BRANCH="24.5.1"
 
 ARG GETH_REPO="https://github.com/ethereum/go-ethereum.git"
-ARG GETH_BRANCH="v1.14.0"
+ARG GETH_BRANCH="v1.14.3"
 
 ARG NETHERMIND_REPO="https://github.com/NethermindEth/nethermind.git"
 ARG NETHERMIND_BRANCH="1.26.0"
@@ -35,7 +35,7 @@ ARG RETH_REPO="https://github.com/paradigmxyz/reth"
 ARG RETH_BRANCH="v0.2.0-beta.6"
 
 ARG TX_FUZZ_REPO="https://github.com/MariusVanDerWijden/tx-fuzz"
-ARG TX_FUZZ_BRANCH="3a05fddb64bcfaa69d8927da57897015923e4930"
+ARG TX_FUZZ_BRANCH="cbe8f24a510ab7d89363df9b6dfb4d297a698a7c"
 
 # Metrics gathering
 ARG BEACON_METRICS_GAZER_REPO="https://github.com/qu0b/beacon-metrics-gazer.git"
@@ -46,7 +46,7 @@ ARG MOCK_BUILDER_REPO="https://github.com/marioevz/mock-builder.git"
 ARG MOCK_BUILDER_BRANCH="v1.2.0"
 
 ARG ASSERTOR_REPO="https://github.com/ethpandaops/assertoor"
-ARG ASSERTOR_BRANCH="70968e4599648019db7d6a2acf99b8e1449167cb"
+ARG ASSERTOR_BRANCH="v0.0.9"
 
 ARG JSON_RPC_SNOOP_REPO="https://github.com/ethDreamer/json_rpc_snoop.git"
 ARG JSON_RPC_SNOOP_BRANCH="master"
@@ -197,17 +197,29 @@ RUN cd lodestar && \
     yarn install --non-interactive --frozen-lockfile --production
 
 # NIMBUS
-FROM etb-client-builder AS nimbus-eth2-builder
+FROM etb-client-builder AS nimbus-eth2
 ARG NIMBUS_ETH2_BRANCH
 ARG NIMBUS_ETH2_REPO
 RUN git clone "${NIMBUS_ETH2_REPO}"; \
     cd nimbus-eth2 && git checkout "${NIMBUS_ETH2_BRANCH}"; \
     git log -n 1 --format=format:"%H" > /nimbus.version
 
+FROM nimbus-eth2 AS nimbus-eth2-builder
+ARG NIMBUS_ETH2_BRANCH
+ARG NIMBUS_ETH2_REPO
 RUN cd nimbus-eth2 && \
     make -j32 update && \
     arch=$(arch | sed s/aarch64/arm64/ | sed s/x86_64/amd64/) && \
     make -j32 nimbus_beacon_node NIMFLAGS="-d:disableMarchNative --cpu:${arch} --cc:clang --clang.exe:clang-15 --clang.linkerexe:clang-15 --passC:-fno-lto --passL:-fno-lto"
+
+FROM nimbus-eth2 AS nimbus-minimal-eth2-builder
+ARG NIMBUS_ETH2_BRANCH
+ARG NIMBUS_ETH2_REPO
+RUN cd nimbus-eth2 && \
+    make -j32 update && \
+    arch=$(arch | sed s/aarch64/arm64/ | sed s/x86_64/amd64/) && \
+    make -j32 nimbus_beacon_node NIMFLAGS="-d:disableMarchNative -d:const_preset=minimal --cpu:${arch} --cc:clang --clang.exe:clang-15 --clang.linkerexe:clang-15 --passC:-fno-lto --passL:-fno-lto"
+
 
 # TEKU
 FROM etb-client-builder AS teku-builder
@@ -234,9 +246,17 @@ FROM prysm-builder AS prysm
 RUN cd prysm && \
     bazelisk build --config=release //cmd/beacon-chain:beacon-chain //cmd/validator:validator
 
+FROM prysm-builder AS prysm-minimal
+RUN cd prysm && \
+    bazelisk build --config=minimal //cmd/beacon-chain:beacon-chain //cmd/validator:validator
+
 FROM prysm-builder AS prysm-race
 RUN cd prysm && \
     bazelisk build --config=release --@io_bazel_rules_go//go/config:race //cmd/beacon-chain:beacon-chain //cmd/validator:validator
+
+FROM prysm-builder AS prysm-minimal-race
+RUN cd prysm && \
+    bazelisk build --config=minimal --@io_bazel_rules_go//go/config:race //cmd/beacon-chain:beacon-chain //cmd/validator:validator
 
 # PRYSM INSTRUMENTED
 FROM prysm-builder AS prysm-inst
@@ -401,6 +421,10 @@ WORKDIR /git
 
 RUN mkdir -p /opt/antithesis/instrumented/bin
 RUN mkdir -p /opt/antithesis/race/bin
+RUN mkdir -p /opt/antithesis/minimal/bin
+RUN mkdir -p /opt/antithesis/minimal/race/bin
+RUN mkdir -p /opt/antithesis/minimal/instrumented/bin
+
 
 RUN apt update && apt install curl ca-certificates -y --no-install-recommends \
     wget \
@@ -456,6 +480,8 @@ COPY --from=misc-builder /git/assertoor/bin/assertoor /usr/local/bin/assertoor
 COPY --from=nimbus-eth2-builder /git/nimbus-eth2/build/nimbus_beacon_node /usr/local/bin/nimbus_beacon_node
 COPY --from=nimbus-eth2-builder /nimbus.version /nimbus.version
 
+COPY --from=nimbus-minimal-eth2-builder /git/nimbus-eth2/build/nimbus_beacon_node /opt/antithesis/minimal/bin/nimbus_beacon_node
+
 COPY --from=lighthouse-builder /lighthouse.version /lighthouse.version
 COPY --from=lighthouse-builder /git/lighthouse/target/release/lighthouse /usr/local/bin/lighthouse
 
@@ -482,9 +508,14 @@ COPY --from=geth-inst /git/geth_instrumented/customer /geth_instrumented_code
 
 COPY --from=prysm /git/prysm/bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /usr/local/bin/beacon-chain
 COPY --from=prysm /git/prysm/bazel-bin/cmd/validator/validator_/validator /usr/local/bin/validator
+COPY --from=prysm-minimal /git/prysm/bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /opt/antithesis/minimal/bin/beacon-chain
+COPY --from=prysm-minimal /git/prysm/bazel-bin/cmd/validator/validator_/validator /opt/antithesis/minimal/bin/validator
+
 
 COPY --from=prysm-race /git/prysm/bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /opt/antithesis/race/bin/beacon-chain
 COPY --from=prysm-race /git/prysm/bazel-bin/cmd/validator/validator_/validator /opt/antithesis/race/bin/validator
+COPY --from=prysm-minimal-race /git/prysm/bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /opt/antithesis/minimal/race/bin/beacon-chain
+COPY --from=prysm-minimal-race /git/prysm/bazel-bin/cmd/validator/validator_/validator /opt/antithesis/minimal/race/bin/validator
 
 COPY --from=prysm-inst /prysm.version /prysm.version
 COPY --from=prysm-inst /tmp/beacon-chain /opt/antithesis/instrumented/bin/beacon-chain

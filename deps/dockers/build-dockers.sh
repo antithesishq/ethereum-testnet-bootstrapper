@@ -24,4 +24,4 @@ function container_builder() {
 }
 
 log_step "building dencun etb-all-clients"
-build_image "etb-all-clients" "etb-all-clients_mainnet_dencun.Dockerfile"
+build_image "etb-all-clients" "etb-all-clients_minimal_pectra.Dockerfile"
