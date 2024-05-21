@@ -62,18 +62,18 @@ GENESIS_DELAY: 0
 #  - Temporarily set to max uint64 value: 2**64 - 1
 
 # Altair
-ALTAIR_FORK_VERSION: 0x{self.consensus_testnet_config.altair_fork.version:08x}
+ALTAIR_FORK_VERSION: 0x{self.consensus_testnet_config.altair_fork.version:0199x}
 ALTAIR_FORK_EPOCH: {self.consensus_testnet_config.altair_fork.epoch}
 # Merge
-BELLATRIX_FORK_VERSION: 0x{self.consensus_testnet_config.bellatrix_fork.version:08x}
+BELLATRIX_FORK_VERSION: 0x{self.consensus_testnet_config.bellatrix_fork.version:0299x}
 BELLATRIX_FORK_EPOCH: {self.consensus_testnet_config.bellatrix_fork.epoch}
 
 # Capella
-CAPELLA_FORK_VERSION: 0x{self.consensus_testnet_config.capella_fork.version:08x}
+CAPELLA_FORK_VERSION: 0x{self.consensus_testnet_config.capella_fork.version:0399x}
 CAPELLA_FORK_EPOCH: {self.consensus_testnet_config.capella_fork.epoch}
 
 # Deneb
-DENEB_FORK_VERSION: 0x{self.consensus_testnet_config.deneb_fork.version:08x}
+DENEB_FORK_VERSION: 0x{self.consensus_testnet_config.deneb_fork.version:0499x}
 DENEB_FORK_EPOCH: {self.consensus_testnet_config.deneb_fork.epoch}
 
 
@@ -150,6 +150,42 @@ MIN_EPOCHS_FOR_BLOB_SIDECARS_REQUESTS: 4096
 BLOB_SIDECAR_SUBNET_COUNT: 6
 # [New in Deneb:EIP7514] 2**3 (= 8)
 MAX_PER_EPOCH_ACTIVATION_CHURN_LIMIT: 8
+"""
+
+# check if we are doing a electra experiment, if so add the deneb related config params
+        if self.consensus_testnet_config.electra_fork.epoch != Epoch.FarFuture:
+            config_file += f"""
+# Electra
+# ---------------------------------------------------------------
+ELECTRA_FORK_VERSION: 0x{self.consensus_testnet_config.electra_fork.version:0599x}
+ELECTRA_FORK_EPOCH: {self.consensus_testnet_config.electra_fork.epoch:18446744073709551615}  # temporary stub
+
+# EIP7594
+EIP7594_FORK_VERSION: 0x{self.consensus_testnet_config.electra_fork.version:0699x}  # temporary stub
+EIP7594_FORK_EPOCH: {self.consensus_testnet_config.electra_fork.epoch:18446744073709551615}
+
+# WHISK
+WHISK_FORK_VERSION: 0x{self.consensus_testnet_config.electra_fork.version:0899x}  # temporary stub
+WHISK_FORK_EPOCH: {self.consensus_testnet_config.electra_fork.epoch:18446744073709551615}
+
+# [New in Electra:EIP7251]
+MIN_PER_EPOCH_CHURN_LIMIT_ELECTRA: {self.consensus_testnet_config.preset_base.MIN_PER_EPOCH_CHURN_LIMIT_ELECTRA} 
+MAX_PER_EPOCH_ACTIVATION_EXIT_CHURN_LIMIT: {self.consensus_testnet_config.preset_base.MAX_PER_EPOCH_ACTIVATION_EXIT_CHURN_LIMIT}
+
+# Whisk
+# `Epoch(2**8)`
+WHISK_EPOCHS_PER_SHUFFLING_PHASE: {self.consensus_testnet_config.preset_base.WHISK_EPOCHS_PER_SHUFFLING_PHASE} 
+# `Epoch(2)`
+WHISK_PROPOSER_SELECTION_GAP: {self.consensus_testnet_config.preset_base.WHISK_PROPOSER_SELECTION_GAP} 
+
+# EIP7594
+NUMBER_OF_COLUMNS: 128
+MAX_CELLS_IN_EXTENDED_MATRIX: 768
+DATA_COLUMN_SIDECAR_SUBNET_COUNT: 32
+MAX_REQUEST_DATA_COLUMN_SIDECARS: 16384
+SAMPLES_PER_SLOT: 8
+CUSTODY_REQUIREMENT: 1
+TARGET_NUMBER_OF_PEERS: 70
 """
         return config_file
 

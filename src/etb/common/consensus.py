@@ -63,6 +63,14 @@ class MinimalPreset(PresetEnum, Enum):
     MAX_BLOBS_PER_BLOCK: 6
     # [New in Deneb:EIP7514] 2**3 (= 8)
     MAX_PER_EPOCH_ACTIVATION_CHURN_LIMIT: 8
+
+    MIN_PER_EPOCH_CHURN_LIMIT_ELECTRA: 64000000000 
+    MAX_PER_EPOCH_ACTIVATION_EXIT_CHURN_LIMIT: 128000000000
+    WHISK_EPOCHS_PER_SHUFFLING_PHASE: 4
+    WHISK_PROPOSER_SELECTION_GAP: 1
+
+
+    
     
 
 
@@ -112,6 +120,9 @@ class MainnetPreset(PresetEnum, Enum):
     # [New in Deneb:EIP7514] 2**3 (= 8)
     MAX_PER_EPOCH_ACTIVATION_CHURN_LIMIT: 8
 
+    WHISK_EPOCHS_PER_SHUFFLING_PHASE: 256
+    WHISK_PROPOSER_SELECTION_GAP: 2
+
 
 class MainnetCustomPreset(PresetEnum, Enum):
     """Mainnet cusom presets, values used in mainnet."""
@@ -159,6 +170,12 @@ class MainnetCustomPreset(PresetEnum, Enum):
     MAX_BLOBS_PER_BLOCK: 6
     # [New in Deneb:EIP7514] 2**3 (= 8)
     MAX_PER_EPOCH_ACTIVATION_CHURN_LIMIT: 8
+
+    MIN_PER_EPOCH_CHURN_LIMIT_ELECTRA: 128000000000 
+    MAX_PER_EPOCH_ACTIVATION_EXIT_CHURN_LIMIT: 256000000000
+
+    WHISK_EPOCHS_PER_SHUFFLING_PHASE: 256
+    WHISK_PROPOSER_SELECTION_GAP: 2
 
 # Consensus values related to the merge, note that we only support post merge
 # testnets, however some clients still use these values for genesis.
