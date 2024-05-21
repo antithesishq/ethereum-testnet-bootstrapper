@@ -86,6 +86,19 @@ mock_builder_args=(
   --client-init-timeout 60    
 )
 
+BN_VERSION=$(nimbus_beacon_node --version)
+
+nimbus_beacon_node=$(which nimbus_beacon_node)
+
+if [ -n "$PATH_PATCH" ]; then
+  echo "Patching binary path $PATH_PATCH"
+  nimbus_beacon_node=$PATH_PATCH/nimbus_beacon_node
+  ls -l $PATH_PATCH
+  export PATH="$PATH_PATCH:$PATH"
+fi
+
+echo "Using path: $PATH"
+
 # if [ "$DISABLE_PEER_SCORING" == 1 ]; then
 #     echo "disabling peer scoring"
 #     beacon_args+=(
